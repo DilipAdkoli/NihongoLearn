@@ -1,6 +1,12 @@
 # NihongoLearn 🇯🇵
 
-> **Project status: Planning / specification only.** This repository currently contains documentation, not a working app. Everything below is a proposed requirement unless explicitly marked otherwise.
+> **Development checkpoint — first playable lesson.** The Expo app teaches あ・い・う・え・お with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
+
+## Run the app
+
+Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
+
+**Resume here.** TypeScript and seven automated tests passed, including SQLite close/reopen. The lesson opened in desktop and phone-width browsers. Finish the full lesson and reload smoke test, review the draft lesson and synthesized pronunciations, then run `npm run android` with an Android SDK and device. Native prebuild succeeded. APK assembly needs network access to `repo.reactnative.dev` for the React Native and Hermes libraries. Confirm progress and bundled audio on an Android device in airplane mode before marking Phase 1 complete.
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 
@@ -1111,4 +1117,4 @@ These are product inspiration points, not rigorous comparative efficacy findings
 
 ---
 
-**Current state:** comprehensive specification only. **No mobile application, backend, AI model, or deployment has yet been implemented in this repository.**
+**Current implementation and verification status are recorded in the development checkpoint at the top of this README.**

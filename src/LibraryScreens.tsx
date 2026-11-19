@@ -1,0 +1,538 @@
+import { useRef, useState } from "react";
+import {
+  Linking,
+  Pressable,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
+import {
+  ArrowRight,
+  AudioLines,
+  BookOpen,
+  Check,
+  ChevronRight,
+  CircleHelp,
+  ExternalLink,
+  HardDrive,
+  RotateCcw,
+  Sprout,
+} from "lucide-react-native";
+import { kana } from "./learning";
+import { startLesson, useStudy } from "./study";
+import type { Attempt } from "./storage.types";
+
+const ink = "#203730";
+const green = "#215848";
+const muted = "#566860";
+const coral = "#c95634";
+const allIds = kana.map((item) => item.id);
+
+function Heading({ title, detail }: { title: string; detail: string }) {
+  return (
+    <View style={s.heading}>
+      <Text accessibilityRole="header" style={s.title}>
+        {title}
+      </Text>
+      <Text style={s.subtitle}>{detail}</Text>
+    </View>
+  );
+}
+
+function Action({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [s.action, pressed && s.pressed]}
+    >
+      <Text style={s.actionLabel}>{label}</Text>
+      <ArrowRight size={18} color="white" />
+    </Pressable>
+  );
+}
+
+export function Learn() {
+  const { data } = useStudy();
+  const visited = kana.filter((item) => data.seen.includes(item.id)).length;
+  return (
+    <View style={s.page}>
+      <Heading
+        title="Learn"
+        detail="Build your hiragana reading skills, one sound at a time."
+      />
+      <View style={s.feature}>
+        <View style={s.iconLabel}>
+          <BookOpen size={18} color={green} />
+          <Text style={s.kicker}>HIRAGANA</Text>
+        </View>
+        <Text style={s.featureTitle}>The five vowels</Text>
+        <Text style={s.body}>
+          Read and hear each vowel, then identify the characters and type their
+          sounds from memory.
+        </Text>
+        <View style={s.featureFooter}>
+          <Action
+            label={visited ? "Revisit lesson" : "Start lesson"}
+            onPress={() => startLesson(allIds)}
+          />
+          <Text style={s.detail}>{visited} of 5 characters studied</Text>
+        </View>
+      </View>
+      <View style={s.section}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Explore a character
+        </Text>
+        <View style={s.list}>
+          {kana.map((item, index) => (
+            <Pressable
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={`Study ${item.glyph}, ${item.reading}`}
+              onPress={() => startLesson([item.id])}
+              style={({ pressed }) => [
+                s.row,
+                index > 0 && s.rule,
+                pressed && s.pressed,
+              ]}
+            >
+              <View style={s.glyphTile}>
+                <Text style={s.glyph}>{item.glyph}</Text>
+              </View>
+              <View style={s.grow}>
+                <Text style={s.rowTitle}>{item.reading}</Text>
+                <Text style={s.detail}>
+                  {item.example} · {item.meaning}
+                </Text>
+              </View>
+              {data.seen.includes(item.id) && (
+                <Check accessibilityLabel="Studied" size={17} color={green} />
+              )}
+              <ChevronRight size={18} color={muted} />
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
+  let latest: Attempt | undefined;
+  for (const attempt of attempts) {
+    if (
+      attempt.kanaId === id &&
+      attempt.mode === mode &&
+      (!latest || attempt.at >= latest.at)
+    )
+      latest = attempt;
+  }
+  return latest?.correct;
+}
+
+export function Review() {
+  const { data } = useStudy();
+  const studied = kana.filter(
+    (item) =>
+      data.seen.includes(item.id) ||
+      data.attempts.some((a) => a.kanaId === item.id),
+  );
+  const needsPractice = studied.filter(
+    (item) =>
+      latestResult(data.attempts, item.id, "recognition") === false ||
+      latestResult(data.attempts, item.id, "recall") === false,
+  );
+  const focus = needsPractice.length ? needsPractice : studied;
+  let detail = "Study your first vowel lesson to begin a personal review list.";
+  if (studied.length) {
+    detail = needsPractice.length
+      ? "Practice the characters you missed on your latest recognition or recall attempt."
+      : "Practice the characters you have already studied, with recognition and typed recall.";
+  }
+  return (
+    <View style={s.page}>
+      <Heading
+        title="Review"
+        detail="Return to the sounds you’ve been learning."
+      />
+      <View style={s.feature}>
+        <View style={s.iconLabel}>
+          <RotateCcw size={18} color={green} />
+          <Text style={s.kicker}>PERSONAL PRACTICE</Text>
+        </View>
+        <Text style={s.featureTitle}>
+          {needsPractice.length
+            ? "Another look"
+            : studied.length
+              ? "Keep it fresh"
+              : "Your first review"}
+        </Text>
+        <Text style={s.body}>{detail}</Text>
+        {focus.length > 0 && (
+          <View style={s.chips}>
+            {focus.map((item) => (
+              <View style={s.chip} key={item.id}>
+                <Text style={s.glyph}>{item.glyph}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+        <View style={s.featureFooter}>
+          <Action
+            label={focus.length ? "Start review" : "Learn the five vowels"}
+            onPress={() =>
+              focus.length
+                ? startLesson(
+                    focus.map((item) => item.id),
+                    true,
+                  )
+                : startLesson(allIds)
+            }
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
+  const correct = attempts.filter((item) => item.correct).length;
+  return (
+    <View style={s.stat}>
+      <Text style={s.rowTitle}>{label}</Text>
+      <Text style={s.statValue}>
+        {attempts.length
+          ? `${Math.round((correct / attempts.length) * 100)}%`
+          : "—"}
+      </Text>
+      <Text style={s.detail}>
+        {attempts.length
+          ? `${correct} of ${attempts.length} correct`
+          : "No attempts yet"}
+      </Text>
+    </View>
+  );
+}
+
+export function Progress() {
+  const { data } = useStudy();
+  const studied = kana.filter((item) => data.seen.includes(item.id)).length;
+  return (
+    <View style={s.page}>
+      <Heading
+        title="Progress"
+        detail="See what you’ve studied and how you’re answering."
+      />
+      <View style={s.feature}>
+        <View style={s.iconLabel}>
+          <Sprout size={19} color={green} />
+          <Text style={s.kicker}>HIRAGANA VOWELS</Text>
+        </View>
+        <Text style={s.featureTitle}>{studied} of 5 studied</Text>
+        <View
+          style={s.track}
+          accessibilityLabel={`${studied} of five characters studied`}
+        >
+          {kana.map((item) => (
+            <View
+              key={item.id}
+              style={[
+                s.segment,
+                data.seen.includes(item.id) && s.segmentFilled,
+              ]}
+            />
+          ))}
+        </View>
+        {!studied && (
+          <View style={s.featureFooter}>
+            <Action
+              label="Start learning"
+              onPress={() => startLesson(allIds)}
+            />
+          </View>
+        )}
+      </View>
+      <View style={s.stats}>
+        <Score
+          label="Recognition"
+          attempts={data.attempts.filter((a) => a.mode === "recognition")}
+        />
+        <Score
+          label="Typed recall"
+          attempts={data.attempts.filter((a) => a.mode === "recall")}
+        />
+      </View>
+      <View style={s.section}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          By character
+        </Text>
+        <View style={s.list}>
+          {kana.map((item, index) => {
+            const attempts = data.attempts.filter(
+              (attempt) => attempt.kanaId === item.id,
+            );
+            return (
+              <View key={item.id} style={[s.row, index > 0 && s.rule]}>
+                <View style={s.glyphTile}>
+                  <Text style={s.glyph}>{item.glyph}</Text>
+                </View>
+                <View style={s.grow}>
+                  <Text style={s.rowTitle}>{item.reading}</Text>
+                  <Text style={s.detail}>
+                    {attempts.length
+                      ? `${attempts.filter((attempt) => attempt.correct).length} of ${attempts.length} correct`
+                      : data.seen.includes(item.id)
+                        ? "Studied · awaiting practice"
+                        : "Ready to learn"}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+export function Settings() {
+  const { data, changeSound } = useStudy();
+  const [pending, setPending] = useState(false);
+  const [message, setMessage] = useState("");
+  const saving = useRef(false);
+  async function updateSound(value: boolean) {
+    if (saving.current) return;
+    saving.current = true;
+    setPending(true);
+    setMessage("");
+    try {
+      await changeSound(value);
+    } catch {
+      setMessage("Your sound setting could not be saved. Try again.");
+    } finally {
+      saving.current = false;
+      setPending(false);
+    }
+  }
+  return (
+    <View style={s.page}>
+      <Heading title="Settings" detail="Choose how you study on this device." />
+      <View style={s.section}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Study preferences
+        </Text>
+        <View style={s.list}>
+          <View style={s.row}>
+            <AudioLines size={23} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Pronunciation audio</Text>
+              <Text style={s.detail}>
+                Play the Japanese vowel sounds during a lesson.
+              </Text>
+            </View>
+            <Switch
+              value={data.sound}
+              disabled={pending}
+              accessibilityLabel="Pronunciation audio"
+              onValueChange={updateSound}
+              trackColor={{ false: "#bbc4be", true: green }}
+            />
+          </View>
+          {message ? (
+            <Text accessibilityRole="alert" style={s.error}>
+              {message}
+            </Text>
+          ) : null}
+          <View style={[s.row, s.rule]}>
+            <HardDrive size={22} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Local progress</Text>
+              <Text style={s.detail}>
+                This device stores your study history and preferences.
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View style={s.section}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Audio credits
+        </Text>
+        <View style={[s.list, s.credit]}>
+          <CircleHelp size={21} color={green} />
+          <View style={s.grow}>
+            <Text style={s.body}>
+              Kana audio synthesized with HTS Voice Mei, © Nagoya Institute of
+              Technology, CC BY 3.0.
+            </Text>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() =>
+                Linking.openURL(
+                  "https://creativecommons.org/licenses/by/3.0/",
+                ).catch(() =>
+                  setMessage(
+                    "Open creativecommons.org/licenses/by/3.0/ to read the license.",
+                  ),
+                )
+              }
+              style={({ pressed }) => [s.link, pressed && s.pressed]}
+            >
+              <Text style={s.linkText}>Audio license</Text>
+              <ExternalLink size={15} color={green} />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  page: { gap: 26, paddingBottom: 28 },
+  heading: { gap: 6 },
+  title: {
+    fontFamily: "DMSerifText",
+    fontSize: 40,
+    color: ink,
+    lineHeight: 49,
+  },
+  subtitle: {
+    fontFamily: "DMSans",
+    fontSize: 16,
+    lineHeight: 24,
+    color: muted,
+  },
+  feature: {
+    padding: 24,
+    borderRadius: 18,
+    backgroundColor: "#e8efe3",
+    gap: 12,
+    alignItems: "flex-start",
+  },
+  iconLabel: { flexDirection: "row", alignItems: "center", gap: 8 },
+  kicker: {
+    fontFamily: "DMSansBold",
+    fontSize: 11,
+    letterSpacing: 1.7,
+    color: green,
+  },
+  featureTitle: {
+    fontFamily: "DMSerifText",
+    fontSize: 34,
+    color: ink,
+    lineHeight: 41,
+  },
+  body: {
+    fontFamily: "DMSans",
+    fontSize: 16,
+    lineHeight: 24,
+    color: ink,
+    maxWidth: 600,
+  },
+  featureFooter: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 16,
+    marginTop: 5,
+  },
+  action: {
+    minHeight: 46,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 11,
+    backgroundColor: green,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+  },
+  actionLabel: { fontFamily: "DMSansBold", color: "white", fontSize: 15 },
+  pressed: { opacity: 0.72 },
+  section: { gap: 13 },
+  sectionTitle: { fontFamily: "DMSerifText", fontSize: 26, color: ink },
+  list: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#d9dfd3",
+    backgroundColor: "#fffef9",
+    overflow: "hidden",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingVertical: 15,
+    paddingHorizontal: 18,
+  },
+  rule: { borderTopWidth: 1, borderTopColor: "#e3e5db" },
+  grow: { flex: 1, minWidth: 0, gap: 3 },
+  glyphTile: {
+    width: 48,
+    minHeight: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f4eee1",
+  },
+  glyph: { color: ink, fontSize: 26 },
+  rowTitle: { fontFamily: "DMSansBold", color: ink, fontSize: 16 },
+  detail: { fontFamily: "DMSans", fontSize: 14, color: muted, lineHeight: 21 },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
+  chip: {
+    minWidth: 48,
+    minHeight: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f7f8ed",
+    borderRadius: 10,
+  },
+  stats: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  stat: {
+    flexGrow: 1,
+    flexBasis: 130,
+    borderRadius: 15,
+    borderColor: "#d9dfd3",
+    borderWidth: 1,
+    backgroundColor: "#fffef9",
+    padding: 18,
+    gap: 4,
+  },
+  statValue: { fontFamily: "DMSerifText", fontSize: 34, color: green },
+  track: {
+    alignSelf: "stretch",
+    maxWidth: 480,
+    flexDirection: "row",
+    gap: 5,
+    marginVertical: 3,
+  },
+  segment: { flex: 1, height: 7, borderRadius: 5, backgroundColor: "#ccd9c5" },
+  segmentFilled: { backgroundColor: green },
+  error: {
+    fontFamily: "DMSans",
+    color: coral,
+    marginHorizontal: 18,
+    marginBottom: 15,
+  },
+  credit: {
+    flexDirection: "row",
+    gap: 14,
+    padding: 20,
+    alignItems: "flex-start",
+  },
+  link: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    minHeight: 44,
+  },
+  linkText: {
+    fontFamily: "DMSansBold",
+    fontSize: 14,
+    color: green,
+    textDecorationLine: "underline",
+  },
+});
