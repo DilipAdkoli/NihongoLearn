@@ -1,3 +1,5 @@
+import { yoon } from "./yoon.ts";
+
 export type Script = "hiragana" | "katakana";
 
 export type Kana = {
@@ -823,8 +825,37 @@ const katakana: Kana[] = katakanaExamples.map(
   },
 );
 
+const contracted: Kana[] = yoon.map(
+  ([glyph, reading, example, exampleReading, meaning]) => ({
+    id: reading,
+    glyph,
+    script: "hiragana",
+    reading,
+    cue: `Combine ${glyph[0]} with small ${glyph[1]}. Read both together as one beat: ${reading}.`,
+    example,
+    exampleReading,
+    meaning,
+  }),
+);
+
+const contractedLessons = Array.from(
+  { length: contracted.length / 3 },
+  (_, index) => {
+    const row = contracted.slice(index * 3, index * 3 + 3);
+    const glyphs = row.map((item) => item.glyph).join("・");
+    return {
+      script: "hiragana" as const,
+      title: `Small や, ゆ, and よ with ${row[0].glyph[0]}`,
+      notebook: glyphs,
+      detail: `Read ${glyphs} as one beat each. The second kana stays small in writing.`,
+      ids: row.map((item) => item.id),
+    };
+  },
+);
+
 export const kana: readonly Kana[] = [
   ...hiragana.map((item): Kana => ({ ...item, script: "hiragana" })),
+  ...contracted,
   ...katakana,
 ];
 
@@ -833,6 +864,7 @@ export const lessons = [
     ...lesson,
     script: "hiragana" as const,
   })),
+  ...contractedLessons,
   ...hiraganaLessons.slice(0, 10).map((lesson) => {
     const ids = lesson.ids.map((id) => `kata-${id}`);
     const glyphs = katakana
@@ -876,6 +908,7 @@ export function makeExercises(ids: string[]): Exercise[] {
         (other) =>
           other.id !== item.id &&
           other.script === item.script &&
+          other.glyph.length === item.glyph.length &&
           !row?.ids.includes(other.id) &&
           other.reading !== item.reading,
       ),

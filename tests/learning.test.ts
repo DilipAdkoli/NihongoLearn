@@ -24,14 +24,20 @@ test("kana lessons have unique glyphs and examples readable with taught characte
     lessons.flatMap((lesson) => lesson.ids),
     kana.map((item) => item.id),
   );
-  assert.equal(kana.filter((item) => item.script === "hiragana").length, 71);
+  assert.equal(kana.filter((item) => item.script === "hiragana").length, 104);
   assert.equal(kana.filter((item) => item.script === "katakana").length, 46);
   assert.equal(new Set(kana.map((item) => item.glyph)).size, kana.length);
-  const readings = new Map(kana.map((item) => [item.glyph, item.reading]));
+  const readings = [...kana].sort((a, b) => b.glyph.length - a.glyph.length);
   for (const item of kana) {
-    const letters = Array.from(item.example, (symbol) => readings.get(symbol));
-    assert.ok(letters.every(Boolean));
-    assert.equal(letters.join(""), item.exampleReading.replaceAll(" ", ""));
+    let remaining = item.example;
+    let romaji = "";
+    while (remaining) {
+      const match = readings.find((entry) => remaining.startsWith(entry.glyph));
+      assert.ok(match, `Untaught kana in ${item.example}: ${remaining}`);
+      romaji += match.reading;
+      remaining = remaining.slice(match.glyph.length);
+    }
+    assert.equal(romaji, item.exampleReading.replaceAll(" ", ""));
   }
 });
 
