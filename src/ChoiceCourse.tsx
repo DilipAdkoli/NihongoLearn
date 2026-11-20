@@ -1,5 +1,5 @@
 import { Link, type Href } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import type { Attempt } from "./storage.types";
@@ -38,6 +38,7 @@ type Course =
   | "vocabulary-recall"
   | "counters"
   | "prices"
+  | "beginner-check"
   | "sound-listening";
 
 type PassageData = {
@@ -400,6 +401,7 @@ function Passage({ japanese, standardJapanese, english, audio }: PassageData) {
 export function ChoiceCourse({
   title,
   description,
+  children,
   course,
   groups,
   backHref = "/learn",
@@ -411,6 +413,7 @@ export function ChoiceCourse({
 }: {
   title: string;
   description?: string;
+  children?: ReactNode;
   course: Course;
   groups: readonly CourseGroup[];
   backHref?: Href;
@@ -445,6 +448,7 @@ export function ChoiceCourse({
         {title}
       </Text>
       {description && <Text style={s.body}>{description}</Text>}
+      {children}
       {showTopics && (
         <View
           accessibilityRole="tablist"

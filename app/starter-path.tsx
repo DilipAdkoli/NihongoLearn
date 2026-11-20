@@ -65,6 +65,11 @@ export default function StarterPath() {
           style={[s.fill, { width: `${(100 * completed) / steps.length}%` }]}
         />
       </View>
+      {!next && (
+        <Link href="/beginner-check" style={s.back}>
+          Try the beginner skill check ›
+        </Link>
+      )}
       {steps.map((step) => (
         <View
           key={step.id}

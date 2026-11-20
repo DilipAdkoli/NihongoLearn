@@ -145,6 +145,12 @@ const lessonLinks = [
     icon: Sprout,
   },
   {
+    href: "/beginner-check",
+    title: "Beginner skill check",
+    detail: "Check your vocabulary, grammar, reading, and listening",
+    icon: CircleHelp,
+  },
+  {
     href: "/numbers",
     title: "Count from 1 to 99",
     detail: "Read Japanese numbers and practice the tens",
