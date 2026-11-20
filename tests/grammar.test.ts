@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { comparisons } from "../src/comparisons.ts";
 import { existence } from "../src/existence.ts";
 import {
   adjectives,
@@ -20,6 +21,7 @@ test("grammar lessons have stable IDs and a single selectable answer each", () =
     ...particles,
     ...verbs,
     ...adjectives,
+    ...comparisons,
     ...teForm,
   ];
   assert.equal(
@@ -75,5 +77,12 @@ test("everyday questions cover time, people, things, prices, and methods", () =>
   assert.deepEqual(
     questionWords.map((lesson) => lesson.answer),
     ["いつ", "だれ", "なん", "いくら", "どうやって"],
+  );
+});
+
+test("comparison questions cover より, ほうが, どちら, and いちばん", () => {
+  assert.deepEqual(
+    comparisons.map((lesson) => lesson.answer),
+    ["より", "ほうが", "どちら", "いちばん"],
   );
 });

@@ -1,4 +1,5 @@
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { comparisons } from "../src/comparisons";
 import { existence } from "../src/existence";
 import {
   adjectives,
@@ -24,6 +25,7 @@ export default function Grammar() {
         { title: "Objects, places, and destinations", lessons: particles },
         { title: "Polite verb forms", lessons: verbs },
         { title: "Describing things", lessons: adjectives },
+        { title: "Comparing things", lessons: comparisons },
         { title: "Requests with the て-form", lessons: teForm },
       ]}
     />
