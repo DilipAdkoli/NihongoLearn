@@ -10,6 +10,7 @@ import {
   teForm,
   verbs,
 } from "./grammar.ts";
+import { nounParticles } from "./nounParticles.ts";
 import { plainVerbs } from "./plainVerbs.ts";
 import { questionWords } from "./questions.ts";
 
@@ -19,6 +20,7 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Ask everyday questions", lessons: questionWords },
   { title: "Say what’s present and where", lessons: existence },
   { title: "Objects, places, and destinations", lessons: particles },
+  { title: "Possession, company, and ranges", lessons: nounParticles },
   { title: "Polite verb forms", lessons: verbs },
   { title: "Describing things", lessons: adjectives },
   { title: "Comparing things", lessons: comparisons },
