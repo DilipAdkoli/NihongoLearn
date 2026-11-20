@@ -54,3 +54,20 @@ export function wordChoices(
   const choices = [entry.meaning, ...alternatives.slice(0, 3)];
   return choices.sort((a, b) => a.localeCompare(b));
 }
+
+export function wordRecallAnswers(
+  entry: GlossaryEntry,
+  entries: readonly GlossaryEntry[],
+) {
+  const meaning = entry.meaning.toLowerCase();
+  const matches = entries.filter(
+    (candidate) => candidate.meaning.toLowerCase() === meaning,
+  );
+  return [
+    ...new Set([
+      entry.kana,
+      entry.spelling,
+      ...matches.flatMap((match) => [match.kana, match.spelling]),
+    ]),
+  ];
+}

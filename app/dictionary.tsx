@@ -59,9 +59,20 @@ export default function Dictionary() {
         ))}
       </View>
       {savedOnly && source.length > 0 && (
-        <Link href="/saved-practice" style={[s.button, s.more, s.buttonLabel]}>
-          Practice saved words
-        </Link>
+        <View style={s.actions}>
+          <Link
+            href="/saved-practice"
+            style={[s.button, s.more, s.buttonLabel]}
+          >
+            Practice saved words
+          </Link>
+          <Link
+            href={{ pathname: "/saved-practice", params: { mode: "recall" } }}
+            style={[s.button, s.more, s.buttonLabel]}
+          >
+            Recall saved words
+          </Link>
+        </View>
       )}
       <TextInput
         accessibilityLabel="Search lesson glossary"

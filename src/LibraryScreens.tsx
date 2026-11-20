@@ -598,6 +598,9 @@ export function Progress() {
   const savedWordAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("saved-words:"),
   );
+  const savedRecallAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("saved-word-recall:"),
+  );
   const loanwordAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("loanwords:"),
   );
@@ -698,6 +701,9 @@ export function Progress() {
       )}
       {!!savedWordAttempts.length && (
         <Score label="Saved words" attempts={savedWordAttempts} />
+      )}
+      {!!savedRecallAttempts.length && (
+        <Score label="Saved word recall" attempts={savedRecallAttempts} />
       )}
       {!!loanwordAttempts.length && (
         <Score label="Loanword sounds" attempts={loanwordAttempts} />

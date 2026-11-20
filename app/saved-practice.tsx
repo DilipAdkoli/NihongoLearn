@@ -1,19 +1,22 @@
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
-import { glossaryKey, wordChoices } from "../src/glossary";
+import { glossaryKey, wordChoices, wordRecallAnswers } from "../src/glossary";
 import { glossaryEntries } from "../src/glossaryEntries";
 import { useStudy } from "../src/study";
 
-export default function SavedPractice() {
+function SavedPracticeBatch({ recall }: { recall: boolean }) {
   const { data } = useStudy();
+  const title = recall ? "Recall saved words" : "Saved word practice";
+  const course = recall ? "saved-word-recall" : "saved-words";
   const [batch] = useState(() => {
     const saved = new Set(data.savedWords);
+    const prefix = `${course}:`;
     const lastAttempt = new Map<string, number>();
     for (const attempt of data.attempts) {
-      if (attempt.kanaId.startsWith("saved-words:")) {
-        const key = attempt.kanaId.slice("saved-words:".length);
+      if (attempt.kanaId.startsWith(prefix)) {
+        const key = attempt.kanaId.slice(prefix.length);
         lastAttempt.set(key, Math.max(lastAttempt.get(key) ?? -1, attempt.at));
       }
     }
@@ -33,7 +36,7 @@ export default function SavedPractice() {
           accessibilityRole="header"
           style={{ fontFamily: "DMSerifText", fontSize: 30, color: "#203730" }}
         >
-          Saved word practice
+          {title}
         </Text>
         <Text style={{ fontFamily: "DMSans", color: "#566860" }}>
           Save a glossary word to start practicing.
@@ -49,26 +52,42 @@ export default function SavedPractice() {
 
   return (
     <ChoiceCourse
-      title="Saved word practice"
-      course="saved-words"
+      title={title}
+      course={course}
       backHref="/dictionary"
       backLabel="‹ Back to glossary"
       groups={[
         {
           lessons: batch.map((entry) => ({
             id: glossaryKey(entry),
-            title: entry.kana,
+            title: recall ? entry.meaning : entry.kana,
             explanation: "",
             japanese: "",
             english: "",
-            prompt: "What does this word mean?",
+            prompt: recall
+              ? "Type the Japanese word in kana or kanji."
+              : "What does this word mean?",
             stem: "",
-            answer: entry.meaning,
-            choices: wordChoices(entry, glossaryEntries),
-            feedback: `${entry.spelling} means ${entry.meaning}.`,
+            answer: recall ? entry.kana : entry.meaning,
+            choices: recall ? [] : wordChoices(entry, glossaryEntries),
+            acceptedAnswers: recall
+              ? wordRecallAnswers(entry, glossaryEntries)
+              : undefined,
+            feedback: `${entry.spelling} (${entry.kana}) means ${entry.meaning}.`,
           })),
         },
       ]}
+    />
+  );
+}
+
+export default function SavedPractice() {
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const recall = mode === "recall";
+  return (
+    <SavedPracticeBatch
+      key={recall ? "recall" : "recognition"}
+      recall={recall}
     />
   );
 }

@@ -34,6 +34,7 @@ type Course =
   | "kanji"
   | "conversation"
   | "saved-words"
+  | "saved-word-recall"
   | "loanwords"
   | "numbers"
   | "time"
