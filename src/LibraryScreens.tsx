@@ -481,6 +481,9 @@ export function Progress() {
   const savedWordAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("saved-words:"),
   );
+  const loanwordAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("loanwords:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -554,6 +557,9 @@ export function Progress() {
       )}
       {!!savedWordAttempts.length && (
         <Score label="Saved words" attempts={savedWordAttempts} />
+      )}
+      {!!loanwordAttempts.length && (
+        <Score label="Loanword sounds" attempts={loanwordAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>

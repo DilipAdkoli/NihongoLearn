@@ -116,3 +116,29 @@ export function searchLoanwords(query: string) {
   }));
   return searchGlossary(entries, query);
 }
+
+export const loanwordPractice = loanwords.map((entry, index) => {
+  const distractors = loanwords
+    .filter((other) => other.sound !== entry.sound)
+    .sort((a, b) => {
+      const similarity = (reading: string) =>
+        Number(reading.endsWith(entry.reading.slice(-1))) +
+        Number(reading.slice(0, -1) === entry.reading.slice(0, -1));
+      return similarity(b.reading) - similarity(a.reading);
+    })
+    .slice(0, 3)
+    .map((other) => other.sound);
+  const choices = distractors.toSpliced(index % 4, 0, entry.sound);
+  return {
+    id: entry.reading,
+    title: entry.meaning,
+    explanation: "",
+    japanese: "",
+    english: "",
+    prompt: `Choose the combination that completes the word for “${entry.meaning}” (${entry.romaji}).`,
+    stem: entry.word.replace(entry.sound, "＿＿"),
+    choices,
+    answer: entry.sound,
+    feedback: `${entry.word} means ${entry.meaning}. ${entry.note}`,
+  };
+});

@@ -45,6 +45,11 @@ export default function Loanwords() {
         Read each combination as one beat. The second kana stays small in
         writing.
       </Text>
+      <Link href="/loanword-practice" asChild>
+        <Pressable accessibilityRole="link" style={s.listen}>
+          <Text style={s.reading}>Practice loanword sounds</Text>
+        </Pressable>
+      </Link>
       <TextInput
         accessibilityLabel="Search loanword sounds"
         value={query}

@@ -26,7 +26,8 @@ type Course =
   | "passage-listening"
   | "kanji"
   | "conversation"
-  | "saved-words";
+  | "saved-words"
+  | "loanwords";
 
 type PassageData = {
   japanese: string;
@@ -276,7 +277,7 @@ export function ChoiceCourse({
   title: string;
   course: Course;
   groups: readonly CourseGroup[];
-  backHref?: "/learn" | "/dictionary";
+  backHref?: "/learn" | "/dictionary" | "/loanwords";
   backLabel?: string;
 }) {
   const { answer } = useStudy();
