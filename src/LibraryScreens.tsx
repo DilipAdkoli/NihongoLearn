@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import {
@@ -203,7 +204,7 @@ const lessonLinks = [
   {
     href: "/vocabulary",
     title: "Everyday vocabulary",
-    detail: "Food, travel, and everyday words",
+    detail: "Food, travel, routines, and weather",
     icon: BookOpen,
   },
   {
@@ -215,7 +216,7 @@ const lessonLinks = [
   {
     href: "/grammar",
     title: "First Japanese sentences",
-    detail: "Polite statements, particles, and verbs",
+    detail: "Beginner grammar, including particles and verb forms",
     icon: BookOpen,
   },
   {
@@ -239,7 +240,7 @@ const lessonLinks = [
   {
     href: "/passage-listening",
     title: "Listen to short passages",
-    detail: "Two speeds and an optional transcript",
+    detail: "Train announcements, weather, and daily routines",
     icon: AudioLines,
   },
   {
@@ -268,109 +269,168 @@ const lessonLinks = [
   },
 ] as const;
 
+function normalizeLessonSearch(text: string) {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFC")
+    .toLowerCase();
+}
+
+const kanaById = new Map(kana.map((item) => [item.id, item.glyph]));
+const kanaLessons = (["hiragana", "katakana"] as const).flatMap((script) =>
+  lessons
+    .filter((lesson) => lesson.script === script)
+    .map((lesson, index) => ({
+      lesson,
+      number: index + 1,
+      searchable: normalizeLessonSearch(
+        `${script} ${lesson.title} ${lesson.detail} ${lesson.ids.map((id) => kanaById.get(id)).join("")}`,
+      ),
+    })),
+);
+
 export function Learn() {
   const { data } = useStudy();
   const [script, setScript] = useState<Script>("hiragana");
+  const [query, setQuery] = useState("");
+  const terms = normalizeLessonSearch(query).split(/\s+/).filter(Boolean);
+  const searching = terms.length > 0;
+  const courses = lessonLinks.filter(({ title, detail }) =>
+    terms.every((term) =>
+      normalizeLessonSearch(title + " " + detail).includes(term),
+    ),
+  );
+  const visibleKana = kanaLessons.filter(({ lesson, searchable }) =>
+    searching
+      ? terms.every((term) => searchable.includes(term))
+      : lesson.script === script,
+  );
   return (
     <View style={s.page}>
       <Heading
         title="Learn"
         detail="Choose a kana lesson or practice everyday Japanese."
       />
-      <View style={s.section}>
-        <Text accessibilityRole="header" style={s.sectionTitle}>
-          Beginner Japanese
-        </Text>
-        <View style={s.courseGrid}>
-          {lessonLinks.map(({ href, title, detail, icon: Icon }) => (
-            <Link key={href} href={href} asChild>
-              <Pressable
-                accessibilityRole="link"
-                style={({ pressed }) => [
-                  s.list,
-                  s.courseLink,
-                  pressed && s.pressed,
-                ]}
-              >
-                <Icon size={18} color={green} />
-                <Text style={s.rowTitle}>{title}</Text>
-                <Text style={s.detail}>{detail}</Text>
-              </Pressable>
-            </Link>
-          ))}
-        </View>
-      </View>
-      <Text accessibilityRole="header" style={s.sectionTitle}>
-        Kana lessons
-      </Text>
-      <View accessibilityRole="tablist" style={s.chartRow}>
-        {(["hiragana", "katakana"] as const).map((option) => (
-          <Pressable
-            key={option}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: script === option }}
-            onPress={() => setScript(option)}
-            style={[s.chartTile, script === option && s.chartStudied]}
-          >
-            <Text style={s.rowTitle}>
-              {option === "hiragana" ? "Hiragana" : "Katakana"}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-      <KanaChart
-        key={script}
-        seen={data.seen}
-        script={script}
-        romaji={data.romaji}
+      <TextInput
+        accessibilityLabel="Search lessons"
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search lessons"
+        placeholderTextColor={muted}
+        autoCorrect={false}
+        autoCapitalize="none"
+        returnKeyType="search"
+        maxLength={100}
+        style={s.search}
       />
-      <View style={s.feature}>
-        <Text style={s.featureTitle}>Check your basic {script}</Text>
-        <Text style={s.body}>
-          Try ten characters across the basic rows. Get a lesson suggestion
-          based on your answers.
-        </Text>
-        <View style={s.featureFooter}>
-          <Action
-            label="Start kana check"
-            onPress={() => startLesson(placementSample(script), "placement")}
-          />
+      {courses.length > 0 && (
+        <View style={s.section}>
+          <Text accessibilityRole="header" style={s.sectionTitle}>
+            Beginner Japanese
+          </Text>
+          <View style={s.courseGrid}>
+            {courses.map(({ href, title, detail, icon: Icon }) => (
+              <Link key={href} href={href} asChild>
+                <Pressable
+                  accessibilityRole="link"
+                  style={({ pressed }) => [
+                    s.list,
+                    s.courseLink,
+                    pressed && s.pressed,
+                  ]}
+                >
+                  <Icon size={18} color={green} />
+                  <Text style={s.rowTitle}>{title}</Text>
+                  <Text style={s.detail}>{detail}</Text>
+                </Pressable>
+              </Link>
+            ))}
+          </View>
         </View>
-      </View>
-      {lessons
-        .filter((lesson) => lesson.script === script)
-        .map((lesson, index) => {
-          const studied = lesson.ids.filter((id) =>
-            data.seen.includes(id),
-          ).length;
-          return (
-            <View key={lesson.title} style={s.feature}>
-              <View style={s.iconLabel}>
-                <BookOpen size={18} color={green} />
-                <Text style={s.kicker}>
-                  {script.toUpperCase()} / LESSON {index + 1}
+      )}
+      {(!searching || visibleKana.length > 0) && (
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Kana lessons
+        </Text>
+      )}
+      {!searching && (
+        <>
+          <View accessibilityRole="tablist" style={s.chartRow}>
+            {(["hiragana", "katakana"] as const).map((option) => (
+              <Pressable
+                key={option}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: script === option }}
+                onPress={() => setScript(option)}
+                style={[s.chartTile, script === option && s.chartStudied]}
+              >
+                <Text style={s.rowTitle}>
+                  {option === "hiragana" ? "Hiragana" : "Katakana"}
                 </Text>
-              </View>
-              <Text style={s.featureTitle}>{lesson.title}</Text>
-              <Text style={s.body}>{lesson.detail}</Text>
-              <View style={s.featureFooter}>
-                <Action
-                  label={
-                    studied === lesson.ids.length
-                      ? "Revisit lesson"
-                      : studied
-                        ? "Continue lesson"
-                        : "Start lesson"
-                  }
-                  onPress={() => startLesson(lesson.ids)}
-                />
-                <Text style={s.detail}>
-                  {studied} of {lesson.ids.length} characters studied
-                </Text>
-              </View>
+              </Pressable>
+            ))}
+          </View>
+          <KanaChart
+            key={script}
+            seen={data.seen}
+            script={script}
+            romaji={data.romaji}
+          />
+          <View style={s.feature}>
+            <Text style={s.featureTitle}>Check your basic {script}</Text>
+            <Text style={s.body}>
+              Try ten characters across the basic rows. Get a lesson suggestion
+              based on your answers.
+            </Text>
+            <View style={s.featureFooter}>
+              <Action
+                label="Start kana check"
+                onPress={() =>
+                  startLesson(placementSample(script), "placement")
+                }
+              />
             </View>
-          );
-        })}
+          </View>
+        </>
+      )}
+      {searching && !courses.length && !visibleKana.length && (
+        <Text accessibilityLiveRegion="polite" style={s.detail}>
+          No lessons match this search.
+        </Text>
+      )}
+      {visibleKana.map(({ lesson, number }) => {
+        const studied = lesson.ids.filter((id) =>
+          data.seen.includes(id),
+        ).length;
+        return (
+          <View key={`${lesson.script}:${lesson.title}`} style={s.feature}>
+            <View style={s.iconLabel}>
+              <BookOpen size={18} color={green} />
+              <Text style={s.kicker}>
+                {lesson.script.toUpperCase()} / LESSON {number}
+              </Text>
+            </View>
+            <Text style={s.featureTitle}>{lesson.title}</Text>
+            <Text style={s.body}>{lesson.detail}</Text>
+            <View style={s.featureFooter}>
+              <Action
+                label={
+                  studied === lesson.ids.length
+                    ? "Revisit lesson"
+                    : studied
+                      ? "Continue lesson"
+                      : "Start lesson"
+                }
+                onPress={() => startLesson(lesson.ids)}
+              />
+              <Text style={s.detail}>
+                {studied} of {lesson.ids.length} characters studied
+              </Text>
+            </View>
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -1077,6 +1137,17 @@ export function Settings() {
 }
 
 const s = StyleSheet.create({
+  search: {
+    minHeight: 46,
+    color: ink,
+    borderColor: "#9bad9e",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontFamily: "DMSans",
+    fontSize: 16,
+    backgroundColor: "#fffef8",
+  },
   page: { gap: 26, paddingBottom: 28 },
   heading: { gap: 6 },
   title: {

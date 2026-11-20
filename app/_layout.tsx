@@ -140,6 +140,7 @@ function Frame() {
           ) : (
             <ScrollView
               key={path}
+              keyboardShouldPersistTaps="handled"
               style={{ flex: 1 }}
               contentContainerStyle={s.scroll}
             >
