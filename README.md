@@ -1,12 +1,21 @@
 # NihongoLearn 🇯🇵
 
-> **Development checkpoint — first playable lesson.** The Expo app teaches あ・い・う・え・お with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
+> **Development checkpoint — kana curriculum.** The Expo app teaches all 46 basic hiragana and 25 kana with dakuten or handakuten across 15 lessons, 33 contracted hiragana sounds across 11 lessons, plus matching basic, voiced, and contracted katakana across 26 lessons, with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
 
 ## Run the app
 
 Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
-**Resume here.** TypeScript and seven automated tests passed, including SQLite close/reopen. The full lesson passed in phone-width and desktop browsers, including a simulated save failure and retry, progress after reload, and review of a missed character. The Android JavaScript bundle exported successfully. Review the draft lesson and synthesized pronunciations, then run `npm run android` with an Android SDK and device. Native prebuild succeeded. APK assembly needs network access to `repo.reactnative.dev` for the React Native and Hermes libraries. Confirm progress and bundled audio on an Android device in airplane mode before marking Phase 1 complete.
+For a web build that can reopen offline, run `npm run export:web` and serve `dist/` from the root of an HTTPS origin or from localhost. Open it once with a connection so the service worker can cache the app and audio.
+
+## Current build
+
+- **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. The sound guide compares small っ and ッ and long vowels.
+- **Beginner lessons.** Practice polite grammar, everyday words, sentence building, weekday kanji, and scripted dialogue. Reading and listening passages offer optional translations. Listening includes two playback speeds and transcripts. The glossary searches lesson words by Japanese, romaji, or English and offers practice with saved words.
+- **Review and progress.** Overview shows due kana and opens the next review batch. FSRS schedules recall from saved answers. A kana check suggests a lesson, and Review offers targeted drills for pairs learners have mixed up. Progress shows separate skill scores and seven days of activity.
+- **Local settings.** Pronunciation audio and kana reading hints can be toggled independently. Settings exports study data as JSON and merges imported progress without changing local preferences.
+
+TypeScript, formatting, and 25 automated tests passed. Browser checks covered lesson and review flows, backup export and import, and persistence across reloads. The Android JavaScript bundle exported successfully. APK assembly still needs access to `repo.reactnative.dev` for React Native and Hermes. Confirm playback and persistence on a physical Android device in airplane mode before marking Phase 1 complete. Draft lesson content and synthesized pronunciation still need human review.
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 
@@ -30,7 +39,7 @@ This README records the full feature vision developed in the project's planning 
 - **C / Core** — initial product and learning foundations.
 - **N / Next** — later versions once foundations work.
 - **A / Advanced** — complex, expensive, experimental, or optional.
-- All feature checkboxes start unchecked: this README is a backlog, not a claim that code exists.
+- The checklist describes the full backlog. The current build is summarized above.
 
 ## Learner journeys
 

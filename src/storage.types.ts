@@ -1,7 +1,7 @@
 export type Attempt = {
   id: string;
   kanaId: string;
-  mode: "recognition" | "recall";
+  mode: "recognition" | "recall" | "listening";
   answer: string;
   correct: boolean;
   at: number;
@@ -9,13 +9,18 @@ export type Attempt = {
 
 export type StudyData = {
   seen: string[];
+  savedWords: string[];
   attempts: Attempt[];
   sound: boolean;
+  romaji: boolean;
 };
+
+export type StudyPreference = "sound" | "romaji";
 
 export type StudyStorage = {
   loadStudy(): Promise<StudyData>;
   markSeen(id: string): Promise<void>;
   recordAttempt(attempt: Attempt): Promise<void>;
-  setSound(value: boolean): Promise<void>;
+  setWordSaved(id: string, saved: boolean): Promise<void>;
+  setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };

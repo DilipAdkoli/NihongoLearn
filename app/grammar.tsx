@@ -1,0 +1,16 @@
+import { ChoiceCourse } from "../src/ChoiceCourse";
+import { grammar, particles, verbs } from "../src/grammar";
+
+export default function Grammar() {
+  return (
+    <ChoiceCourse
+      title="First Japanese sentences"
+      course="grammar"
+      groups={[
+        { title: "Statements and questions", lessons: grammar },
+        { title: "Objects, places, and destinations", lessons: particles },
+        { title: "Polite verb forms", lessons: verbs },
+      ]}
+    />
+  );
+}

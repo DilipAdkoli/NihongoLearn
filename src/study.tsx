@@ -1,3 +1,5 @@
+import type { parseBackup } from "./backup";
+import type { SessionMode } from "./learning";
 import {
   createContext,
   useContext,
@@ -8,13 +10,15 @@ import {
 import { ActivityIndicator, Button, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as storage from "./storage";
-import type { Attempt, StudyData } from "./storage.types";
+import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 type StudyContext = {
   data: StudyData;
   see: (id: string) => Promise<void>;
   answer: (attempt: Attempt) => Promise<void>;
-  changeSound: (enabled: boolean) => Promise<void>;
+  mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
+  saveWord: (id: string, saved: boolean) => Promise<void>;
+  changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
 const Context = createContext<StudyContext | null>(null);
@@ -86,9 +90,53 @@ export function StudyProvider({ children }: PropsWithChildren) {
           : old,
       );
     },
-    async changeSound(enabled) {
-      await storage.setSound(enabled);
-      setData((old) => old && { ...old, sound: enabled });
+    async mergeProgress(backup) {
+      const seen = new Set(data.seen);
+      const answers = new Set(data.attempts.map((attempt) => attempt.id));
+      try {
+        for (const id of backup.seen) {
+          if (!seen.has(id)) await storage.markSeen(id);
+        }
+        for (const id of backup.savedWords) {
+          await storage.setWordSaved(id, true);
+        }
+        for (const attempt of backup.attempts) {
+          if (!answers.has(attempt.id)) await storage.recordAttempt(attempt);
+        }
+      } finally {
+        const persisted = await storage.loadStudy();
+        setData((old) => {
+          if (!old) return persisted;
+          const attempts = new Map(
+            persisted.attempts.map((attempt) => [attempt.id, attempt]),
+          );
+          for (const attempt of old.attempts) {
+            if (!attempts.has(attempt.id)) attempts.set(attempt.id, attempt);
+          }
+          return {
+            ...old,
+            seen: [...new Set([...old.seen, ...persisted.seen])],
+            savedWords: [
+              ...new Set([...old.savedWords, ...persisted.savedWords]),
+            ],
+            attempts: [...attempts.values()],
+          };
+        });
+      }
+    },
+    async saveWord(id, saved) {
+      await storage.setWordSaved(id, saved);
+      setData((old) => {
+        if (!old) return old;
+        const words = new Set(old.savedWords);
+        if (saved) words.add(id);
+        else words.delete(id);
+        return { ...old, savedWords: [...words] };
+      });
+    },
+    async changePreference(name, enabled) {
+      await storage.setPreference(name, enabled);
+      setData((old) => old && { ...old, [name]: enabled });
     },
   };
   return <Context.Provider value={value}>{children}</Context.Provider>;
@@ -100,9 +148,6 @@ export function useStudy() {
   return context;
 }
 
-export function startLesson(ids: string[], review = false) {
-  router.push({
-    pathname: "/session",
-    params: { ids: ids.join(","), review: review ? "1" : "0" },
-  });
+export function startLesson(ids: string[], mode: SessionMode = "study") {
+  router.push({ pathname: "/session", params: { ids: ids.join(","), mode } });
 }

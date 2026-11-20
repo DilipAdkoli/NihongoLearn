@@ -9,17 +9,27 @@ import {
   View,
 } from "react-native";
 import { playKana } from "./audio";
-import { evaluateAnswer, kana, makeExercises, type Kana } from "./learning";
+import {
+  evaluateAnswer,
+  kana,
+  lessons,
+  makeExercises,
+  type Kana,
+  type SessionMode,
+} from "./learning";
+import { recommendedLesson } from "./placement";
 import type { Attempt } from "./storage.types";
 
 type SessionProps = {
   ids: string[];
-  review: boolean;
+  mode: SessionMode;
   sound: boolean;
+  romaji: boolean;
   onSeen: (id: string) => Promise<void>;
   onAttempt: (attempt: Attempt) => Promise<void>;
   onClose: () => void;
   onFinish: () => void;
+  onRecommendedLesson: (ids: string[]) => void;
 };
 
 function Action({
@@ -48,11 +58,11 @@ function Action({
   );
 }
 
-function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
+function ListenButton({ id, label }: { id: string; label: string }) {
   const [audioError, setAudioError] = useState(false);
   async function listen() {
     try {
-      await playKana(item.id);
+      await playKana(id);
       setAudioError(false);
     } catch {
       setAudioError(true);
@@ -60,56 +70,87 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
   }
   return (
     <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        style={({ pressed }) => [s.listen, pressed && s.pressed]}
+        onPress={listen}
+      >
+        <Text style={s.listenText}>♪ Listen</Text>
+      </Pressable>
+      {audioError && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Audio couldn’t play. Tap Listen to retry.
+        </Text>
+      )}
+    </>
+  );
+}
+
+function LessonCard({
+  item,
+  sound,
+  romaji,
+}: {
+  item: Kana;
+  sound: boolean;
+  romaji: boolean;
+}) {
+  return (
+    <>
       <View style={s.studyCard}>
-        <Text style={s.glyph} accessibilityLabel={`Hiragana ${item.reading}`}>
+        <Text
+          style={s.glyph}
+          accessibilityLabel={
+            romaji ? `${item.script} ${item.reading}` : undefined
+          }
+        >
           {item.glyph}
         </Text>
-        <Text style={s.reading}>{item.reading}</Text>
+        {romaji && <Text style={s.reading}>{item.reading}</Text>}
         {sound && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Listen to ${item.reading}`}
-            style={({ pressed }) => [s.listen, pressed && s.pressed]}
-            onPress={listen}
-          >
-            <Text style={s.listenText}>♪ Listen</Text>
-          </Pressable>
+          <ListenButton
+            id={item.id}
+            label={romaji ? `Listen to ${item.reading}` : "Listen to the sound"}
+          />
         )}
-        {audioError && (
-          <Text accessibilityLiveRegion="polite" style={s.error}>
-            Audio couldn’t play. Tap Listen to retry.
+      </View>
+      {romaji && <Text style={s.cue}>{item.cue}</Text>}
+      {item.example && (
+        <View style={s.example}>
+          <Text style={s.label}>IN A WORD</Text>
+          <Text style={s.exampleWord}>
+            {item.example}
+            {romaji && (
+              <Text style={s.exampleReading}> {item.exampleReading}</Text>
+            )}
           </Text>
-        )}
-      </View>
-      <Text style={s.cue}>{item.cue}</Text>
-      <View style={s.example}>
-        <Text style={s.label}>IN A WORD</Text>
-        <Text style={s.exampleWord}>
-          {item.example}{" "}
-          <Text style={s.exampleReading}>{item.exampleReading}</Text>
-        </Text>
-        <Text style={s.body}>{item.meaning}</Text>
-      </View>
+          <Text style={s.body}>{item.meaning}</Text>
+        </View>
+      )}
     </>
   );
 }
 
 export default function Session({
   ids,
-  review,
+  mode,
   sound,
+  romaji,
   onSeen,
   onAttempt,
   onClose,
   onFinish,
+  onRecommendedLesson,
 }: SessionProps) {
+  const listening = mode === "listening";
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
-  const [exercises] = useState(() => makeExercises(ids));
+  const [exercises] = useState(() => makeExercises(ids, mode));
   const [sessionId] = useState(
     () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
   );
   const [stage, setStage] = useState<"lesson" | "quiz" | "results">(
-    review ? "quiz" : "lesson",
+    mode === "study" ? "lesson" : "quiz",
   );
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -179,17 +220,35 @@ export default function Session({
     else setIndex(index + 1);
   }
 
+  const lesson = lessons.find(
+    (entry) =>
+      entry.ids.length === items.length &&
+      items.every((item) => entry.ids.includes(item.id)),
+  );
   const title =
     stage === "lesson"
-      ? "The first five vowels"
+      ? (lesson?.title ?? "Study kana")
       : stage === "results"
         ? "Practice complete"
-        : exercise?.mode === "recognition"
-          ? "Choose the hiragana"
+        : exercise?.mode !== "recall"
+          ? `Choose the ${item?.script ?? "kana"}`
           : "Type the reading";
-  const heading = review ? "Review" : "Hiragana lesson";
+  const heading =
+    mode === "placement"
+      ? "Basic kana check"
+      : listening
+        ? "Listening practice"
+        : mode === "contrast"
+          ? "Compare kana"
+          : mode === "review"
+            ? "Review"
+            : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
+  const suggestion =
+    stage === "results" && mode === "placement"
+      ? recommendedLesson(attempts)
+      : undefined;
   return (
     <ScrollView
       ref={scroll}
@@ -253,27 +312,44 @@ export default function Session({
               {title}
             </Text>
             {stage === "lesson" && item && (
-              <LessonCard key={item.id} item={item} sound={sound} />
+              <LessonCard
+                key={item.id}
+                item={item}
+                sound={sound}
+                romaji={romaji}
+              />
             )}
             {stage === "quiz" && item && (
               <>
-                <View style={s.prompt}>
-                  <Text style={s.label}>
-                    {exercise.mode === "recognition" ? "ROMAJI" : "HIRAGANA"}
-                  </Text>
-                  <Text
-                    style={
-                      exercise.mode === "recognition"
-                        ? s.promptReading
-                        : s.promptGlyph
-                    }
-                  >
-                    {exercise.mode === "recognition"
-                      ? item.reading
-                      : item.glyph}
-                  </Text>
-                </View>
-                {exercise.mode === "recognition" ? (
+                {listening ? (
+                  <View style={s.prompt}>
+                    <ListenButton
+                      key={index}
+                      id={item.id}
+                      label="Listen to the sound"
+                    />
+                  </View>
+                ) : (
+                  <View style={s.prompt}>
+                    <Text style={s.label}>
+                      {exercise.mode === "recognition"
+                        ? "ROMAJI"
+                        : item.script.toUpperCase()}
+                    </Text>
+                    <Text
+                      style={
+                        exercise.mode === "recognition"
+                          ? s.promptReading
+                          : s.promptGlyph
+                      }
+                    >
+                      {exercise.mode === "recognition"
+                        ? item.reading
+                        : item.glyph}
+                    </Text>
+                  </View>
+                )}
+                {exercise.mode !== "recall" ? (
                   <View style={s.choices}>
                     {exercise.choices.map((choice) => (
                       <Pressable
@@ -344,14 +420,19 @@ export default function Session({
                     {countCorrect}{" "}
                     <Text style={s.scoreTotal}>/ {attempts.length}</Text>
                   </Text>
-                  {(["recognition", "recall"] as const).map((mode) => {
+                  {(listening
+                    ? (["listening"] as const)
+                    : (["recognition", "recall"] as const)
+                  ).map((mode) => {
                     const group = attempts.filter((a) => a.mode === mode);
                     return (
                       <View key={mode} style={s.stat}>
                         <Text style={s.body}>
-                          {mode === "recognition"
-                            ? "Recognition"
-                            : "Typed recall"}
+                          {mode === "listening"
+                            ? "Listening"
+                            : mode === "recognition"
+                              ? "Recognition"
+                              : "Typed recall"}
                         </Text>
                         <Text style={s.statNumber}>
                           {group.filter((a) => a.correct).length} /{" "}
@@ -362,6 +443,22 @@ export default function Session({
                   })}
                 </View>
               </>
+            )}
+            {stage === "results" && mode === "placement" && (
+              <View style={s.resultCard}>
+                <Text style={s.label}>WHERE TO PRACTICE NEXT</Text>
+                <Text style={s.body}>
+                  {suggestion
+                    ? suggestion.title
+                    : "All sampled characters were correct. Try a marked or contracted row next."}
+                </Text>
+                {suggestion && (
+                  <Action
+                    label="Open suggested lesson"
+                    onPress={() => onRecommendedLesson(suggestion.ids)}
+                  />
+                )}
+              </View>
             )}
             {!!error && (
               <Text accessibilityLiveRegion="polite" style={s.error}>

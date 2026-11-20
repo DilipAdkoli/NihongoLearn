@@ -1,22 +1,25 @@
-import type { Attempt, StudyData } from "./storage.types";
+import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 export type { Attempt, StudyData } from "./storage.types";
 
 // Separate keys keep writes from different tabs from replacing each other's progress.
 const namespace = "nihongolearn:v1:";
 const seenPrefix = namespace + "seen:";
+const wordPrefix = namespace + "word:";
 const attemptPrefix = namespace + "attempt:";
-const soundKey = namespace + "sound";
 
 export async function loadStudy(): Promise<StudyData> {
   const storage = globalThis.localStorage;
   const seen: string[] = [];
+  const savedWords: string[] = [];
   const attempts: Attempt[] = [];
 
   for (let i = 0; i < storage.length; i++) {
     const key = storage.key(i);
     if (key?.startsWith(seenPrefix)) {
       seen.push(key.slice(seenPrefix.length));
+    } else if (key?.startsWith(wordPrefix) && storage.getItem(key) === "on") {
+      savedWords.push(key.slice(wordPrefix.length));
     } else if (key?.startsWith(attemptPrefix)) {
       const value = storage.getItem(key);
       if (value !== null) attempts.push(JSON.parse(value) as Attempt);
@@ -25,7 +28,13 @@ export async function loadStudy(): Promise<StudyData> {
 
   seen.sort();
   attempts.sort((a, b) => a.at - b.at || a.id.localeCompare(b.id));
-  return { seen, attempts, sound: storage.getItem(soundKey) !== "off" };
+  return {
+    seen,
+    savedWords: savedWords.sort(),
+    attempts,
+    sound: storage.getItem(namespace + "sound") !== "off",
+    romaji: storage.getItem(namespace + "romaji") !== "off",
+  };
 }
 
 export async function markSeen(id: string): Promise<void> {
@@ -39,6 +48,15 @@ export async function recordAttempt(attempt: Attempt): Promise<void> {
   }
 }
 
-export async function setSound(value: boolean): Promise<void> {
-  globalThis.localStorage.setItem(soundKey, value ? "on" : "off");
+export async function setPreference(
+  name: StudyPreference,
+  value: boolean,
+): Promise<void> {
+  globalThis.localStorage.setItem(namespace + name, value ? "on" : "off");
+}
+
+export async function setWordSaved(id: string, saved: boolean): Promise<void> {
+  const key = wordPrefix + id;
+  if (saved) globalThis.localStorage.setItem(key, "on");
+  else globalThis.localStorage.removeItem(key);
 }

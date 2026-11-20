@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
@@ -11,7 +12,6 @@ import {
   ArrowRight,
   AudioLines,
   BookOpen,
-  Check,
   ChevronRight,
   CircleHelp,
   ExternalLink,
@@ -19,15 +19,23 @@ import {
   RotateCcw,
   Sprout,
 } from "lucide-react-native";
-import { kana } from "./learning";
+
+import { ActivityChart } from "./ActivityChart";
+import { createBackup, parseBackup } from "./backup";
+import { pickBackup } from "./pickBackup";
+import { saveBackup } from "./saveBackup";
+import { confusedPairs } from "./confusions";
+import { kana, lessons, type Script } from "./learning";
+import { placementSample } from "./placement";
+import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
-import type { Attempt } from "./storage.types";
+import type { Attempt, StudyPreference } from "./storage.types";
 
 const ink = "#203730";
 const green = "#215848";
 const muted = "#566860";
 const coral = "#c95634";
-const allIds = kana.map((item) => item.id);
+const firstLessonIds = lessons[0].ids;
 
 function Heading({ title, detail }: { title: string; detail: string }) {
   return (
@@ -53,67 +61,240 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
+function KanaChart({
+  seen,
+  script,
+  romaji,
+}: {
+  seen: readonly string[];
+  script: Script;
+  romaji: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const characters = kana.filter((item) => item.script === script);
+  return (
+    <View style={s.list}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded(!expanded)}
+        style={({ pressed }) => [s.row, pressed && s.pressed]}
+      >
+        <View style={s.grow}>
+          <Text style={s.rowTitle}>
+            {script === "hiragana" ? "Hiragana" : "Katakana"} chart
+          </Text>
+          <Text style={s.detail}>
+            {characters.filter((item) => seen.includes(item.id)).length} of{" "}
+            {characters.length} studied
+          </Text>
+        </View>
+        <ChevronRight
+          size={18}
+          color={muted}
+          style={{ transform: [{ rotate: expanded ? "90deg" : "0deg" }] }}
+        />
+      </Pressable>
+      {expanded && (
+        <View style={s.chart}>
+          {lessons
+            .filter((lesson) => lesson.script === script)
+            .map((lesson) => (
+              <View key={lesson.title}>
+                <Text style={s.rowTitle}>{lesson.notebook}</Text>
+                <View style={s.chartRow}>
+                  {kana
+                    .filter((item) => lesson.ids.includes(item.id))
+                    .map((item) => {
+                      const studied = seen.includes(item.id);
+                      return (
+                        <Pressable
+                          key={item.id}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Study ${item.glyph}${romaji ? ", " + item.reading : ""}${studied ? ", already studied" : ""}`}
+                          onPress={() => startLesson([item.id])}
+                          style={({ pressed }) => [
+                            s.chartTile,
+                            studied && s.chartStudied,
+                            pressed && s.pressed,
+                          ]}
+                        >
+                          <Text style={s.glyph}>{item.glyph}</Text>
+                          {romaji && (
+                            <Text style={s.detail}>{item.reading}</Text>
+                          )}
+                        </Pressable>
+                      );
+                    })}
+                </View>
+              </View>
+            ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const lessonLinks = [
+  {
+    href: "/conversation",
+    title: "Everyday dialogue",
+    detail: "Introductions and ordering tea",
+    icon: AudioLines,
+  },
+  {
+    href: "/vocabulary",
+    title: "Everyday vocabulary",
+    detail: "Food, drinks, and familiar objects",
+    icon: BookOpen,
+  },
+  {
+    href: "/grammar",
+    title: "First Japanese sentences",
+    detail: "Polite statements, particles, and verbs",
+    icon: BookOpen,
+  },
+  {
+    href: "/writing",
+    title: "Build a sentence",
+    detail: "Arrange words and particles",
+    icon: BookOpen,
+  },
+  {
+    href: "/kanji",
+    title: "First kanji in context",
+    detail: "The seven days of the week",
+    icon: BookOpen,
+  },
+  {
+    href: "/reading",
+    title: "Beginner reading",
+    detail: "Two short passages with questions",
+    icon: BookOpen,
+  },
+  {
+    href: "/passage-listening",
+    title: "Listen to short passages",
+    detail: "Two speeds and an optional transcript",
+    icon: AudioLines,
+  },
+  {
+    href: "/sound-rules",
+    title: "Sound and spelling rules",
+    detail: "Small っ and ッ, long vowels, and ー",
+    icon: AudioLines,
+  },
+  {
+    href: "/dictionary",
+    title: "Lesson glossary",
+    detail: "Search Japanese, romaji, or English",
+    icon: BookOpen,
+  },
+] as const;
+
 export function Learn() {
   const { data } = useStudy();
-  const visited = kana.filter((item) => data.seen.includes(item.id)).length;
+  const [script, setScript] = useState<Script>("hiragana");
   return (
     <View style={s.page}>
       <Heading
         title="Learn"
-        detail="Build your hiragana reading skills, one sound at a time."
+        detail="Choose a kana lesson or practice everyday Japanese."
       />
-      <View style={s.feature}>
-        <View style={s.iconLabel}>
-          <BookOpen size={18} color={green} />
-          <Text style={s.kicker}>HIRAGANA</Text>
-        </View>
-        <Text style={s.featureTitle}>The five vowels</Text>
-        <Text style={s.body}>
-          Read and hear each vowel, then identify the characters and type their
-          sounds from memory.
-        </Text>
-        <View style={s.featureFooter}>
-          <Action
-            label={visited ? "Revisit lesson" : "Start lesson"}
-            onPress={() => startLesson(allIds)}
-          />
-          <Text style={s.detail}>{visited} of 5 characters studied</Text>
-        </View>
-      </View>
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
-          Explore a character
+          Beginner Japanese
         </Text>
-        <View style={s.list}>
-          {kana.map((item, index) => (
-            <Pressable
-              key={item.id}
-              accessibilityRole="button"
-              accessibilityLabel={`Study ${item.glyph}, ${item.reading}`}
-              onPress={() => startLesson([item.id])}
-              style={({ pressed }) => [
-                s.row,
-                index > 0 && s.rule,
-                pressed && s.pressed,
-              ]}
-            >
-              <View style={s.glyphTile}>
-                <Text style={s.glyph}>{item.glyph}</Text>
-              </View>
-              <View style={s.grow}>
-                <Text style={s.rowTitle}>{item.reading}</Text>
-                <Text style={s.detail}>
-                  {item.example} · {item.meaning}
-                </Text>
-              </View>
-              {data.seen.includes(item.id) && (
-                <Check accessibilityLabel="Studied" size={17} color={green} />
-              )}
-              <ChevronRight size={18} color={muted} />
-            </Pressable>
+        <View style={s.courseGrid}>
+          {lessonLinks.map(({ href, title, detail, icon: Icon }) => (
+            <Link key={href} href={href} asChild>
+              <Pressable
+                accessibilityRole="link"
+                style={({ pressed }) => [
+                  s.list,
+                  s.courseLink,
+                  pressed && s.pressed,
+                ]}
+              >
+                <Icon size={18} color={green} />
+                <Text style={s.rowTitle}>{title}</Text>
+                <Text style={s.detail}>{detail}</Text>
+              </Pressable>
+            </Link>
           ))}
         </View>
       </View>
+      <Text accessibilityRole="header" style={s.sectionTitle}>
+        Kana lessons
+      </Text>
+      <View accessibilityRole="tablist" style={s.chartRow}>
+        {(["hiragana", "katakana"] as const).map((option) => (
+          <Pressable
+            key={option}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: script === option }}
+            onPress={() => setScript(option)}
+            style={[s.chartTile, script === option && s.chartStudied]}
+          >
+            <Text style={s.rowTitle}>
+              {option === "hiragana" ? "Hiragana" : "Katakana"}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+      <KanaChart
+        key={script}
+        seen={data.seen}
+        script={script}
+        romaji={data.romaji}
+      />
+      <View style={s.feature}>
+        <Text style={s.featureTitle}>Check your basic {script}</Text>
+        <Text style={s.body}>
+          Try ten characters across the basic rows. Get a lesson suggestion
+          based on your answers.
+        </Text>
+        <View style={s.featureFooter}>
+          <Action
+            label="Start kana check"
+            onPress={() => startLesson(placementSample(script), "placement")}
+          />
+        </View>
+      </View>
+      {lessons
+        .filter((lesson) => lesson.script === script)
+        .map((lesson, index) => {
+          const studied = lesson.ids.filter((id) =>
+            data.seen.includes(id),
+          ).length;
+          return (
+            <View key={lesson.title} style={s.feature}>
+              <View style={s.iconLabel}>
+                <BookOpen size={18} color={green} />
+                <Text style={s.kicker}>
+                  {script.toUpperCase()} / LESSON {index + 1}
+                </Text>
+              </View>
+              <Text style={s.featureTitle}>{lesson.title}</Text>
+              <Text style={s.body}>{lesson.detail}</Text>
+              <View style={s.featureFooter}>
+                <Action
+                  label={
+                    studied === lesson.ids.length
+                      ? "Revisit lesson"
+                      : studied
+                        ? "Continue lesson"
+                        : "Start lesson"
+                  }
+                  onPress={() => startLesson(lesson.ids)}
+                />
+                <Text style={s.detail}>
+                  {studied} of {lesson.ids.length} characters studied
+                </Text>
+              </View>
+            </View>
+          );
+        })}
     </View>
   );
 }
@@ -133,23 +314,27 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
 
 export function Review() {
   const { data } = useStudy();
-  const studied = kana.filter(
-    (item) =>
-      data.seen.includes(item.id) ||
-      data.attempts.some((a) => a.kanaId === item.id),
+  const { queue, due } = useReviewQueue(data);
+  const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
+  const missed = queue.filter(
+    ({ id }) =>
+      latestResult(data.attempts, id, "recognition") === false ||
+      latestResult(data.attempts, id, "recall") === false,
   );
-  const needsPractice = studied.filter(
-    (item) =>
-      latestResult(data.attempts, item.id, "recognition") === false ||
-      latestResult(data.attempts, item.id, "recall") === false,
+  const focus = (due.length ? due : missed.length ? missed : queue).slice(
+    0,
+    REVIEW_BATCH_SIZE,
   );
-  const focus = needsPractice.length ? needsPractice : studied;
-  let detail = "Study your first vowel lesson to begin a personal review list.";
-  if (studied.length) {
-    detail = needsPractice.length
-      ? "Practice the characters you missed on your latest recognition or recall attempt."
-      : "Practice the characters you have already studied, with recognition and typed recall.";
-  }
+  const title = due.length
+    ? `${due.length} ready for review`
+    : queue.length
+      ? "You’re caught up"
+      : "Your first review";
+  const detail = due.length
+    ? `Practice ${focus.length} ${focus.length === 1 ? "character" : "characters"} in this round. Typed recall schedules the next review.`
+    : queue.length
+      ? `Next review ${new Date(queue[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}. You can also practice early.`
+      : "Study your first vowel lesson to begin a personal review list.";
   return (
     <View style={s.page}>
       <Heading
@@ -161,37 +346,85 @@ export function Review() {
           <RotateCcw size={18} color={green} />
           <Text style={s.kicker}>PERSONAL PRACTICE</Text>
         </View>
-        <Text style={s.featureTitle}>
-          {needsPractice.length
-            ? "Another look"
-            : studied.length
-              ? "Keep it fresh"
-              : "Your first review"}
-        </Text>
+        <Text style={s.featureTitle}>{title}</Text>
         <Text style={s.body}>{detail}</Text>
         {focus.length > 0 && (
           <View style={s.chips}>
-            {focus.map((item) => (
-              <View style={s.chip} key={item.id}>
-                <Text style={s.glyph}>{item.glyph}</Text>
+            {focus.map(({ id }) => (
+              <View style={s.chip} key={id}>
+                <Text style={s.glyph}>
+                  {kana.find((item) => item.id === id)?.glyph}
+                </Text>
               </View>
             ))}
           </View>
         )}
         <View style={s.featureFooter}>
           <Action
-            label={focus.length ? "Start review" : "Learn the five vowels"}
+            label={
+              due.length
+                ? "Start review"
+                : focus.length
+                  ? "Practice early"
+                  : "Learn the five vowels"
+            }
             onPress={() =>
               focus.length
                 ? startLesson(
                     focus.map((item) => item.id),
-                    true,
+                    "review",
                   )
-                : startLesson(allIds)
+                : startLesson(firstLessonIds)
             }
           />
+          {focus.length > 0 && (
+            <Action
+              label="Practice listening"
+              onPress={() =>
+                startLesson(
+                  focus.map((card) => card.id),
+                  "listening",
+                )
+              }
+            />
+          )}
         </View>
       </View>
+      {!!pairs.length && (
+        <View style={s.section}>
+          <Text accessibilityRole="header" style={s.sectionTitle}>
+            Kana you mixed up
+          </Text>
+          {pairs.map(({ items, count }) => (
+            <View
+              style={s.feature}
+              key={items.map((item) => item.id).join(":")}
+            >
+              <View style={s.chips}>
+                {items.map((item) => (
+                  <View key={item.id} style={s.chartTile}>
+                    <Text style={s.glyph}>{item.glyph}</Text>
+                    <Text style={s.detail}>{item.reading}</Text>
+                  </View>
+                ))}
+              </View>
+              <Text style={s.detail}>
+                Mixed up {count} {count === 1 ? "time" : "times"} in recognition
+                practice.
+              </Text>
+              <Action
+                label={`Practice ${items.map((item) => item.glyph).join(" and ")}`}
+                onPress={() =>
+                  startLesson(
+                    items.map((item) => item.id),
+                    "contrast",
+                  )
+                }
+              />
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -218,6 +451,32 @@ function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
 export function Progress() {
   const { data } = useStudy();
   const studied = kana.filter((item) => data.seen.includes(item.id)).length;
+  const grammarAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("grammar:"),
+  );
+  const vocabularyAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("vocabulary:"),
+  );
+  const readingAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("reading:"),
+  );
+  const passageAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("passage-listening:"),
+  );
+  const writingAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("writing:"),
+  );
+  const kanjiAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("kanji:"),
+  );
+  const conversationAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("conversation:"),
+  );
+  const savedWordAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("saved-words:"),
+  );
+  const kanaIds = new Set(kana.map((item) => item.id));
+  const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
     <View style={s.page}>
       <Heading
@@ -227,28 +486,27 @@ export function Progress() {
       <View style={s.feature}>
         <View style={s.iconLabel}>
           <Sprout size={19} color={green} />
-          <Text style={s.kicker}>HIRAGANA VOWELS</Text>
+          <Text style={s.kicker}>KANA</Text>
         </View>
-        <Text style={s.featureTitle}>{studied} of 5 studied</Text>
+        <Text style={s.featureTitle}>
+          {studied} of {kana.length} studied
+        </Text>
         <View
           style={s.track}
-          accessibilityLabel={`${studied} of five characters studied`}
+          accessibilityLabel={`${studied} of ${kana.length} characters studied`}
         >
-          {kana.map((item) => (
-            <View
-              key={item.id}
-              style={[
-                s.segment,
-                data.seen.includes(item.id) && s.segmentFilled,
-              ]}
-            />
-          ))}
+          <View
+            style={[
+              s.progressFill,
+              { width: `${(100 * studied) / kana.length}%` },
+            ]}
+          />
         </View>
         {!studied && (
           <View style={s.featureFooter}>
             <Action
               label="Start learning"
-              onPress={() => startLesson(allIds)}
+              onPress={() => startLesson(firstLessonIds)}
             />
           </View>
         )}
@@ -256,13 +514,42 @@ export function Progress() {
       <View style={s.stats}>
         <Score
           label="Recognition"
-          attempts={data.attempts.filter((a) => a.mode === "recognition")}
+          attempts={kanaAttempts.filter((a) => a.mode === "recognition")}
         />
         <Score
           label="Typed recall"
-          attempts={data.attempts.filter((a) => a.mode === "recall")}
+          attempts={kanaAttempts.filter((a) => a.mode === "recall")}
+        />
+        <Score
+          label="Listening"
+          attempts={kanaAttempts.filter((a) => a.mode === "listening")}
         />
       </View>
+      {!!grammarAttempts.length && (
+        <Score label="Grammar" attempts={grammarAttempts} />
+      )}
+      {!!vocabularyAttempts.length && (
+        <Score label="Vocabulary" attempts={vocabularyAttempts} />
+      )}
+      {!!readingAttempts.length && (
+        <Score label="Reading" attempts={readingAttempts} />
+      )}
+      {!!passageAttempts.length && (
+        <Score label="Passage listening" attempts={passageAttempts} />
+      )}
+      {!!writingAttempts.length && (
+        <Score label="Sentence building" attempts={writingAttempts} />
+      )}
+      {!!kanjiAttempts.length && (
+        <Score label="Kanji" attempts={kanjiAttempts} />
+      )}
+      {!!conversationAttempts.length && (
+        <Score label="Dialogue" attempts={conversationAttempts} />
+      )}
+      {!!savedWordAttempts.length && (
+        <Score label="Saved words" attempts={savedWordAttempts} />
+      )}
+      <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           By character
@@ -297,19 +584,55 @@ export function Progress() {
 }
 
 export function Settings() {
-  const { data, changeSound } = useStudy();
+  const { data, changePreference, mergeProgress } = useStudy();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const saving = useRef(false);
-  async function updateSound(value: boolean) {
+  async function updatePreference(name: StudyPreference, value: boolean) {
     if (saving.current) return;
     saving.current = true;
     setPending(true);
     setMessage("");
     try {
-      await changeSound(value);
+      await changePreference(name, value);
     } catch {
-      setMessage("Your sound setting could not be saved. Try again.");
+      setMessage("Your study preference could not be saved. Try again.");
+    } finally {
+      saving.current = false;
+      setPending(false);
+    }
+  }
+  async function exportProgress() {
+    if (saving.current) return;
+    saving.current = true;
+    setPending(true);
+    setMessage("");
+    try {
+      await saveBackup(createBackup(data, new Date()));
+    } catch {
+      setMessage("Couldn’t save the backup. Try again.");
+    } finally {
+      saving.current = false;
+      setPending(false);
+    }
+  }
+  async function importProgress() {
+    if (saving.current) return;
+    saving.current = true;
+    setPending(true);
+    setMessage("");
+    try {
+      const file = await pickBackup();
+      if (file === null) return;
+      const backup = parseBackup(file);
+      await mergeProgress(backup);
+      setMessage("Backup merged into your local progress.");
+    } catch (error) {
+      setMessage(
+        error instanceof Error && /NihongoLearn/.test(error.message)
+          ? error.message
+          : "Couldn’t import this backup. Use a JSON export from NihongoLearn and try again.",
+      );
     } finally {
       saving.current = false;
       setPending(false);
@@ -328,22 +651,34 @@ export function Settings() {
             <View style={s.grow}>
               <Text style={s.rowTitle}>Pronunciation audio</Text>
               <Text style={s.detail}>
-                Play the Japanese vowel sounds during a lesson.
+                Play the Japanese kana sounds during a lesson.
               </Text>
             </View>
             <Switch
               value={data.sound}
               disabled={pending}
               accessibilityLabel="Pronunciation audio"
-              onValueChange={updateSound}
+              onValueChange={(value) => updatePreference("sound", value)}
               trackColor={{ false: "#bbc4be", true: green }}
             />
           </View>
-          {message ? (
-            <Text accessibilityRole="alert" style={s.error}>
-              {message}
-            </Text>
-          ) : null}
+          <View style={[s.row, s.rule]}>
+            <BookOpen size={22} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Kana reading hints</Text>
+              <Text style={s.detail}>
+                Show romaji and pronunciation tips on kana study cards and
+                charts.
+              </Text>
+            </View>
+            <Switch
+              value={data.romaji}
+              disabled={pending}
+              accessibilityLabel="Kana reading hints"
+              onValueChange={(value) => updatePreference("romaji", value)}
+              trackColor={{ false: "#bbc4be", true: green }}
+            />
+          </View>
           <View style={[s.row, s.rule]}>
             <HardDrive size={22} color={green} />
             <View style={s.grow}>
@@ -353,6 +688,58 @@ export function Settings() {
               </Text>
             </View>
           </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Export study history</Text>
+              <Text style={s.detail}>
+                Save a JSON copy of your answers, studied kana, saved words, and
+                preferences.
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                disabled={pending}
+                accessibilityState={{ disabled: pending }}
+                onPress={exportProgress}
+                style={[
+                  s.action,
+                  { alignSelf: "flex-start", marginTop: 8 },
+                  pending && s.pressed,
+                ]}
+              >
+                <Text style={s.actionLabel}>Export progress</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Restore study history</Text>
+              <Text style={s.detail}>
+                Merge a NihongoLearn backup with this device’s progress. Local
+                preferences stay in effect.
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                disabled={pending}
+                accessibilityState={{ disabled: pending }}
+                onPress={importProgress}
+                style={[
+                  s.action,
+                  { alignSelf: "flex-start", marginTop: 8 },
+                  pending && s.pressed,
+                ]}
+              >
+                <Text style={s.actionLabel}>Import backup</Text>
+              </Pressable>
+            </View>
+          </View>
+          {message ? (
+            <Text
+              accessibilityRole="alert"
+              style={message.startsWith("Backup merged") ? s.detail : s.error}
+            >
+              {message}
+            </Text>
+          ) : null}
         </View>
       </View>
       <View style={s.section}>
@@ -502,14 +889,36 @@ const s = StyleSheet.create({
   },
   statValue: { fontFamily: "DMSerifText", fontSize: 34, color: green },
   track: {
+    backgroundColor: "#ccd9c5",
+    borderRadius: 5,
     alignSelf: "stretch",
     maxWidth: 480,
     flexDirection: "row",
     gap: 5,
     marginVertical: 3,
   },
-  segment: { flex: 1, height: 7, borderRadius: 5, backgroundColor: "#ccd9c5" },
-  segmentFilled: { backgroundColor: green },
+  courseGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  courseLink: {
+    flexBasis: "46%",
+    flexGrow: 1,
+    minHeight: 96,
+    padding: 12,
+    gap: 5,
+  },
+  chart: { padding: 14, gap: 12 },
+  chartRow: { flexDirection: "row", gap: 6, marginTop: 4 },
+  chartTile: {
+    flex: 1,
+    maxWidth: 110,
+    minHeight: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    backgroundColor: "#f5f4eb",
+  },
+  chartStudied: { backgroundColor: "#dfe8d9" },
+  progressFill: { height: 7, borderRadius: 5, backgroundColor: green },
+
   error: {
     fontFamily: "DMSans",
     color: coral,

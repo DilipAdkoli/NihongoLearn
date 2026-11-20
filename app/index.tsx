@@ -18,7 +18,8 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { kana } from "../src/learning";
+import { kana, lessons } from "../src/learning";
+import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
 
 function Metric({
@@ -78,11 +79,20 @@ function SectionTitle({
 
 export default function Home() {
   const { data } = useStudy();
+  const { due } = useReviewQueue(data);
   const { width } = useWindowDimensions();
   const narrow = width < 700;
   const phone = width < 520;
-  const ids = kana.map((k) => k.id);
-  const seen = ids.filter((id) => data.seen.includes(id)).length;
+  const seen = kana.filter((item) => data.seen.includes(item.id)).length;
+  const nextIndex = lessons.findIndex((lesson) =>
+    lesson.ids.some((id) => !data.seen.includes(id)),
+  );
+  const lessonIndex = nextIndex < 0 ? lessons.length - 1 : nextIndex;
+  const lesson = lessons[lessonIndex];
+  const lessonNumber = lessons
+    .slice(0, lessonIndex + 1)
+    .filter((entry) => entry.script === lesson.script).length;
+  const notebook = kana.filter((item) => lesson.ids.includes(item.id));
   const correct = data.attempts.filter((a) => a.correct).length;
   const date = new Intl.DateTimeFormat("en", {
     weekday: "short",
@@ -111,26 +121,26 @@ export default function Home() {
         >
           <View style={s.lessonTag}>
             <View style={s.tagLine} />
-            <Text style={s.tagText}>HIRAGANA / LESSON 01</Text>
+            <Text style={s.tagText}>
+              {lesson.script.toUpperCase()} / LESSON{" "}
+              {String(lessonNumber).padStart(2, "0")}
+            </Text>
           </View>
           <Text
             accessibilityRole="header"
             style={[s.heroTitle, phone && { fontSize: 37, lineHeight: 44 }]}
           >
-            The five vowels
+            {lesson.title}
           </Text>
-          <Text style={s.heroDetail}>
-            Meet あ, い, う, え, and お. Hear each sound, then practice reading
-            it from memory.
-          </Text>
+          <Text style={s.heroDetail}>{lesson.detail}</Text>
           <View style={s.heroActions}>
             <Pressable
               accessibilityRole="button"
-              onPress={() => startLesson(ids)}
+              onPress={() => startLesson(lesson.ids)}
               style={({ pressed }) => [s.start, pressed && s.pressed]}
             >
               <Text style={s.startText}>
-                {seen === 5 ? "Revisit lesson" : "Start lesson"}
+                {nextIndex < 0 ? "Revisit lesson" : "Start lesson"}
               </Text>
               <ArrowRight size={17} color="#fffdf6" />
             </Pressable>
@@ -155,6 +165,31 @@ export default function Home() {
           />
         </View>
       </View>
+      {!!due.length && (
+        <View style={s.reviewCard}>
+          <View style={s.reviewCopy}>
+            <Text accessibilityRole="header" style={s.reviewTitle}>
+              {due.length} kana ready for review
+            </Text>
+            <Text style={s.metricLabel}>
+              Refresh them before your next lesson.
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() =>
+              startLesson(
+                due.slice(0, REVIEW_BATCH_SIZE).map((card) => card.id),
+                "review",
+              )
+            }
+            style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+          >
+            <Text style={s.linkText}>Start review</Text>
+            <ArrowRight size={16} color="#345b45" />
+          </Pressable>
+        </View>
+      )}
       <SectionTitle
         title="Study snapshot"
         link="View progress"
@@ -163,7 +198,7 @@ export default function Home() {
       <View style={[s.metrics, phone && s.phoneMetrics]}>
         <Metric
           label="Kana studied"
-          value={seen + " / 5"}
+          value={seen + " / " + kana.length}
           icon={BookOpen}
           tone="sage"
         />
@@ -192,16 +227,18 @@ export default function Home() {
       <View style={s.notebook}>
         <View style={s.bookHead}>
           <BookMarked size={17} color="#5b6956" />
-          <Text style={s.bookLabel}>HIRAGANA</Text>
+          <Text style={s.bookLabel}>{lesson.script.toUpperCase()}</Text>
           <View style={s.separator} />
-          <Text style={s.bookGroup}>Vowel row</Text>
+          <Text style={s.bookGroup}>{lesson.notebook}</Text>
         </View>
         <View style={s.tiles}>
-          {kana.map((item) => (
+          {notebook.map((item) => (
             <Pressable
               key={item.id}
               accessibilityRole="button"
-              accessibilityLabel={"Study " + item.glyph + ", " + item.reading}
+              accessibilityLabel={
+                "Study " + item.glyph + (data.romaji ? ", " + item.reading : "")
+              }
               onPress={() => startLesson([item.id])}
               style={({ pressed }) => [
                 s.tile,
@@ -217,7 +254,7 @@ export default function Home() {
               <Text style={[s.character, phone && { fontSize: 31 }]}>
                 {item.glyph}
               </Text>
-              <Text style={s.romaji}>{item.reading}</Text>
+              {data.romaji && <Text style={s.romaji}>{item.reading}</Text>}
             </Pressable>
           ))}
         </View>
@@ -297,6 +334,31 @@ const s = StyleSheet.create({
   time: { flexDirection: "row", alignItems: "center", gap: 6 },
   timeText: { fontFamily: "DMSans", fontSize: 12, color: "#e1e8da" },
   fill: { width: "100%", height: "100%", position: "absolute" },
+  reviewCard: {
+    backgroundColor: "#e9eee2",
+    borderColor: "#cddbc7",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    flexDirection: "row",
+    gap: 10,
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  reviewCopy: { flexGrow: 1, flexShrink: 1, gap: 3 },
+  reviewTitle: { color: "#253e32", fontSize: 18, fontFamily: "DMSansBold" },
+  reviewButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    minHeight: 44,
+    borderRadius: 7,
+    paddingHorizontal: 12,
+    backgroundColor: "#fffef8",
+  },
   sectionTitle: {
     flexDirection: "row",
     alignItems: "center",

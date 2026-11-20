@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { evaluateAnswer, kana, makeExercises } from "../src/learning.ts";
+import {
+  evaluateAnswer,
+  kana,
+  lessons,
+  makeExercises,
+} from "../src/learning.ts";
 
-test("the lesson has all five vowel readings and examples readable with those kana", () => {
+test("kana lessons have unique glyphs and examples readable with taught characters", () => {
   assert.deepEqual(
-    kana.map((item) => [item.glyph, item.reading]),
+    kana
+      .filter((item) => lessons[0].ids.includes(item.id))
+      .map((item) => [item.glyph, item.reading]),
     [
       ["あ", "a"],
       ["い", "i"],
@@ -13,11 +20,24 @@ test("the lesson has all five vowel readings and examples readable with those ka
       ["お", "o"],
     ],
   );
-  const readings = new Map(kana.map((item) => [item.glyph, item.reading]));
+  assert.deepEqual(
+    lessons.flatMap((lesson) => lesson.ids),
+    kana.map((item) => item.id),
+  );
+  assert.equal(kana.filter((item) => item.script === "hiragana").length, 104);
+  assert.equal(kana.filter((item) => item.script === "katakana").length, 104);
+  assert.equal(new Set(kana.map((item) => item.glyph)).size, kana.length);
+  const readings = [...kana].sort((a, b) => b.glyph.length - a.glyph.length);
   for (const item of kana) {
-    const letters = Array.from(item.example, (symbol) => readings.get(symbol));
-    assert.ok(letters.every(Boolean));
-    assert.equal(letters.join(""), item.exampleReading);
+    let remaining = item.example;
+    let romaji = "";
+    while (remaining) {
+      const match = readings.find((entry) => remaining.startsWith(entry.glyph));
+      assert.ok(match, `Untaught kana in ${item.example}: ${remaining}`);
+      romaji += match.reading;
+      remaining = remaining.slice(match.glyph.length);
+    }
+    assert.equal(romaji, item.exampleReading.replaceAll(" ", ""));
   }
 });
 
@@ -40,7 +60,21 @@ test("recognition includes exactly one correct glyph among four distinct choices
   for (const item of kana) {
     const [question] = makeExercises([item.id]);
     assert.equal(question.choices.length, 4);
+    assert.ok(
+      question.choices.every((glyph) =>
+        kana.some(
+          (entry) => entry.glyph === glyph && entry.script === item.script,
+        ),
+      ),
+    );
     assert.equal(new Set(question.choices).size, 4);
+    const row = lessons.find((lesson) => lesson.ids.includes(item.id));
+    const sameRow = question.choices.filter((glyph) =>
+      kana.some(
+        (entry) => entry.glyph === glyph && row?.ids.includes(entry.id),
+      ),
+    );
+    assert.equal(sameRow.length, Math.min(4, row?.ids.length ?? 0));
     assert.deepEqual(
       question.choices.filter((choice) => evaluateAnswer(question, choice)),
       [item.glyph],
@@ -56,4 +90,53 @@ test("recall accepts romaji with common mobile keyboard variations", () => {
   for (const answer of ["", "う", "oo", "ū", "o", "u u"])
     assert.equal(evaluateAnswer(question, answer), false);
   assert.equal(evaluateAnswer({ ...question, kanaId: "missing" }, "u"), false);
+});
+
+test("recall accepts both the spelling and common pronunciation of を", () => {
+  const [, question] = makeExercises(["wo"]);
+  assert.ok(evaluateAnswer(question, "wo"));
+  assert.ok(evaluateAnswer(question, "o"));
+  assert.equal(evaluateAnswer(question, "w"), false);
+});
+
+test("ぢ and づ accept their standard readings and keyboard spellings", () => {
+  const [, di] = makeExercises(["di"]);
+  const [, du] = makeExercises(["du"]);
+  assert.ok(evaluateAnswer(di, "ji"));
+  assert.ok(evaluateAnswer(di, "di"));
+  assert.ok(evaluateAnswer(du, "zu"));
+  assert.ok(evaluateAnswer(du, "du"));
+  assert.equal(evaluateAnswer(du, "tsu"), false);
+});
+
+test("listening never offers an alternative spelling of the same sound", () => {
+  const ids = ["o", "wo", "ji", "di", "zu", "du", "kata-wo"];
+  const questions = makeExercises(ids, "listening");
+  assert.equal(questions.length, ids.length);
+  for (const question of questions) {
+    assert.equal(question.mode, "listening");
+    assert.equal(question.choices.length, 4);
+    const item = kana.find((entry) => entry.id === question.kanaId)!;
+    const phonetic = (reading: string) => (reading === "wo" ? "o" : reading);
+    for (const glyph of question.choices) {
+      const other = kana.find((entry) => entry.glyph === glyph)!;
+      assert.equal(other.script, item.script);
+      assert.equal(
+        phonetic(other.reading) === phonetic(item.reading),
+        evaluateAnswer(question, glyph),
+      );
+    }
+  }
+});
+
+test("contrast practice includes the other kana even across rows", () => {
+  const questions = makeExercises(["kata-shi", "kata-tsu"], "contrast").filter(
+    (q) => q.mode === "recognition",
+  );
+  assert.equal(questions.length, 2);
+  for (const question of questions) {
+    assert.ok(question.choices.includes("シ"));
+    assert.ok(question.choices.includes("ツ"));
+    assert.equal(new Set(question.choices).size, 4);
+  }
 });

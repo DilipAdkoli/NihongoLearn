@@ -9,24 +9,54 @@ export interface StudyDatabase {
   getAllAsync<T>(sql: string): Promise<T[]>;
 }
 
-const schema = `
-  CREATE TABLE IF NOT EXISTS seen_kana (
-    kana_id TEXT PRIMARY KEY NOT NULL
-  );
+const attemptsTable = `
   CREATE TABLE IF NOT EXISTS attempts (
     id TEXT PRIMARY KEY NOT NULL,
     kana_id TEXT NOT NULL,
-    mode TEXT NOT NULL CHECK (mode IN ('recognition', 'recall')),
+    mode TEXT NOT NULL CHECK (mode IN ('recognition', 'recall', 'listening')),
     answer TEXT NOT NULL,
     correct INTEGER NOT NULL CHECK (correct IN (0, 1)),
     attempted_at INTEGER NOT NULL
   );
+`;
+
+const schema = `
+  CREATE TABLE IF NOT EXISTS seen_kana (
+    kana_id TEXT PRIMARY KEY NOT NULL
+  );
+  ${attemptsTable}
   CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY NOT NULL,
     value INTEGER NOT NULL
   );
-  PRAGMA user_version = 1;
 `;
+
+const addListening = `
+  ALTER TABLE attempts RENAME TO attempts_v1;
+  ${attemptsTable}
+  INSERT INTO attempts (id, kana_id, mode, answer, correct, attempted_at)
+    SELECT id, kana_id, mode, answer, correct, attempted_at FROM attempts_v1;
+  DROP TABLE attempts_v1;
+`;
+
+async function initialize(db: StudyDatabase) {
+  await db.execAsync("BEGIN IMMEDIATE");
+  try {
+    const version = (
+      await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version")
+    )?.user_version;
+    if (version === 0 || version === 1) {
+      await db.execAsync(version === 0 ? schema : addListening);
+      await db.execAsync("PRAGMA user_version = 2");
+    } else if (version !== 2) {
+      throw new Error("This study database needs a different app version.");
+    }
+    await db.execAsync("COMMIT");
+  } catch (error) {
+    await db.execAsync("ROLLBACK");
+    throw error;
+  }
+}
 
 export function createSqliteStorage(
   open: () => Promise<StudyDatabase>,
@@ -36,14 +66,7 @@ export function createSqliteStorage(
   function database(): Promise<StudyDatabase> {
     ready ??= open()
       .then(async (db) => {
-        const version = await db.getFirstAsync<{ user_version: number }>(
-          "PRAGMA user_version",
-        );
-        if (version?.user_version === 0) {
-          await db.execAsync(schema);
-        } else if (version?.user_version !== 1) {
-          throw new Error("This study database needs a different app version.");
-        }
+        await initialize(db);
         return db;
       })
       .catch((error) => {
@@ -53,10 +76,19 @@ export function createSqliteStorage(
     return ready;
   }
 
+  async function setFlag(key: string, value: boolean) {
+    const db = await database();
+    await db.runAsync(
+      "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+      key,
+      Number(value),
+    );
+  }
+
   return {
     async loadStudy() {
       const db = await database();
-      const [seen, attempts, sound] = await Promise.all([
+      const [seen, attempts, settings] = await Promise.all([
         db.getAllAsync<{ kana_id: string }>(
           "SELECT kana_id FROM seen_kana ORDER BY kana_id",
         ),
@@ -64,17 +96,25 @@ export function createSqliteStorage(
           `SELECT id, kana_id AS kanaId, mode, answer, correct, attempted_at AS at
            FROM attempts ORDER BY attempted_at, id`,
         ),
-        db.getFirstAsync<{ value: number }>(
-          "SELECT value FROM settings WHERE key = 'sound'",
+        db.getAllAsync<{ key: string; value: number }>(
+          "SELECT key, value FROM settings",
         ),
       ]);
       return {
+        savedWords: settings
+          .filter(
+            (setting) => setting.key.startsWith("word:") && setting.value === 1,
+          )
+          .map((setting) => setting.key.slice(5))
+          .sort(),
         seen: seen.map((row) => row.kana_id),
         attempts: attempts.map((row) => ({
           ...row,
           correct: row.correct === 1,
         })),
-        sound: sound?.value !== 0,
+        sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
+        romaji:
+          settings.find((setting) => setting.key === "romaji")?.value !== 0,
       };
     },
     async markSeen(id) {
@@ -97,12 +137,7 @@ export function createSqliteStorage(
         attempt.at,
       );
     },
-    async setSound(value) {
-      const db = await database();
-      await db.runAsync(
-        "INSERT INTO settings (key, value) VALUES ('sound', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-        Number(value),
-      );
-    },
+    setWordSaved: (id, saved) => setFlag("word:" + id, saved),
+    setPreference: setFlag,
   };
 }
