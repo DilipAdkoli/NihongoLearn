@@ -1,6 +1,6 @@
 import type { CourseGroup } from "./ChoiceCourse";
 
-export const conversation: readonly CourseGroup[] = [
+export const conversation = [
   {
     title: "Meeting someone",
     lessons: [
@@ -132,4 +132,4 @@ export const conversation: readonly CourseGroup[] = [
       },
     ],
   },
-];
+] as const satisfies readonly CourseGroup[];

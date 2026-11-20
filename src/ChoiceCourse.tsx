@@ -18,6 +18,7 @@ export type ChoiceLesson = {
   answer: string;
   feedback: string;
   audio?: number;
+  answerAudio?: number;
   acceptedAnswers?: readonly string[];
 };
 
@@ -52,6 +53,43 @@ export function lessonKey(course: Course, id: string) {
   return `${course}:${id}`;
 }
 
+function ClipButton({
+  clip,
+  label,
+  accessibilityLabel = label,
+}: {
+  clip: number;
+  label: string;
+  accessibilityLabel?: string;
+}) {
+  const [audioError, setAudioError] = useState(false);
+
+  return (
+    <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        style={s.choice}
+        onPress={async () => {
+          try {
+            setAudioError(false);
+            await playClip(clip);
+          } catch {
+            setAudioError(true);
+          }
+        }}
+      >
+        <Text style={s.choiceLabel}>♪ {label}</Text>
+      </Pressable>
+      {audioError && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Audio couldn’t play. Tap again to retry.
+        </Text>
+      )}
+    </>
+  );
+}
+
 function PracticeCard({
   course,
   lesson,
@@ -65,7 +103,6 @@ function PracticeCard({
 }) {
   const studyFirst = course === "vocabulary" || course === "kanji";
   const [practice, setPractice] = useState(!studyFirst);
-  const [audioError, setAudioError] = useState(false);
   const [choice, setChoice] = useState("");
   const [result, setResult] = useState<Attempt>();
   const [pending, setPending] = useState(false);
@@ -127,26 +164,11 @@ function PracticeCard({
             )}
             <Text style={s.body}>{lesson.english}</Text>
             {lesson.audio !== undefined && (
-              <Pressable
-                accessibilityRole="button"
+              <ClipButton
+                clip={lesson.audio}
+                label="Listen"
                 accessibilityLabel={`Listen to ${lesson.title}`}
-                style={s.choice}
-                onPress={async () => {
-                  try {
-                    setAudioError(false);
-                    await playClip(lesson.audio!);
-                  } catch {
-                    setAudioError(true);
-                  }
-                }}
-              >
-                <Text style={s.choiceLabel}>♪ Listen</Text>
-              </Pressable>
-            )}
-            {audioError && (
-              <Text style={s.error}>
-                Audio couldn’t play. Tap Listen to retry.
-              </Text>
+              />
             )}
           </View>
         </>
@@ -206,6 +228,12 @@ function PracticeCard({
                 : `The answer is ${lesson.answer}. `}
               {lesson.feedback}
             </Text>
+          )}
+          {result && lesson.answerAudio !== undefined && (
+            <ClipButton
+              clip={lesson.answerAudio}
+              label="Hear the correct response"
+            />
           )}
           {failed && (
             <Text accessibilityLiveRegion="polite" style={s.error}>

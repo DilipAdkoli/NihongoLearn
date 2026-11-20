@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { ChoiceLesson } from "../src/ChoiceCourse.tsx";
 import { conversation } from "../src/conversation.ts";
 
 test("dialogue prompts have unique IDs and one valid listed response", () => {
-  const lessons = conversation.flatMap((group) => group.lessons);
+  const lessons = conversation.flatMap<ChoiceLesson>((group) => group.lessons);
   assert.equal(
     new Set(lessons.map((lesson) => lesson.id)).size,
     lessons.length,
