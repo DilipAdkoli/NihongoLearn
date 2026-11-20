@@ -1,3 +1,4 @@
+import { readDailyGoal } from "./dailyGoal.ts";
 import type { Attempt, StudyStorage } from "./storage.types";
 
 type BindValue = string | number;
@@ -76,12 +77,12 @@ export function createSqliteStorage(
     return ready;
   }
 
-  async function setFlag(key: string, value: boolean) {
+  async function setSetting(key: string, value: number) {
     const db = await database();
     await db.runAsync(
       "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
       key,
-      Number(value),
+      value,
     );
   }
 
@@ -112,6 +113,9 @@ export function createSqliteStorage(
           ...row,
           correct: row.correct === 1,
         })),
+        dailyGoal: readDailyGoal(
+          settings.find((setting) => setting.key === "daily-goal")?.value,
+        ),
         sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
         romaji:
           settings.find((setting) => setting.key === "romaji")?.value !== 0,
@@ -137,7 +141,8 @@ export function createSqliteStorage(
         attempt.at,
       );
     },
-    setWordSaved: (id, saved) => setFlag("word:" + id, saved),
-    setPreference: setFlag,
+    setWordSaved: (id, saved) => setSetting("word:" + id, Number(saved)),
+    setPreference: (name, value) => setSetting(name, Number(value)),
+    setDailyGoal: (goal) => setSetting("daily-goal", goal),
   };
 }

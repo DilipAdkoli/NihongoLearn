@@ -9,4 +9,5 @@ export const {
   recordAttempt,
   setPreference,
   setWordSaved,
+  setDailyGoal,
 } = createSqliteStorage(() => openDatabaseAsync("nihongo-learn.db"));

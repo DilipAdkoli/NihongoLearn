@@ -24,12 +24,13 @@ import { ActivityChart } from "./ActivityChart";
 import { createBackup, parseBackup } from "./backup";
 import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
+import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { placementSample } from "./placement";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
-import type { Attempt, StudyPreference } from "./storage.types";
+import type { Attempt } from "./storage.types";
 
 const ink = "#203730";
 const green = "#215848";
@@ -633,17 +634,17 @@ export function Progress() {
 }
 
 export function Settings() {
-  const { data, changePreference, mergeProgress } = useStudy();
+  const { data, changePreference, changeDailyGoal, mergeProgress } = useStudy();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const saving = useRef(false);
-  async function updatePreference(name: StudyPreference, value: boolean) {
+  async function savePreference(update: () => Promise<void>) {
     if (saving.current) return;
     saving.current = true;
     setPending(true);
     setMessage("");
     try {
-      await changePreference(name, value);
+      await update();
     } catch {
       setMessage("Your study preference could not be saved. Try again.");
     } finally {
@@ -707,7 +708,9 @@ export function Settings() {
               value={data.sound}
               disabled={pending}
               accessibilityLabel="Pronunciation audio"
-              onValueChange={(value) => updatePreference("sound", value)}
+              onValueChange={(value) =>
+                savePreference(() => changePreference("sound", value))
+              }
               trackColor={{ false: "#bbc4be", true: green }}
             />
           </View>
@@ -724,7 +727,9 @@ export function Settings() {
               value={data.romaji}
               disabled={pending}
               accessibilityLabel="Kana reading hints"
-              onValueChange={(value) => updatePreference("romaji", value)}
+              onValueChange={(value) =>
+                savePreference(() => changePreference("romaji", value))
+              }
               trackColor={{ false: "#bbc4be", true: green }}
             />
           </View>
@@ -779,6 +784,38 @@ export function Settings() {
               >
                 <Text style={s.actionLabel}>Import backup</Text>
               </Pressable>
+            </View>
+          </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Daily practice goal</Text>
+              <Text style={s.detail}>
+                Choose how many questions to answer each day.
+              </Text>
+              <View style={s.chips} accessibilityRole="tablist">
+                {dailyGoals.map((goal) => (
+                  <Pressable
+                    key={goal}
+                    accessibilityRole="tab"
+                    accessibilityLabel={
+                      goal ? `${goal} questions per day` : "No daily goal"
+                    }
+                    accessibilityState={{
+                      selected: data.dailyGoal === goal,
+                      disabled: pending,
+                    }}
+                    disabled={pending}
+                    onPress={() => savePreference(() => changeDailyGoal(goal))}
+                    style={[
+                      s.chip,
+                      { minWidth: 44, minHeight: 44, justifyContent: "center" },
+                      data.dailyGoal === goal && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{goal || "Off"}</Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
           </View>
           {message ? (

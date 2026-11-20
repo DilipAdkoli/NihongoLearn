@@ -1,3 +1,4 @@
+import type { DailyGoal } from "./dailyGoal";
 import type { parseBackup } from "./backup";
 import type { SessionMode } from "./learning";
 import {
@@ -18,6 +19,7 @@ type StudyContext = {
   answer: (attempt: Attempt) => Promise<void>;
   mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
   saveWord: (id: string, saved: boolean) => Promise<void>;
+  changeDailyGoal: (goal: DailyGoal) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -133,6 +135,10 @@ export function StudyProvider({ children }: PropsWithChildren) {
         else words.delete(id);
         return { ...old, savedWords: [...words] };
       });
+    },
+    async changeDailyGoal(goal) {
+      await storage.setDailyGoal(goal);
+      setData((old) => old && { ...old, dailyGoal: goal });
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);

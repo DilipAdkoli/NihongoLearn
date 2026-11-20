@@ -8,6 +8,7 @@ test("backup exports versioned Unicode study data and preferences", () => {
     seen: ["kata-shi"],
     savedWords: ["みず:water"],
     sound: false,
+    dailyGoal: 0,
     romaji: true,
     attempts: [
       {
@@ -39,11 +40,12 @@ test("import parses exported progress without changing device preferences", () =
     at: 12,
     mode: "recognition" as const,
   };
-  const data = {
+  const data: StudyData = {
     seen: ["a"],
     savedWords: ["みず:water"],
     attempts: [attempt],
     sound: true,
+    dailyGoal: 0,
     romaji: false,
   };
   assert.deepEqual(parseBackup(createBackup(data, new Date(0)).content), {

@@ -18,6 +18,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { dailyGoalProgress } from "../src/dailyGoal";
 import { kana, lessons } from "../src/learning";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
@@ -80,6 +81,8 @@ function SectionTitle({
 export default function Home() {
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
+  const goal = data.dailyGoal;
+  const goalStatus = dailyGoalProgress(data.attempts, goal, new Date());
   const { width } = useWindowDimensions();
   const narrow = width < 700;
   const phone = width < 520;
@@ -188,6 +191,29 @@ export default function Home() {
             <Text style={s.linkText}>Start review</Text>
             <ArrowRight size={16} color="#345b45" />
           </Pressable>
+        </View>
+      )}
+      {goal > 0 && (
+        <View style={s.goalCard}>
+          <Text accessibilityRole="header" style={s.reviewTitle}>
+            Today’s practice goal
+          </Text>
+          <Text style={s.metricLabel}>
+            {goalStatus.answered} of {goal} questions answered
+            {goalStatus.complete ? " · Goal reached" : ""}
+          </Text>
+          <View
+            style={s.goalTrack}
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityValue={{
+              min: 0,
+              max: goal,
+              now: Math.min(goal, goalStatus.answered),
+            }}
+          >
+            <View style={[s.goalFill, { width: `${goalStatus.percent}%` }]} />
+          </View>
         </View>
       )}
       <SectionTitle
@@ -359,6 +385,22 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: "#fffef8",
   },
+  goalCard: {
+    backgroundColor: "#fffef8",
+    borderColor: "#d9dfd3",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    gap: 6,
+  },
+  goalTrack: {
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "#dce5d6",
+    overflow: "hidden",
+  },
+  goalFill: { height: 7, backgroundColor: "#215848" },
   sectionTitle: {
     flexDirection: "row",
     alignItems: "center",

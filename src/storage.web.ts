@@ -1,3 +1,4 @@
+import { readDailyGoal, type DailyGoal } from "./dailyGoal.ts";
 import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 export type { Attempt, StudyData } from "./storage.types";
@@ -32,6 +33,7 @@ export async function loadStudy(): Promise<StudyData> {
     seen,
     savedWords: savedWords.sort(),
     attempts,
+    dailyGoal: readDailyGoal(Number(storage.getItem(namespace + "daily-goal"))),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
   };
@@ -59,4 +61,8 @@ export async function setWordSaved(id: string, saved: boolean): Promise<void> {
   const key = wordPrefix + id;
   if (saved) globalThis.localStorage.setItem(key, "on");
   else globalThis.localStorage.removeItem(key);
+}
+
+export async function setDailyGoal(goal: DailyGoal): Promise<void> {
+  globalThis.localStorage.setItem(namespace + "daily-goal", String(goal));
 }

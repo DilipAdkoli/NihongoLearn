@@ -1,3 +1,5 @@
+import type { DailyGoal } from "./dailyGoal";
+
 export type Attempt = {
   id: string;
   kanaId: string;
@@ -11,6 +13,7 @@ export type StudyData = {
   seen: string[];
   savedWords: string[];
   attempts: Attempt[];
+  dailyGoal: DailyGoal;
   sound: boolean;
   romaji: boolean;
 };
@@ -22,5 +25,6 @@ export type StudyStorage = {
   markSeen(id: string): Promise<void>;
   recordAttempt(attempt: Attempt): Promise<void>;
   setWordSaved(id: string, saved: boolean): Promise<void>;
+  setDailyGoal(goal: DailyGoal): Promise<void>;
   setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };
