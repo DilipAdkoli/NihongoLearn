@@ -9,24 +9,54 @@ export interface StudyDatabase {
   getAllAsync<T>(sql: string): Promise<T[]>;
 }
 
-const schema = `
-  CREATE TABLE IF NOT EXISTS seen_kana (
-    kana_id TEXT PRIMARY KEY NOT NULL
-  );
+const attemptsTable = `
   CREATE TABLE IF NOT EXISTS attempts (
     id TEXT PRIMARY KEY NOT NULL,
     kana_id TEXT NOT NULL,
-    mode TEXT NOT NULL CHECK (mode IN ('recognition', 'recall')),
+    mode TEXT NOT NULL CHECK (mode IN ('recognition', 'recall', 'listening')),
     answer TEXT NOT NULL,
     correct INTEGER NOT NULL CHECK (correct IN (0, 1)),
     attempted_at INTEGER NOT NULL
   );
+`;
+
+const schema = `
+  CREATE TABLE IF NOT EXISTS seen_kana (
+    kana_id TEXT PRIMARY KEY NOT NULL
+  );
+  ${attemptsTable}
   CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY NOT NULL,
     value INTEGER NOT NULL
   );
-  PRAGMA user_version = 1;
 `;
+
+const addListening = `
+  ALTER TABLE attempts RENAME TO attempts_v1;
+  ${attemptsTable}
+  INSERT INTO attempts (id, kana_id, mode, answer, correct, attempted_at)
+    SELECT id, kana_id, mode, answer, correct, attempted_at FROM attempts_v1;
+  DROP TABLE attempts_v1;
+`;
+
+async function initialize(db: StudyDatabase) {
+  await db.execAsync("BEGIN IMMEDIATE");
+  try {
+    const version = (
+      await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version")
+    )?.user_version;
+    if (version === 0 || version === 1) {
+      await db.execAsync(version === 0 ? schema : addListening);
+      await db.execAsync("PRAGMA user_version = 2");
+    } else if (version !== 2) {
+      throw new Error("This study database needs a different app version.");
+    }
+    await db.execAsync("COMMIT");
+  } catch (error) {
+    await db.execAsync("ROLLBACK");
+    throw error;
+  }
+}
 
 export function createSqliteStorage(
   open: () => Promise<StudyDatabase>,
@@ -36,14 +66,7 @@ export function createSqliteStorage(
   function database(): Promise<StudyDatabase> {
     ready ??= open()
       .then(async (db) => {
-        const version = await db.getFirstAsync<{ user_version: number }>(
-          "PRAGMA user_version",
-        );
-        if (version?.user_version === 0) {
-          await db.execAsync(schema);
-        } else if (version?.user_version !== 1) {
-          throw new Error("This study database needs a different app version.");
-        }
+        await initialize(db);
         return db;
       })
       .catch((error) => {

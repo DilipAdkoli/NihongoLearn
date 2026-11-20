@@ -108,3 +108,23 @@ test("ぢ and づ accept their standard readings and keyboard spellings", () => 
   assert.ok(evaluateAnswer(du, "du"));
   assert.equal(evaluateAnswer(du, "tsu"), false);
 });
+
+test("listening never offers an alternative spelling of the same sound", () => {
+  const ids = ["o", "wo", "ji", "di", "zu", "du", "kata-wo"];
+  const questions = makeExercises(ids, true);
+  assert.equal(questions.length, ids.length);
+  for (const question of questions) {
+    assert.equal(question.mode, "listening");
+    assert.equal(question.choices.length, 4);
+    const item = kana.find((entry) => entry.id === question.kanaId)!;
+    const phonetic = (reading: string) => (reading === "wo" ? "o" : reading);
+    for (const glyph of question.choices) {
+      const other = kana.find((entry) => entry.glyph === glyph)!;
+      assert.equal(other.script, item.script);
+      assert.equal(
+        phonetic(other.reading) === phonetic(item.reading),
+        evaluateAnswer(question, glyph),
+      );
+    }
+  }
+});

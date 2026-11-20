@@ -273,6 +273,18 @@ export function Review() {
                 : startLesson(firstLessonIds)
             }
           />
+          {focus.length > 0 && (
+            <Action
+              label="Practice listening"
+              onPress={() =>
+                startLesson(
+                  focus.map((card) => card.id),
+                  true,
+                  true,
+                )
+              }
+            />
+          )}
         </View>
       </View>
     </View>
@@ -343,6 +355,10 @@ export function Progress() {
         <Score
           label="Typed recall"
           attempts={data.attempts.filter((a) => a.mode === "recall")}
+        />
+        <Score
+          label="Listening"
+          attempts={data.attempts.filter((a) => a.mode === "listening")}
         />
       </View>
       <View style={s.section}>

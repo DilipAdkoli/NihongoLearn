@@ -1,7 +1,7 @@
 export type Attempt = {
   id: string;
   kanaId: string;
-  mode: "recognition" | "recall";
+  mode: "recognition" | "recall" | "listening";
   answer: string;
   correct: boolean;
   at: number;

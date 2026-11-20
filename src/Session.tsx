@@ -21,6 +21,7 @@ import type { Attempt } from "./storage.types";
 type SessionProps = {
   ids: string[];
   review: boolean;
+  listening: boolean;
   sound: boolean;
   onSeen: (id: string) => Promise<void>;
   onAttempt: (attempt: Attempt) => Promise<void>;
@@ -54,16 +55,36 @@ function Action({
   );
 }
 
-function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
+function ListenButton({ id, label }: { id: string; label: string }) {
   const [audioError, setAudioError] = useState(false);
   async function listen() {
     try {
-      await playKana(item.id);
+      await playKana(id);
       setAudioError(false);
     } catch {
       setAudioError(true);
     }
   }
+  return (
+    <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        style={({ pressed }) => [s.listen, pressed && s.pressed]}
+        onPress={listen}
+      >
+        <Text style={s.listenText}>♪ Listen</Text>
+      </Pressable>
+      {audioError && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Audio couldn’t play. Tap Listen to retry.
+        </Text>
+      )}
+    </>
+  );
+}
+
+function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
   return (
     <>
       <View style={s.studyCard}>
@@ -75,19 +96,7 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
         </Text>
         <Text style={s.reading}>{item.reading}</Text>
         {sound && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Listen to ${item.reading}`}
-            style={({ pressed }) => [s.listen, pressed && s.pressed]}
-            onPress={listen}
-          >
-            <Text style={s.listenText}>♪ Listen</Text>
-          </Pressable>
-        )}
-        {audioError && (
-          <Text accessibilityLiveRegion="polite" style={s.error}>
-            Audio couldn’t play. Tap Listen to retry.
-          </Text>
+          <ListenButton id={item.id} label={`Listen to ${item.reading}`} />
         )}
       </View>
       <Text style={s.cue}>{item.cue}</Text>
@@ -108,6 +117,7 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
 export default function Session({
   ids,
   review,
+  listening,
   sound,
   onSeen,
   onAttempt,
@@ -115,12 +125,12 @@ export default function Session({
   onFinish,
 }: SessionProps) {
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
-  const [exercises] = useState(() => makeExercises(ids));
+  const [exercises] = useState(() => makeExercises(ids, listening));
   const [sessionId] = useState(
     () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
   );
   const [stage, setStage] = useState<"lesson" | "quiz" | "results">(
-    review ? "quiz" : "lesson",
+    review || listening ? "quiz" : "lesson",
   );
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -200,12 +210,14 @@ export default function Session({
       ? (lesson?.title ?? "Study kana")
       : stage === "results"
         ? "Practice complete"
-        : exercise?.mode === "recognition"
+        : exercise?.mode !== "recall"
           ? `Choose the ${item?.script ?? "kana"}`
           : "Type the reading";
-  const heading = review
-    ? "Review"
-    : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
+  const heading = listening
+    ? "Listening practice"
+    : review
+      ? "Review"
+      : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
   return (
@@ -275,25 +287,35 @@ export default function Session({
             )}
             {stage === "quiz" && item && (
               <>
-                <View style={s.prompt}>
-                  <Text style={s.label}>
-                    {exercise.mode === "recognition"
-                      ? "ROMAJI"
-                      : item.script.toUpperCase()}
-                  </Text>
-                  <Text
-                    style={
-                      exercise.mode === "recognition"
-                        ? s.promptReading
-                        : s.promptGlyph
-                    }
-                  >
-                    {exercise.mode === "recognition"
-                      ? item.reading
-                      : item.glyph}
-                  </Text>
-                </View>
-                {exercise.mode === "recognition" ? (
+                {listening ? (
+                  <View style={s.prompt}>
+                    <ListenButton
+                      key={index}
+                      id={item.id}
+                      label="Listen to the sound"
+                    />
+                  </View>
+                ) : (
+                  <View style={s.prompt}>
+                    <Text style={s.label}>
+                      {exercise.mode === "recognition"
+                        ? "ROMAJI"
+                        : item.script.toUpperCase()}
+                    </Text>
+                    <Text
+                      style={
+                        exercise.mode === "recognition"
+                          ? s.promptReading
+                          : s.promptGlyph
+                      }
+                    >
+                      {exercise.mode === "recognition"
+                        ? item.reading
+                        : item.glyph}
+                    </Text>
+                  </View>
+                )}
+                {exercise.mode !== "recall" ? (
                   <View style={s.choices}>
                     {exercise.choices.map((choice) => (
                       <Pressable
@@ -364,14 +386,19 @@ export default function Session({
                     {countCorrect}{" "}
                     <Text style={s.scoreTotal}>/ {attempts.length}</Text>
                   </Text>
-                  {(["recognition", "recall"] as const).map((mode) => {
+                  {(listening
+                    ? (["listening"] as const)
+                    : (["recognition", "recall"] as const)
+                  ).map((mode) => {
                     const group = attempts.filter((a) => a.mode === mode);
                     return (
                       <View key={mode} style={s.stat}>
                         <Text style={s.body}>
-                          {mode === "recognition"
-                            ? "Recognition"
-                            : "Typed recall"}
+                          {mode === "listening"
+                            ? "Listening"
+                            : mode === "recognition"
+                              ? "Recognition"
+                              : "Typed recall"}
                         </Text>
                         <Text style={s.statNumber}>
                           {group.filter((a) => a.correct).length} /{" "}

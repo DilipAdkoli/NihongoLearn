@@ -1,3 +1,4 @@
+import type { Attempt } from "./storage.types";
 import { yoon } from "./yoon.ts";
 
 export type Script = "hiragana" | "katakana";
@@ -952,7 +953,7 @@ export const lessons = [
 
 export type Exercise = {
   kanaId: string;
-  mode: "recognition" | "recall";
+  mode: Attempt["mode"];
   choices: string[];
 };
 
@@ -965,31 +966,36 @@ function shuffled<T>(items: readonly T[]): T[] {
   return result;
 }
 
-export function makeExercises(ids: string[]): Exercise[] {
+function soundReading(item: Kana) {
+  return item.reading === "wo" ? "o" : item.reading;
+}
+
+export function makeExercises(ids: string[], listening = false): Exercise[] {
   const selected = shuffled(kana.filter((item) => ids.includes(item.id)));
   const recognition = selected.map((item): Exercise => {
     const row = lessons.find((lesson) => lesson.ids.includes(item.id));
-    const neighbors = kana.filter(
-      (other) => other.id !== item.id && row?.ids.includes(other.id),
+    const eligible = kana.filter(
+      (other) =>
+        other.id !== item.id &&
+        other.script === item.script &&
+        other.glyph.length === item.glyph.length &&
+        (listening
+          ? soundReading(other) !== soundReading(item)
+          : other.reading !== item.reading),
     );
+    const neighbors = eligible.filter((other) => row?.ids.includes(other.id));
     const nearby = shuffled(neighbors).slice(0, 3);
     const fill = shuffled(
-      kana.filter(
-        (other) =>
-          other.id !== item.id &&
-          other.script === item.script &&
-          other.glyph.length === item.glyph.length &&
-          !row?.ids.includes(other.id) &&
-          other.reading !== item.reading,
-      ),
+      eligible.filter((other) => !row?.ids.includes(other.id)),
     ).slice(0, 3 - nearby.length);
     const distractors = [...nearby, ...fill].map((other) => other.glyph);
     return {
       kanaId: item.id,
-      mode: "recognition",
+      mode: listening ? "listening" : "recognition",
       choices: shuffled([item.glyph, ...distractors]),
     };
   });
+  if (listening) return recognition;
   // Repeat the first round's order to leave other questions between seeing a
   // character with answer choices and having to recall it independently.
   const recall = selected.map((item): Exercise => ({
@@ -1003,7 +1009,7 @@ export function makeExercises(ids: string[]): Exercise[] {
 export function evaluateAnswer(exercise: Exercise, answer: string): boolean {
   const item = kana.find((entry) => entry.id === exercise.kanaId);
   if (!item) return false;
-  if (exercise.mode === "recognition") return answer === item.glyph;
+  if (exercise.mode !== "recall") return answer === item.glyph;
   const reading = answer.normalize("NFKC").trim().toLowerCase();
   return reading === item.reading || (item.aliases?.includes(reading) ?? false);
 }

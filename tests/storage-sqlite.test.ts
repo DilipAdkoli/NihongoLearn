@@ -80,8 +80,50 @@ test("lessons, attempts and preferences persist across closing and reopening the
 test("opening a database with an unknown schema preserves its version", async (t) => {
   const db = new DatabaseSync(":memory:");
   t.after(() => db.close());
-  db.exec("PRAGMA user_version = 2");
+  db.exec("PRAGMA user_version = 3");
   const store = createSqliteStorage(async () => connect(db));
   await assert.rejects(store.loadStudy(), /different app version/);
+  assert.equal(db.prepare("PRAGMA user_version").get()?.user_version, 3);
+});
+
+test("version 1 migrates atomically and keeps saved answers and preferences", async (t) => {
+  const db = new DatabaseSync(":memory:");
+  t.after(() => db.close());
+  db.exec(`
+    CREATE TABLE seen_kana (kana_id TEXT PRIMARY KEY NOT NULL);
+    CREATE TABLE settings (key TEXT PRIMARY KEY NOT NULL, value INTEGER NOT NULL);
+    CREATE TABLE attempts (
+      id TEXT PRIMARY KEY NOT NULL, kana_id TEXT NOT NULL,
+      mode TEXT NOT NULL CHECK (mode IN ('recognition','recall')),
+      answer TEXT NOT NULL, correct INTEGER NOT NULL, attempted_at INTEGER NOT NULL
+    );
+    INSERT INTO seen_kana VALUES ('a');
+    INSERT INTO settings VALUES ('sound', 0);
+    INSERT INTO attempts VALUES ('old','a','recall','a',1,100);
+    PRAGMA user_version = 1;
+  `);
+  const store = createSqliteStorage(async () => connect(db));
+  const first: Attempt = {
+    id: "old",
+    kanaId: "a",
+    mode: "recall",
+    answer: "a",
+    correct: true,
+    at: 100,
+  };
+  const next: Attempt = {
+    ...first,
+    id: "new",
+    mode: "listening",
+    answer: "あ",
+    at: 200,
+  };
+  assert.deepEqual(await store.loadStudy(), {
+    seen: ["a"],
+    attempts: [first],
+    sound: false,
+  });
+  await store.recordAttempt(next);
+  assert.deepEqual((await store.loadStudy()).attempts, [first, next]);
   assert.equal(db.prepare("PRAGMA user_version").get()?.user_version, 2);
 });
