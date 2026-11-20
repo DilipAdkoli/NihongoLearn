@@ -8,6 +8,8 @@ Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci
 
 For a web build that can reopen offline, run `npm run export:web` and serve `dist/` from the root of an HTTPS origin or from localhost. Open it once with a connection so the service worker can cache the app and audio.
 
+To try the latest pushed web build with Python, download `NihongoLearn-web` from **Artifacts** on the latest successful [App checks run](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml). Unzip it, open the folder containing `index.html` in VS Code, and run `python -m http.server 8000 --bind 127.0.0.1`. Open `http://localhost:8000` in your browser.
+
 The [Android test APK workflow](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/android-apk.yml) builds an ARM64 APK with the JavaScript and audio bundled. A successful run’s **Artifacts** section contains `NihongoLearn-test-arm64`. This APK uses the test signing key and is for sideloading on an Android phone.
 
 ## Current build

@@ -29,3 +29,10 @@ jobs:
         env:
           EXPO_NO_TELEMETRY: "1"
           EXPO_OFFLINE: "1"
+      - uses: actions/upload-artifact@v6
+        if: github.event_name == 'push'
+        with:
+          name: NihongoLearn-web
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
