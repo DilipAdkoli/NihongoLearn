@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   ArrowRight,
   BookMarked,
@@ -20,6 +20,7 @@ import {
 } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
 import { kana, lessons } from "../src/learning";
+import { starterPath } from "../src/starterPath";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
 
@@ -81,6 +82,9 @@ function SectionTitle({
 export default function Home() {
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
+  const path = starterPath(data);
+  const nextStep = path.find((step) => !step.complete);
+  const completedSteps = path.filter((step) => step.complete).length;
   const goal = data.dailyGoal;
   const goalStatus = dailyGoalProgress(data.attempts, goal, new Date());
   const { width } = useWindowDimensions();
@@ -191,6 +195,30 @@ export default function Home() {
             <Text style={s.linkText}>Start review</Text>
             <ArrowRight size={16} color="#345b45" />
           </Pressable>
+        </View>
+      )}
+      {nextStep && (
+        <View style={s.starterCard}>
+          <View style={s.reviewCopy}>
+            <Text accessibilityRole="header" style={s.reviewTitle}>
+              Beginner starter path
+            </Text>
+            <Text style={s.metricLabel}>
+              {completedSteps} of {path.length} steps complete
+            </Text>
+            <Text style={s.nextStep}>{nextStep.title}</Text>
+          </View>
+          <Link href="/starter-path" asChild>
+            <Pressable
+              accessibilityRole="link"
+              style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+            >
+              <Text style={s.linkText}>
+                {completedSteps ? "Continue path" : "Open starter path"}
+              </Text>
+              <ArrowRight size={16} color="#345b45" />
+            </Pressable>
+          </Link>
         </View>
       )}
       {goal > 0 && (
@@ -375,6 +403,19 @@ const s = StyleSheet.create({
   },
   reviewCopy: { flexGrow: 1, flexShrink: 1, gap: 3 },
   reviewTitle: { color: "#253e32", fontSize: 18, fontFamily: "DMSansBold" },
+  starterCard: {
+    backgroundColor: "#f3ecd6",
+    borderColor: "#dfd4b7",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 10,
+  },
+  nextStep: { fontFamily: "DMSansBold", fontSize: 14, color: "#253e32" },
   reviewButton: {
     flexDirection: "row",
     alignItems: "center",
