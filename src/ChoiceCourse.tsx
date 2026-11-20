@@ -39,6 +39,7 @@ type Course =
 
 type PassageData = {
   japanese: string;
+  standardJapanese?: string;
   english: string;
   audio?: readonly [number, number];
 };
@@ -259,9 +260,10 @@ function PracticeCard({
   );
 }
 
-function Passage({ japanese, english, audio }: PassageData) {
+function Passage({ japanese, standardJapanese, english, audio }: PassageData) {
   const [translated, setTranslated] = useState(false);
   const [transcript, setTranscript] = useState(false);
+  const [showKanji, setShowKanji] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -337,7 +339,11 @@ function Passage({ japanese, english, audio }: PassageData) {
           Audio couldn’t play. Tap Listen to retry.
         </Text>
       )}
-      {(!audio || transcript) && <Text style={s.japanese}>{japanese}</Text>}
+      {(!audio || transcript) && (
+        <Text style={s.japanese}>
+          {showKanji && standardJapanese ? standardJapanese : japanese}
+        </Text>
+      )}
       {translated && <Text style={s.body}>{english}</Text>}
       <View style={s.choices}>
         {audio && (
@@ -350,6 +356,15 @@ function Passage({ japanese, english, audio }: PassageData) {
             <Text style={s.body}>
               {transcript ? "Hide transcript" : "Show transcript"}
             </Text>
+          </Pressable>
+        )}
+        {standardJapanese && (!audio || transcript) && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setShowKanji((shown) => !shown)}
+            style={s.choice}
+          >
+            <Text style={s.body}>{showKanji ? "Show kana" : "Show kanji"}</Text>
           </Pressable>
         )}
         <Pressable

@@ -6,6 +6,7 @@ test("each reading passage has text, a translation, and questions with unique ke
   const ids = new Set<string>();
   for (const group of reading) {
     assert.ok(group.passage.japanese.trim());
+    assert.match(group.passage.standardJapanese, /\p{Script=Han}/u);
     assert.ok(group.passage.english.trim());
     assert.ok(group.lessons.length > 0);
     for (const lesson of group.lessons) {

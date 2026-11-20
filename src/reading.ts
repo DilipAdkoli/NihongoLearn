@@ -2,7 +2,7 @@ import type { ChoiceLesson } from "./ChoiceCourse";
 
 export const reading: readonly {
   title: string;
-  passage: { japanese: string; english: string };
+  passage: { japanese: string; standardJapanese: string; english: string };
   lessons: readonly ChoiceLesson[];
 }[] = [
   {
@@ -10,6 +10,8 @@ export const reading: readonly {
     passage: {
       japanese:
         "A: これは ほんですか。\nB: はい、ほんです。\nA: これは かさですか。\nB: いいえ、かぎです。",
+      standardJapanese:
+        "A: これは本ですか。\nB: はい、本です。\nA: これは傘ですか。\nB: いいえ、鍵です。",
       english:
         "A: Is this a book?\nB: Yes, it’s a book.\nA: Is this an umbrella?\nB: No, it’s a key.",
     },
@@ -45,6 +47,8 @@ export const reading: readonly {
     passage: {
       japanese:
         "ここは きっさてんです。\nわたしは おちゃを のみます。\nともだちは パンを たべます。",
+      standardJapanese:
+        "ここは喫茶店です。\n私はお茶を飲みます。\n友だちはパンを食べます。",
       english: "This is a café.\nI drink tea.\nMy friend eats bread.",
     },
     lessons: [
@@ -79,6 +83,8 @@ export const reading: readonly {
     passage: {
       japanese:
         "えきの まえに コンビニが あります。\nえきの ひだりに こうえんが あります。\nコンビニの となりに バスていが あります。",
+      standardJapanese:
+        "駅の前にコンビニがあります。\n駅の左に公園があります。\nコンビニの隣にバス停があります。",
       english:
         "There’s a convenience store in front of the station.\nThere’s a park to the left of the station.\nThere’s a bus stop next to the convenience store.",
     },
@@ -133,6 +139,8 @@ export const reading: readonly {
     passage: {
       japanese:
         "まいあさ、しちじに おきます。\nパンを たべて、それから おちゃを のみます。\nはちじに がっこうに いきます。",
+      standardJapanese:
+        "毎朝、七時に起きます。\nパンを食べて、それからお茶を飲みます。\n八時に学校に行きます。",
       english:
         "Every morning, I get up at seven.\nI eat bread and then drink tea.\nI go to school at eight.",
     },
@@ -180,6 +188,8 @@ export const reading: readonly {
     passage: {
       japanese:
         "きのう、ほんやに いった。\nでも、ほんは かわなかった。\nあした、ともだちと もういちど いく。",
+      standardJapanese:
+        "昨日、本屋に行った。\nでも、本は買わなかった。\n明日、友だちともう一度行く。",
       english:
         "Yesterday I went to a bookstore.\nBut I didn’t buy a book.\nTomorrow I’ll go back with a friend.",
     },
