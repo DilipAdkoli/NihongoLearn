@@ -3,7 +3,12 @@ import type { ChoiceLesson } from "./ChoiceCourse";
 export const reading: readonly {
   id?: string;
   title: string;
-  passage: { japanese: string; standardJapanese: string; english: string };
+  passage: {
+    japanese: string;
+    standardJapanese: string;
+    english: string;
+    lookupWords: readonly string[];
+  };
   lessons: readonly ChoiceLesson[];
 }[] = [
   {
@@ -15,6 +20,7 @@ export const reading: readonly {
         "A: これは本ですか。\nB: はい、本です。\nA: これは傘ですか。\nB: いいえ、鍵です。",
       english:
         "A: Is this a book?\nB: Yes, it’s a book.\nA: Is this an umbrella?\nB: No, it’s a key.",
+      lookupWords: ["本", "傘", "鍵"],
     },
     lessons: [
       {
@@ -51,6 +57,7 @@ export const reading: readonly {
       standardJapanese:
         "ここは喫茶店です。\n私はお茶を飲みます。\n友だちはパンを食べます。",
       english: "This is a café.\nI drink tea.\nMy friend eats bread.",
+      lookupWords: ["お茶", "パン", "友だち"],
     },
     lessons: [
       {
@@ -89,6 +96,7 @@ export const reading: readonly {
         "駅の前にコンビニがあります。\n駅の左に公園があります。\nコンビニの隣にバス停があります。",
       english:
         "There’s a convenience store in front of the station.\nThere’s a park to the left of the station.\nThere’s a bus stop next to the convenience store.",
+      lookupWords: ["駅", "前", "公園"],
     },
     lessons: [
       {
@@ -145,6 +153,7 @@ export const reading: readonly {
         "毎朝、七時に起きます。\nパンを食べて、それからお茶を飲みます。\n八時に学校に行きます。",
       english:
         "Every morning, I get up at seven.\nI eat bread and then drink tea.\nI go to school at eight.",
+      lookupWords: ["起きる", "食べる", "行く"],
     },
     lessons: [
       {
@@ -194,6 +203,7 @@ export const reading: readonly {
         "昨日、本屋に行った。\nでも、本は買わなかった。\n明日、友だちともう一度行く。",
       english:
         "Yesterday I went to a bookstore.\nBut I didn’t buy a book.\nTomorrow I’ll go back with a friend.",
+      lookupWords: ["本屋", "本", "友だち"],
     },
     lessons: [
       {
@@ -243,6 +253,7 @@ export const reading: readonly {
         "本屋の営業時間\n月曜日から金曜日まで\n午前9時から午後6時まで\n土曜日\n午前10時から午後4時まで\n日曜日は休みです。",
       english:
         "Bookstore opening hours\nMonday through Friday\n9 a.m. to 6 p.m.\nSaturday\n10 a.m. to 4 p.m.\nClosed on Sunday.",
+      lookupWords: ["営業時間", "金曜日", "休み"],
     },
     lessons: [
       {

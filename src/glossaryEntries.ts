@@ -25,6 +25,18 @@ for (const group of wordGroups) {
     });
 }
 for (const word of kanjiWords) addEntry(word);
+addEntry({
+  spelling: "本屋",
+  kana: "ほんや",
+  meaning: "bookstore",
+  romaji: "honya",
+});
+addEntry({
+  spelling: "営業時間",
+  kana: "えいぎょうじかん",
+  meaning: "opening hours",
+  romaji: "eigyou jikan",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

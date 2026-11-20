@@ -2,6 +2,7 @@ import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
+import { glossaryEntries } from "./glossaryEntries";
 import type { Attempt } from "./storage.types";
 import { matchesTypedAnswer } from "./typedAnswer";
 import { useStudy } from "./study";
@@ -46,6 +47,7 @@ type PassageData = {
   standardJapanese?: string;
   english: string;
   audio?: readonly [number, number];
+  lookupWords?: readonly string[];
 };
 
 export type CourseGroup = {
@@ -281,7 +283,56 @@ function PracticeCard({
   );
 }
 
-function Passage({ japanese, standardJapanese, english, audio }: PassageData) {
+function PassageVocabulary({ terms }: { terms: readonly string[] }) {
+  const [shown, setShown] = useState(false);
+  const words = terms.flatMap((term) => {
+    const entry = glossaryEntries.find(
+      (candidate) => candidate.spelling === term,
+    );
+    return entry ? [entry] : [];
+  });
+  if (!words.length) return null;
+
+  return (
+    <View style={{ gap: 8 }}>
+      <Pressable
+        accessibilityRole="button"
+        aria-expanded={shown}
+        onPress={() => setShown((visible) => !visible)}
+        style={[s.choice, { alignSelf: "flex-start" }]}
+      >
+        <Text style={s.body}>
+          {shown ? "Hide vocabulary" : "Show vocabulary"}
+        </Text>
+      </Pressable>
+      {shown &&
+        words.map((word) => (
+          <View key={word.spelling} style={s.example}>
+            <Text style={s.japanese}>{word.spelling}</Text>
+            <Text style={s.body}>
+              {word.kana !== word.spelling ? word.kana + " · " : ""}
+              {word.meaning}
+            </Text>
+            {word.audio !== undefined && (
+              <ClipButton
+                clip={word.audio}
+                label="Listen"
+                accessibilityLabel={`Listen to ${word.spelling}`}
+              />
+            )}
+          </View>
+        ))}
+    </View>
+  );
+}
+
+function Passage({
+  japanese,
+  standardJapanese,
+  english,
+  audio,
+  lookupWords,
+}: PassageData) {
   const [translated, setTranslated] = useState(false);
   const [transcript, setTranscript] = useState(false);
   const [showKanji, setShowKanji] = useState(false);
@@ -399,6 +450,7 @@ function Passage({ japanese, standardJapanese, english, audio }: PassageData) {
           </Text>
         </Pressable>
       </View>
+      {lookupWords && <PassageVocabulary terms={lookupWords} />}
     </View>
   );
 }
