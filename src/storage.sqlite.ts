@@ -76,6 +76,15 @@ export function createSqliteStorage(
     return ready;
   }
 
+  async function setFlag(key: string, value: boolean) {
+    const db = await database();
+    await db.runAsync(
+      "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+      key,
+      Number(value),
+    );
+  }
+
   return {
     async loadStudy() {
       const db = await database();
@@ -92,6 +101,12 @@ export function createSqliteStorage(
         ),
       ]);
       return {
+        savedWords: settings
+          .filter(
+            (setting) => setting.key.startsWith("word:") && setting.value === 1,
+          )
+          .map((setting) => setting.key.slice(5))
+          .sort(),
         seen: seen.map((row) => row.kana_id),
         attempts: attempts.map((row) => ({
           ...row,
@@ -122,13 +137,7 @@ export function createSqliteStorage(
         attempt.at,
       );
     },
-    async setPreference(name, value) {
-      const db = await database();
-      await db.runAsync(
-        "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-        name,
-        Number(value),
-      );
-    },
+    setWordSaved: (id, saved) => setFlag("word:" + id, saved),
+    setPreference: setFlag,
   };
 }

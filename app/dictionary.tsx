@@ -1,15 +1,20 @@
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
-import { searchGlossary, type GlossaryEntry } from "../src/glossary";
+import {
+  glossaryKey,
+  searchGlossary,
+  type GlossaryEntry,
+} from "../src/glossary";
 import { weekdayWords } from "../src/kanji";
 import { kana } from "../src/learning";
+import { useStudy } from "../src/study";
 import { wordGroups } from "../src/vocabulary";
 
 const entries = new Map<string, GlossaryEntry>();
 function addEntry(entry: GlossaryEntry) {
-  const key = [entry.kana, entry.meaning.toLowerCase()].join(":");
+  const key = glossaryKey(entry);
   const existing = entries.get(key);
   entries.set(
     key,
@@ -40,10 +45,35 @@ for (const item of kana) {
 }
 
 export default function Dictionary() {
+  const { data, saveWord } = useStudy();
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const savingRef = useRef(false);
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(24);
   const [failed, setFailed] = useState("");
-  const results = searchGlossary([...entries.values()], query);
+  const saved = new Set(data.savedWords);
+  const source = [...entries.values()].filter(
+    (entry) => !savedOnly || saved.has(glossaryKey(entry)),
+  );
+  const results = searchGlossary(source, query);
+
+  async function toggleWord(entry: GlossaryEntry) {
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
+    setSaveFailed(false);
+    const key = glossaryKey(entry);
+    try {
+      await saveWord(key, !saved.has(key));
+    } catch {
+      setSaveFailed(true);
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  }
 
   async function listen(entry: GlossaryEntry) {
     if (entry.audio === undefined) return;
@@ -66,6 +96,22 @@ export default function Dictionary() {
       <Text style={s.detail}>
         Search words from the lessons by Japanese, romaji, or English.
       </Text>
+      <View style={s.actions} accessibilityRole="tablist">
+        {(["All words", "Saved words"] as const).map((label, index) => (
+          <Pressable
+            key={label}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: savedOnly === Boolean(index) }}
+            onPress={() => {
+              setSavedOnly(Boolean(index));
+              setLimit(24);
+            }}
+            style={[s.button, savedOnly !== Boolean(index) && s.outline]}
+          >
+            <Text style={s.buttonLabel}>{label}</Text>
+          </Pressable>
+        ))}
+      </View>
       <TextInput
         accessibilityLabel="Search lesson glossary"
         value={query}
@@ -85,10 +131,15 @@ export default function Dictionary() {
           Couldn’t play the audio for {failed}. Try again.
         </Text>
       )}
+      {saveFailed && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Couldn’t update saved words. Try again.
+        </Text>
+      )}
       {results.length ? (
         <View style={s.list}>
           {results.slice(0, limit).map((entry) => (
-            <View key={entry.kana + ":" + entry.meaning} style={s.row}>
+            <View key={glossaryKey(entry)} style={s.row}>
               <View style={s.grow}>
                 <Text style={s.word}>{entry.spelling}</Text>
                 <Text style={s.detail}>
@@ -97,22 +148,38 @@ export default function Dictionary() {
                   {entry.romaji ? " · " + entry.romaji : ""}
                 </Text>
               </View>
-              {entry.audio !== undefined && (
+              <View style={s.actions}>
+                {entry.audio !== undefined && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Listen to ${entry.kana}`}
+                    onPress={() => listen(entry)}
+                    style={s.button}
+                  >
+                    <Text style={s.buttonLabel}>♪ Listen</Text>
+                  </Pressable>
+                )}
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`Listen to ${entry.kana}`}
-                  onPress={() => listen(entry)}
-                  style={s.button}
+                  accessibilityLabel={`${saved.has(glossaryKey(entry)) ? "Remove saved word" : "Save"} ${entry.spelling}`}
+                  accessibilityState={{ disabled: saving }}
+                  onPress={() => toggleWord(entry)}
+                  disabled={saving}
+                  style={[s.button, s.outline]}
                 >
-                  <Text style={s.buttonLabel}>♪ Listen</Text>
+                  <Text style={s.buttonLabel}>
+                    {saved.has(glossaryKey(entry)) ? "Saved" : "Save"}
+                  </Text>
                 </Pressable>
-              )}
+              </View>
             </View>
           ))}
         </View>
       ) : (
         <Text accessibilityLiveRegion="polite" style={s.detail}>
-          No matching lesson words.
+          {savedOnly && !data.savedWords.length
+            ? "Save a word to see it here."
+            : "No matching lesson words."}
         </Text>
       )}
       {limit < results.length && (
@@ -173,6 +240,12 @@ const s = StyleSheet.create({
     backgroundColor: "#dfe8d9",
   },
   buttonLabel: { color: "#215848", fontFamily: "DMSansBold" },
+  actions: { flexDirection: "row", gap: 6, flexWrap: "wrap" },
+  outline: {
+    backgroundColor: "#fffef8",
+    borderColor: "#dadfd3",
+    borderWidth: 1,
+  },
   more: { alignSelf: "flex-start" },
   error: { color: "#8d392b", fontFamily: "DMSans" },
 });

@@ -15,7 +15,7 @@ export function createBackup(data: StudyData, now: Date) {
 
 export type BackupFile = ReturnType<typeof createBackup>;
 
-type Progress = Pick<StudyData, "seen" | "attempts">;
+type Progress = Pick<StudyData, "seen" | "attempts" | "savedWords">;
 
 function object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -45,10 +45,12 @@ export function parseBackup(content: string): Progress {
   if (!object(value) || value.schemaVersion !== 1 || !object(value.study)) {
     throw new Error("Unsupported NihongoLearn backup.");
   }
-  const { seen, attempts } = value.study;
+  const { seen, attempts, savedWords = [] } = value.study;
   if (
     !Array.isArray(seen) ||
     seen.some((entry) => typeof entry !== "string" || !entry) ||
+    !Array.isArray(savedWords) ||
+    savedWords.some((entry) => typeof entry !== "string" || !entry) ||
     !Array.isArray(attempts) ||
     !attempts.every(validAttempt)
   ) {
@@ -57,5 +59,9 @@ export function parseBackup(content: string): Progress {
   if (new Set(attempts.map((attempt) => attempt.id)).size !== attempts.length) {
     throw new Error("Duplicate answers in NihongoLearn backup.");
   }
-  return { seen: [...new Set<string>(seen)], attempts };
+  return {
+    seen: [...new Set<string>(seen)],
+    attempts,
+    savedWords: [...new Set<string>(savedWords)],
+  };
 }

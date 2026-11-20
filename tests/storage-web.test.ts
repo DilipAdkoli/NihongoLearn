@@ -28,6 +28,7 @@ test("web progress survives reopening and retries preserve the original attempt"
     JSON.parse(run("console.log(JSON.stringify(await store.loadStudy()))"));
   assert.deepEqual(reload(), {
     seen: [],
+    savedWords: [],
     attempts: [],
     romaji: true,
     sound: true,
@@ -59,6 +60,7 @@ test("web progress survives reopening and retries preserve the original attempt"
       store.recordAttempt(${JSON.stringify(first)}),
       store.setPreference("sound", false),
       store.setPreference("romaji", false),
+      store.setWordSaved("みず:water", true),
     ]);
   `);
   run(
@@ -66,6 +68,7 @@ test("web progress survives reopening and retries preserve the original attempt"
   );
   assert.deepEqual(reload(), {
     seen: ["a", "i"],
+    savedWords: ["みず:water"],
     attempts: [first, second],
     romaji: false,
     sound: false,
@@ -73,4 +76,6 @@ test("web progress survives reopening and retries preserve the original attempt"
   run('await store.setPreference("sound", true)');
   assert.equal(reload().sound, true);
   assert.equal(reload().romaji, false);
+  run('await store.setWordSaved("みず:water", false)');
+  assert.deepEqual(reload().savedWords, []);
 });

@@ -17,6 +17,7 @@ type StudyContext = {
   see: (id: string) => Promise<void>;
   answer: (attempt: Attempt) => Promise<void>;
   mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
+  saveWord: (id: string, saved: boolean) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -96,6 +97,9 @@ export function StudyProvider({ children }: PropsWithChildren) {
         for (const id of backup.seen) {
           if (!seen.has(id)) await storage.markSeen(id);
         }
+        for (const id of backup.savedWords) {
+          await storage.setWordSaved(id, true);
+        }
         for (const attempt of backup.attempts) {
           if (!answers.has(attempt.id)) await storage.recordAttempt(attempt);
         }
@@ -112,10 +116,23 @@ export function StudyProvider({ children }: PropsWithChildren) {
           return {
             ...old,
             seen: [...new Set([...old.seen, ...persisted.seen])],
+            savedWords: [
+              ...new Set([...old.savedWords, ...persisted.savedWords]),
+            ],
             attempts: [...attempts.values()],
           };
         });
       }
+    },
+    async saveWord(id, saved) {
+      await storage.setWordSaved(id, saved);
+      setData((old) => {
+        if (!old) return old;
+        const words = new Set(old.savedWords);
+        if (saved) words.add(id);
+        else words.delete(id);
+        return { ...old, savedWords: [...words] };
+      });
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);

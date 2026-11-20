@@ -38,6 +38,7 @@ test("lessons, attempts and preferences persist across closing and reopening the
   const store = createSqliteStorage(async () => connect(db));
   assert.deepEqual(await store.loadStudy(), {
     seen: [],
+    savedWords: [],
     attempts: [],
     romaji: true,
     sound: true,
@@ -67,11 +68,13 @@ test("lessons, attempts and preferences persist across closing and reopening the
   await store.recordAttempt({ ...first, answer: "changed" });
   await store.setPreference("sound", false);
   await store.setPreference("romaji", false);
+  await store.setWordSaved("みず:water", true);
   db.close();
   db = new DatabaseSync(filename);
   const reopened = createSqliteStorage(async () => connect(db));
   assert.deepEqual(await reopened.loadStudy(), {
     seen: ["a", "i"],
+    savedWords: ["みず:water"],
     attempts: [first, second],
     romaji: false,
     sound: false,
@@ -79,6 +82,8 @@ test("lessons, attempts and preferences persist across closing and reopening the
   await reopened.setPreference("sound", true);
   assert.equal((await reopened.loadStudy()).sound, true);
   assert.equal((await reopened.loadStudy()).romaji, false);
+  await reopened.setWordSaved("みず:water", false);
+  assert.deepEqual((await reopened.loadStudy()).savedWords, []);
 });
 
 test("opening a database with an unknown schema preserves its version", async (t) => {
@@ -124,6 +129,7 @@ test("version 1 migrates atomically and keeps saved answers and preferences", as
   };
   assert.deepEqual(await store.loadStudy(), {
     seen: ["a"],
+    savedWords: [],
     attempts: [first],
     romaji: true,
     sound: false,

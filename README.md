@@ -11,7 +11,7 @@ For a web build that can reopen offline, run `npm run export:web` and serve `dis
 ## Current build
 
 - **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. The sound guide compares small っ and ッ and long vowels.
-- **Beginner lessons.** Practice polite grammar, everyday words, sentence building, weekday kanji, and scripted dialogue. Reading and listening passages offer optional translations. Listening includes two playback speeds and transcripts. The glossary searches lesson words by Japanese, romaji, or English.
+- **Beginner lessons.** Practice polite grammar, everyday words, sentence building, weekday kanji, and scripted dialogue. Reading and listening passages offer optional translations. Listening includes two playback speeds and transcripts. The glossary searches lesson words by Japanese, romaji, or English and saves words for later.
 - **Review and progress.** Overview shows due kana and opens the next review batch. FSRS schedules recall from saved answers. A kana check suggests a lesson, and Review offers targeted drills for pairs learners have mixed up. Progress shows separate skill scores and seven days of activity.
 - **Local settings.** Pronunciation audio and kana reading hints can be toggled independently. Settings exports study data as JSON and merges imported progress without changing local preferences.
 

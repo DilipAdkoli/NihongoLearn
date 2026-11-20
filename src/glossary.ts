@@ -6,6 +6,10 @@ export type GlossaryEntry = {
   audio?: number;
 };
 
+export function glossaryKey(entry: GlossaryEntry) {
+  return `${entry.kana}:${entry.meaning.toLowerCase()}`;
+}
+
 function normalizeQuery(value: string) {
   return value
     .normalize("NFKC")

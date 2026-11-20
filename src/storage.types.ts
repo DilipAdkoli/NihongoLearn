@@ -9,6 +9,7 @@ export type Attempt = {
 
 export type StudyData = {
   seen: string[];
+  savedWords: string[];
   attempts: Attempt[];
   sound: boolean;
   romaji: boolean;
@@ -20,5 +21,6 @@ export type StudyStorage = {
   loadStudy(): Promise<StudyData>;
   markSeen(id: string): Promise<void>;
   recordAttempt(attempt: Attempt): Promise<void>;
+  setWordSaved(id: string, saved: boolean): Promise<void>;
   setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };

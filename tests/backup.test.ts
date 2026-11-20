@@ -6,6 +6,7 @@ import type { StudyData } from "../src/storage.types.ts";
 test("backup exports versioned Unicode study data and preferences", () => {
   const data: StudyData = {
     seen: ["kata-shi"],
+    savedWords: ["みず:water"],
     sound: false,
     romaji: true,
     attempts: [
@@ -38,13 +39,24 @@ test("import parses exported progress without changing device preferences", () =
     at: 12,
     mode: "recognition" as const,
   };
-  const data = { seen: ["a"], attempts: [attempt], sound: true, romaji: false };
+  const data = {
+    seen: ["a"],
+    savedWords: ["みず:water"],
+    attempts: [attempt],
+    sound: true,
+    romaji: false,
+  };
   assert.deepEqual(parseBackup(createBackup(data, new Date(0)).content), {
     seen: ["a"],
+    savedWords: ["みず:water"],
     attempts: [attempt],
   });
   const stringify = (study: unknown, schemaVersion = 1) =>
     JSON.stringify({ schemaVersion, study });
+  assert.deepEqual(
+    parseBackup(stringify({ seen: [], attempts: [] })).savedWords,
+    [],
+  );
   assert.throws(() => parseBackup(stringify(data, 2)), /Unsupported/);
   assert.throws(
     () => parseBackup(stringify({ ...data, seen: [false] })),

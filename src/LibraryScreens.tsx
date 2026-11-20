@@ -686,7 +686,8 @@ export function Settings() {
             <View style={s.grow}>
               <Text style={s.rowTitle}>Export study history</Text>
               <Text style={s.detail}>
-                Save a JSON copy of your answers, studied kana, and preferences.
+                Save a JSON copy of your answers, studied kana, saved words, and
+                preferences.
               </Text>
               <Pressable
                 accessibilityRole="button"
