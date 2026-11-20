@@ -349,6 +349,82 @@ export const wordGroups: readonly {
       },
     ],
   },
+  {
+    id: "town",
+    title: "Places in town",
+    words: [
+      {
+        id: "school",
+        kana: "がっこう",
+        spelling: "学校",
+        romaji: "gakkou",
+        meaning: "school",
+        audio: require("../assets/audio/word-school.mp3"),
+      },
+      {
+        id: "library",
+        kana: "としょかん",
+        spelling: "図書館",
+        romaji: "toshokan",
+        meaning: "library",
+        audio: require("../assets/audio/word-library.mp3"),
+      },
+      {
+        id: "supermarket",
+        kana: "スーパー",
+        spelling: "スーパー",
+        romaji: "suupaa",
+        meaning: "supermarket",
+        audio: require("../assets/audio/word-supermarket.mp3"),
+      },
+      {
+        id: "post-office",
+        kana: "ゆうびんきょく",
+        spelling: "郵便局",
+        romaji: "yuubinkyoku",
+        meaning: "post office",
+        audio: require("../assets/audio/word-post-office.mp3"),
+      },
+    ],
+  },
+  {
+    id: "local-services",
+    title: "Local services",
+    words: [
+      {
+        id: "hospital",
+        kana: "びょういん",
+        spelling: "病院",
+        romaji: "byouin",
+        meaning: "hospital",
+        audio: require("../assets/audio/word-hospital.mp3"),
+      },
+      {
+        id: "pharmacy",
+        kana: "やっきょく",
+        spelling: "薬局",
+        romaji: "yakkyoku",
+        meaning: "pharmacy",
+        audio: require("../assets/audio/word-pharmacy.mp3"),
+      },
+      {
+        id: "bank",
+        kana: "ぎんこう",
+        spelling: "銀行",
+        romaji: "ginkou",
+        meaning: "bank",
+        audio: require("../assets/audio/word-bank.mp3"),
+      },
+      {
+        id: "police-box",
+        kana: "こうばん",
+        spelling: "交番",
+        romaji: "kouban",
+        meaning: "police box",
+        audio: require("../assets/audio/word-police-box.mp3"),
+      },
+    ],
+  },
 ];
 
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
