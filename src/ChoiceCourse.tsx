@@ -48,6 +48,7 @@ type PassageData = {
 };
 
 export type CourseGroup = {
+  id?: string;
   title?: string;
   passage?: PassageData;
   lessons: readonly ChoiceLesson[];
@@ -405,6 +406,7 @@ export function ChoiceCourse({
   backLabel = "‹ Back to Learn",
   showBack = true,
   browseTopics = false,
+  initialTopic,
   reviewQuestions = false,
 }: {
   title: string;
@@ -415,10 +417,18 @@ export function ChoiceCourse({
   backLabel?: string;
   showBack?: boolean;
   browseTopics?: boolean;
+  initialTopic?: string;
   reviewQuestions?: boolean;
 }) {
   const { data, answer } = useStudy();
-  const [topic, setTopic] = useState(0);
+  const [topic, setTopic] = useState(() =>
+    initialTopic
+      ? Math.max(
+          0,
+          groups.findIndex(({ id }) => id === initialTopic),
+        )
+      : 0,
+  );
   const showTopics = browseTopics && groups.length > 1;
   const visibleGroups = showTopics ? groups.slice(topic, topic + 1) : groups;
   const attempted = showTopics

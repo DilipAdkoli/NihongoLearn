@@ -2,6 +2,7 @@ import type { CourseGroup } from "./ChoiceCourse";
 
 export const conversation = [
   {
+    id: "introduction",
     title: "Meeting someone",
     lessons: [
       {
@@ -36,6 +37,7 @@ export const conversation = [
     ],
   },
   {
+    id: "cafe",
     title: "At a café",
     lessons: [
       {
@@ -74,6 +76,7 @@ export const conversation = [
     ],
   },
   {
+    id: "station",
     title: "At the station",
     lessons: [
       {
@@ -133,6 +136,7 @@ export const conversation = [
     ],
   },
   {
+    id: "shop",
     title: "At a shop",
     lessons: [
       {

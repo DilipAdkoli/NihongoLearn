@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from "expo-router";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { conversation } from "../src/conversation";
 
@@ -25,11 +26,16 @@ const dialogueGroups = conversation.map((group) => ({
 }));
 
 export default function Conversation() {
+  const { topic } = useLocalSearchParams<{ topic?: string }>();
+  const initialTopic = typeof topic === "string" ? topic : undefined;
   return (
     <ChoiceCourse
+      key={initialTopic}
       title="Everyday dialogue"
       course="conversation"
       groups={dialogueGroups}
+      browseTopics
+      initialTopic={initialTopic}
     />
   );
 }

@@ -47,8 +47,8 @@ const steps = [
   {
     id: "conversation",
     title: "Order tea and thank the server",
-    detail: "Complete the café exercises in Everyday dialogue.",
-    href: "/conversation",
+    detail: "Complete both exercises in the café dialogue.",
+    href: { pathname: "/conversation", params: { topic: "cafe" } },
     answers: ["conversation:order-tea", "conversation:thank-server"],
   },
 ] as const;
