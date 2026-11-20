@@ -232,4 +232,56 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    title: "Bookstore opening hours",
+    passage: {
+      japanese:
+        "ほんやの えいぎょうじかん\nげつようびから きんようびまで\nごぜん くじから ごご ろくじまで\nどようび\nごぜん じゅうじから ごご よじまで\nにちようびは やすみです。",
+      standardJapanese:
+        "本屋の営業時間\n月曜日から金曜日まで\n午前9時から午後6時まで\n土曜日\n午前10時から午後4時まで\n日曜日は休みです。",
+      english:
+        "Bookstore opening hours\nMonday through Friday\n9 a.m. to 6 p.m.\nSaturday\n10 a.m. to 4 p.m.\nClosed on Sunday.",
+    },
+    lessons: [
+      {
+        id: "hours-weekday-close",
+        title: "Friday closing time",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What time does the bookstore close on Friday?",
+        stem: "",
+        choices: ["4 p.m.", "6 p.m.", "9 a.m."],
+        answer: "6 p.m.",
+        feedback:
+          "Friday falls in the Monday-to-Friday range. ごご ろくじまで means until 6 p.m.",
+      },
+      {
+        id: "hours-saturday-open",
+        title: "Saturday opening time",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What time does the bookstore open on Saturday?",
+        stem: "",
+        choices: ["9 a.m.", "4 p.m.", "10 a.m."],
+        answer: "10 a.m.",
+        feedback:
+          "どようび is Saturday. ごぜん じゅうじから means from 10 a.m.",
+      },
+      {
+        id: "hours-closed-day",
+        title: "Closed for the day",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which day is the bookstore closed all day?",
+        stem: "",
+        choices: ["Sunday", "Monday", "Saturday"],
+        answer: "Sunday",
+        feedback:
+          "にちようびは やすみです means the bookstore is closed on Sunday.",
+      },
+    ],
+  },
 ];
