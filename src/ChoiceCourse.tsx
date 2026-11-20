@@ -101,7 +101,9 @@ function PracticeCard({
   onAnswer: (attempt: Attempt) => Promise<void>;
   reviewQuestions: boolean;
 }) {
-  const studyFirst = course === "vocabulary" || course === "kanji";
+  const studyFirst =
+    !reviewQuestions && (course === "vocabulary" || course === "kanji");
+  const questionHeading = reviewQuestions && course === "grammar";
   const [practice, setPractice] = useState(!studyFirst);
   const [choice, setChoice] = useState("");
   const [result, setResult] = useState<Attempt>();
@@ -149,7 +151,7 @@ function PracticeCard({
   return (
     <View style={s.card}>
       <Text accessibilityRole="header" style={s.heading}>
-        {reviewQuestions ? lesson.prompt : lesson.title}
+        {questionHeading ? lesson.prompt : lesson.title}
       </Text>
       {(!practice ||
         (course === "grammar" && !reviewQuestions) ||
@@ -185,7 +187,7 @@ function PracticeCard({
         </Pressable>
       ) : (
         <>
-          {!reviewQuestions && <Text style={s.body}>{lesson.prompt}</Text>}
+          {!questionHeading && <Text style={s.body}>{lesson.prompt}</Text>}
           {!!lesson.stem && lesson.stem !== lesson.title && (
             <Text style={s.japanese}>{lesson.stem}</Text>
           )}

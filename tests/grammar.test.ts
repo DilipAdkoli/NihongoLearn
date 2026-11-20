@@ -3,7 +3,8 @@ import test from "node:test";
 import { comparisons } from "../src/comparisons.ts";
 import { existence } from "../src/existence.ts";
 import { adjectives, demonstratives, teForm, verbs } from "../src/grammar.ts";
-import { grammarTopics, missedGrammar } from "../src/grammarCourse.ts";
+import { grammarTopics } from "../src/grammarCourse.ts";
+import { missedQuestions } from "../src/missedQuestions.ts";
 import { questionWords } from "../src/questions.ts";
 import type { Attempt } from "../src/storage.types.ts";
 
@@ -91,7 +92,9 @@ test("grammar review selects only known questions with an incorrect latest answe
     attempt("grammar:removed-lesson", 8, false),
   ];
   assert.deepEqual(
-    missedGrammar(history).map((lesson) => lesson.id),
+    missedQuestions(history, "grammar", grammarTopics).map(
+      (lesson) => lesson.id,
+    ),
     ["question-ka", "topic-wa"],
   );
 });

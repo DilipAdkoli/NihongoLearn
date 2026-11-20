@@ -1,5 +1,5 @@
 import { actionPatterns } from "./actionPatterns.ts";
-import type { ChoiceLesson, CourseGroup } from "./ChoiceCourse";
+import type { CourseGroup } from "./ChoiceCourse";
 import { comparisons } from "./comparisons.ts";
 import { existence } from "./existence.ts";
 import {
@@ -11,7 +11,6 @@ import {
   verbs,
 } from "./grammar.ts";
 import { questionWords } from "./questions.ts";
-import type { Attempt } from "./storage.types";
 
 export const grammarTopics: readonly CourseGroup[] = [
   { title: "Statements and questions", lessons: grammar },
@@ -25,23 +24,3 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Requests with the て-form", lessons: teForm },
   { title: "Actions, permission, and wants", lessons: actionPatterns },
 ];
-
-const lessons = grammarTopics.flatMap((topic) => topic.lessons);
-const byKey = new Map(
-  lessons.map((lesson) => [`grammar:${lesson.id}`, lesson]),
-);
-
-export function missedGrammar(attempts: readonly Attempt[]) {
-  const latest = new Map<string, { attempt: Attempt; lesson: ChoiceLesson }>();
-  for (const attempt of attempts) {
-    const lesson = byKey.get(attempt.kanaId);
-    if (!lesson) continue;
-    const previous = latest.get(attempt.kanaId);
-    if (!previous || attempt.at >= previous.attempt.at)
-      latest.set(attempt.kanaId, { attempt, lesson });
-  }
-  return [...latest.values()]
-    .filter(({ attempt }) => !attempt.correct)
-    .sort((a, b) => b.attempt.at - a.attempt.at)
-    .map(({ lesson }) => lesson);
-}

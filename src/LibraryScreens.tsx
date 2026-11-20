@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
@@ -26,7 +26,7 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
-import { missedGrammar } from "./grammarCourse";
+import { missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, type Script } from "./learning";
 import { placementSample } from "./placement";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
@@ -363,10 +363,26 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
   return latest?.correct;
 }
 
+function ReviewLink({ href, label }: { href: Href; label: string }) {
+  return (
+    <Link href={href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        style={({ pressed }) => [s.action, pressed && s.pressed]}
+      >
+        <Text style={s.actionLabel}>{label}</Text>
+        <ArrowRight size={18} color="white" />
+      </Pressable>
+    </Link>
+  );
+}
+
 export function Review() {
   const { data } = useStudy();
   const { queue, due } = useReviewQueue(data);
-  const grammarCount = missedGrammar(data.attempts).length;
+  const grammarCount = missedLessons(data.attempts, "grammar").length;
+  const recognitionCount = missedLessons(data.attempts, "vocabulary").length;
+  const recallCount = missedLessons(data.attempts, "vocabulary-recall").length;
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
@@ -391,7 +407,7 @@ export function Review() {
     <View style={s.page}>
       <Heading
         title="Review"
-        detail="Revisit kana and grammar from past lessons."
+        detail="Revisit kana, grammar, and words from past lessons."
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
@@ -451,15 +467,28 @@ export function Review() {
             Your latest answer was incorrect on {grammarCount}{" "}
             {grammarCount === 1 ? "question" : "questions"}.
           </Text>
-          <Link href="/grammar-review" asChild>
-            <Pressable
-              accessibilityRole="link"
-              style={({ pressed }) => [s.action, pressed && s.pressed]}
-            >
-              <Text style={s.actionLabel}>Review grammar</Text>
-              <ArrowRight size={18} color="white" />
-            </Pressable>
-          </Link>
+          <ReviewLink href="/grammar-review" label="Review grammar" />
+        </View>
+      )}
+      {recognitionCount + recallCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Words to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {recognitionCount > 0 && (
+              <ReviewLink
+                href="/word-review"
+                label={`Recognize ${recognitionCount} missed ${recognitionCount === 1 ? "word" : "words"}`}
+              />
+            )}
+            {recallCount > 0 && (
+              <ReviewLink
+                href={{ pathname: "/word-review", params: { mode: "recall" } }}
+                label={`Recall ${recallCount} missed ${recallCount === 1 ? "word" : "words"}`}
+              />
+            )}
+          </View>
         </View>
       )}
       {!!pairs.length && (
