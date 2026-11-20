@@ -14,7 +14,7 @@ const seenPrefix = namespace + "seen:";
 const wordPrefix = namespace + "word:";
 const attemptPrefix = namespace + "attempt:";
 
-export async function loadStudy(): Promise<StudyData> {
+function readStudy(): StudyData {
   const storage = globalThis.localStorage;
   const seen: string[] = [];
   const savedWords: string[] = [];
@@ -47,6 +47,38 @@ export async function loadStudy(): Promise<StudyData> {
     ),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
+  };
+}
+
+export async function loadStudy(): Promise<StudyData> {
+  return readStudy();
+}
+
+export function subscribeStudyChanges(listener: (study: StudyData) => void) {
+  let refresh: number | undefined;
+  function changed(event: StorageEvent) {
+    if (
+      event.storageArea !== window.localStorage ||
+      (event.key !== null && !event.key.startsWith(namespace)) ||
+      refresh !== undefined
+    )
+      return;
+    refresh = window.setTimeout(() => {
+      refresh = undefined;
+      let study: StudyData;
+      try {
+        study = readStudy();
+      } catch {
+        return;
+      }
+      listener(study);
+    }, 16);
+  }
+
+  window.addEventListener("storage", changed);
+  return () => {
+    window.removeEventListener("storage", changed);
+    window.clearTimeout(refresh);
   };
 }
 

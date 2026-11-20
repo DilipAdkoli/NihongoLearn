@@ -47,6 +47,7 @@ export function StudyProvider({ children }: PropsWithChildren) {
       active = false;
     };
   }, [retry]);
+  useEffect(() => storage.subscribeStudyChanges(setData), []);
 
   if (!data)
     return (

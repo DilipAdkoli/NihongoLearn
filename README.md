@@ -23,7 +23,7 @@ npm.cmd run preview:web
 
 In Chrome or Edge, use the browser’s **Install NihongoLearn** action to open the exported build as a standalone app.
 
-Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
+Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage and shares updates across tabs open to the same local URL. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
 To try a prebuilt copy, download `NihongoLearn-web` from **Artifacts** on the latest successful App checks run for `codex/nihongolearn`. Unzip it, open the folder containing `index.html` in VS Code, and run `node serve.mjs` in its terminal. Open the local URL it prints. [Web builds](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml?query=branch%3Acodex%2Fnihongolearn)
 
