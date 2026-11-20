@@ -1,8 +1,9 @@
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import type { Attempt } from "./storage.types";
+import { matchesTypedAnswer } from "./typedAnswer";
 import { useStudy } from "./study";
 
 export type ChoiceLesson = {
@@ -17,6 +18,7 @@ export type ChoiceLesson = {
   answer: string;
   feedback: string;
   audio?: number;
+  acceptedAnswers?: readonly string[];
 };
 
 type Course =
@@ -30,7 +32,8 @@ type Course =
   | "loanwords"
   | "numbers"
   | "time"
-  | "calendar";
+  | "calendar"
+  | "vocabulary-recall";
 
 type PassageData = {
   japanese: string;
@@ -66,18 +69,22 @@ function PracticeCard({
   const [failed, setFailed] = useState(false);
   const active = useRef(false);
   const saving = useRef<Attempt | null>(null);
+  const accepted = lesson.acceptedAnswers;
+  const canCheck = !!choice.trim() && !pending;
 
   async function check() {
-    if (!choice || active.current || result) return;
+    if (!canCheck || active.current || result) return;
     active.current = true;
     setPending(true);
     setFailed(false);
     const attempt: Attempt = saving.current ?? {
       id: `${course}-${lesson.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       kanaId: lessonKey(course, lesson.id),
-      mode: "recognition",
-      answer: choice,
-      correct: choice === lesson.answer,
+      mode: accepted ? "recall" : "recognition",
+      answer: choice.trim(),
+      correct: accepted
+        ? matchesTypedAnswer(choice, accepted)
+        : choice === lesson.answer,
       at: Date.now(),
     };
     saving.current = attempt;
@@ -155,23 +162,38 @@ function PracticeCard({
           {!!lesson.stem && lesson.stem !== lesson.title && (
             <Text style={s.japanese}>{lesson.stem}</Text>
           )}
-          <View style={s.choices}>
-            {lesson.choices.map((value) => (
-              <Pressable
-                key={value}
-                accessibilityRole="button"
-                accessibilityState={{
-                  selected: value === choice,
-                  disabled: pending || failed || !!result,
-                }}
-                disabled={pending || failed || !!result}
-                onPress={() => setChoice(value)}
-                style={[s.choice, value === choice && s.selected]}
-              >
-                <Text style={s.choiceLabel}>{value}</Text>
-              </Pressable>
-            ))}
-          </View>
+          {accepted ? (
+            <TextInput
+              accessibilityLabel="Your answer in Japanese"
+              placeholder="Type in Japanese"
+              placeholderTextColor="#566860"
+              autoCorrect={false}
+              autoCapitalize="none"
+              maxLength={50}
+              editable={!pending && !failed && !result}
+              value={choice}
+              onChangeText={setChoice}
+              style={s.answerInput}
+            />
+          ) : (
+            <View style={s.choices}>
+              {lesson.choices.map((value) => (
+                <Pressable
+                  key={value}
+                  accessibilityRole="button"
+                  accessibilityState={{
+                    selected: value === choice,
+                    disabled: pending || failed || !!result,
+                  }}
+                  disabled={pending || failed || !!result}
+                  onPress={() => setChoice(value)}
+                  style={[s.choice, value === choice && s.selected]}
+                >
+                  <Text style={s.choiceLabel}>{value}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
           {!!result && (
             <Text accessibilityLiveRegion="polite" style={s.body}>
               {result.correct
@@ -187,10 +209,10 @@ function PracticeCard({
           )}
           <Pressable
             accessibilityRole="button"
-            disabled={!choice || pending}
-            accessibilityState={{ disabled: !choice || pending }}
+            disabled={!canCheck}
+            accessibilityState={{ disabled: !canCheck }}
             onPress={result ? retry : check}
-            style={[s.action, (!choice || pending) && s.disabled]}
+            style={[s.action, !canCheck && s.disabled]}
           >
             <Text style={s.actionLabel}>
               {result ? "Try again" : failed ? "Retry save" : "Check answer"}
@@ -281,7 +303,7 @@ export function ChoiceCourse({
   title: string;
   course: Course;
   groups: readonly CourseGroup[];
-  backHref?: "/learn" | "/dictionary" | "/loanwords";
+  backHref?: "/learn" | "/dictionary" | "/loanwords" | "/vocabulary";
   backLabel?: string;
   showBack?: boolean;
 }) {
@@ -362,6 +384,15 @@ const s = StyleSheet.create({
   },
   choiceLabel: { fontSize: 18, color: "#203730" },
   selected: { backgroundColor: "#dfe8d9", borderColor: "#215848" },
+  answerInput: {
+    paddingHorizontal: 10,
+    minHeight: 46,
+    color: "#203730",
+    borderWidth: 1,
+    borderColor: "#9bad9e",
+    borderRadius: 8,
+    fontSize: 18,
+  },
   action: {
     minHeight: 44,
     justifyContent: "center",

@@ -177,3 +177,24 @@ export const vocabulary = wordGroups.map(({ title, words }) => ({
     audio: word.audio,
   })),
 }));
+
+export const vocabularyRecall = wordGroups.map(({ title, words }) => ({
+  title,
+  lessons: words.map((word): ChoiceLesson => ({
+    id: word.id,
+    title: word.meaning,
+    japanese: "",
+    english: "",
+    explanation: "",
+    prompt: "Type the Japanese word in kana or kanji.",
+    stem: "",
+    choices: [],
+    acceptedAnswers: [
+      word.kana,
+      word.spelling,
+      ...(word.id === "friend" ? ["友達"] : []),
+    ],
+    answer: word.kana,
+    feedback: `${word.spelling} (${word.kana}) means ${word.meaning}.`,
+  })),
+}));

@@ -169,6 +169,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/word-recall",
+    title: "Recall Japanese words",
+    detail: "Type kana or kanji from an English clue",
+    icon: BookOpen,
+  },
+  {
     href: "/grammar",
     title: "First Japanese sentences",
     detail: "Polite statements, particles, and verbs",
@@ -513,6 +519,9 @@ export function Progress() {
   const dateAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("calendar:"),
   );
+  const wordRecallAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("vocabulary-recall:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -598,6 +607,9 @@ export function Progress() {
       )}
       {!!dateAttempts.length && (
         <Score label="Calendar dates" attempts={dateAttempts} />
+      )}
+      {!!wordRecallAttempts.length && (
+        <Score label="Vocabulary recall" attempts={wordRecallAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
