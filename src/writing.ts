@@ -30,6 +30,39 @@ export const writingTasks = [
     ],
     feedback: "で marks where the reading happens. を marks what is read.",
   },
+  {
+    id: "park-left-of-station",
+    meaning: "There’s a park to the left of the station.",
+    tiles: ["が", "ひだり", "えき", "あります", "こうえん", "の", "に"],
+    answers: [
+      ["えき", "の", "ひだり", "に", "こうえん", "が", "あります"],
+      ["こうえん", "が", "えき", "の", "ひだり", "に", "あります"],
+    ],
+    feedback:
+      "えきの ひだりに gives the location. こうえんが marks what’s there.",
+  },
+  {
+    id: "photo-permission",
+    meaning: "May I take a photo here?",
+    tiles: ["を", "いいですか", "ここ", "しゃしん", "で", "とっても"],
+    answers: [
+      ["ここ", "で", "しゃしん", "を", "とっても", "いいですか"],
+      ["しゃしん", "を", "ここ", "で", "とっても", "いいですか"],
+    ],
+    feedback:
+      "ここで gives the place of the action. とっても いいですか asks permission to take the photo.",
+  },
+  {
+    id: "want-tea-at-cafe",
+    meaning: "I want to drink tea at the café.",
+    tiles: ["のみたいです", "を", "きっさてん", "おちゃ", "で"],
+    answers: [
+      ["きっさてん", "で", "おちゃ", "を", "のみたいです"],
+      ["おちゃ", "を", "きっさてん", "で", "のみたいです"],
+    ],
+    feedback:
+      "きっさてんで means at the café. のみたいです means I want to drink.",
+  },
 ] as const;
 
 export function isSentenceAnswer(
