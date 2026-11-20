@@ -208,6 +208,21 @@ export function Learn() {
           <ChevronRight size={18} color={muted} />
         </Pressable>
       </Link>
+      <Link href="/passage-listening" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Listen to short passages</Text>
+            <Text style={s.detail}>
+              Hear two short passages at normal or slower speed and answer
+              questions.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
@@ -417,6 +432,9 @@ export function Progress() {
   const readingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("reading:"),
   );
+  const passageAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("passage-listening:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -475,6 +493,9 @@ export function Progress() {
       )}
       {!!readingAttempts.length && (
         <Score label="Reading" attempts={readingAttempts} />
+      )}
+      {!!passageAttempts.length && (
+        <Score label="Passage listening" attempts={passageAttempts} />
       )}
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>

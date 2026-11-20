@@ -19,7 +19,19 @@ export type ChoiceLesson = {
   audio?: number;
 };
 
-type Course = "grammar" | "vocabulary" | "reading";
+type Course = "grammar" | "vocabulary" | "reading" | "passage-listening";
+
+type PassageData = {
+  japanese: string;
+  english: string;
+  audio?: readonly [number, number];
+};
+
+export type CourseGroup = {
+  title?: string;
+  passage?: PassageData;
+  lessons: readonly ChoiceLesson[];
+};
 
 export function lessonKey(course: Course, id: string) {
   return `${course}:${id}`;
@@ -176,22 +188,70 @@ function PracticeCard({
   );
 }
 
-function Passage({ japanese, english }: { japanese: string; english: string }) {
+function Passage({ japanese, english, audio }: PassageData) {
   const [translated, setTranslated] = useState(false);
+  const [transcript, setTranscript] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+  async function listen(clip: number) {
+    setAudioError(false);
+    try {
+      await playClip(clip);
+    } catch {
+      setAudioError(true);
+    }
+  }
+
   return (
     <View style={s.card}>
-      <Text style={s.japanese}>{japanese}</Text>
-      {translated && <Text style={s.body}>{english}</Text>}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ expanded: translated }}
-        onPress={() => setTranslated(!translated)}
-        style={s.action}
-      >
-        <Text style={s.actionLabel}>
-          {translated ? "Hide translation" : "Show translation"}
+      {audio && (
+        <View style={s.choices}>
+          <Pressable
+            accessibilityRole="button"
+            style={s.action}
+            onPress={() => listen(audio[0])}
+          >
+            <Text style={s.actionLabel}>Listen</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            style={s.choice}
+            onPress={() => listen(audio[1])}
+          >
+            <Text style={s.body}>Listen slowly</Text>
+          </Pressable>
+        </View>
+      )}
+      {audioError && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Audio couldn’t play. Tap Listen to retry.
         </Text>
-      </Pressable>
+      )}
+      {(!audio || transcript) && <Text style={s.japanese}>{japanese}</Text>}
+      {translated && <Text style={s.body}>{english}</Text>}
+      <View style={s.choices}>
+        {audio && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: transcript }}
+            onPress={() => setTranscript(!transcript)}
+            style={s.choice}
+          >
+            <Text style={s.body}>
+              {transcript ? "Hide transcript" : "Show transcript"}
+            </Text>
+          </Pressable>
+        )}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: translated }}
+          onPress={() => setTranslated(!translated)}
+          style={audio ? s.choice : s.action}
+        >
+          <Text style={audio ? s.body : s.actionLabel}>
+            {translated ? "Hide translation" : "Show translation"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -203,11 +263,7 @@ export function ChoiceCourse({
 }: {
   title: string;
   course: Course;
-  groups: readonly {
-    title?: string;
-    passage?: { japanese: string; english: string };
-    lessons: readonly ChoiceLesson[];
-  }[];
+  groups: readonly CourseGroup[];
 }) {
   const { answer } = useStudy();
   return (
