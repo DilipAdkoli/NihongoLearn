@@ -201,7 +201,7 @@ const lessonLinks = [
   {
     href: "/reading",
     title: "Beginner reading",
-    detail: "Two short passages with questions",
+    detail: "Short passages with questions and optional translations",
     icon: BookOpen,
   },
   {
