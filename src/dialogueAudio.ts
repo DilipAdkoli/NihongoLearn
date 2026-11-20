@@ -13,6 +13,9 @@ const responseAudio: Record<ResponseId, number> = {
   "shop-ask-price": require("../assets/audio/dialogue-shop-price.mp3"),
   "shop-take-item": require("../assets/audio/dialogue-shop-take-item.mp3"),
   "shop-card-payment": require("../assets/audio/dialogue-shop-card-payment.mp3"),
+  "help-repeat": require("../assets/audio/dialogue-help-again.mp3"),
+  "help-slowly": require("../assets/audio/dialogue-help-slowly.mp3"),
+  "help-understand": require("../assets/audio/dialogue-help-understand.mp3"),
 };
 
 export const dialogueGroups = conversation.map((group) => ({

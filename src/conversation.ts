@@ -205,4 +205,65 @@ export const conversation = [
       },
     ],
   },
+  {
+    id: "help",
+    title: "Asking for help in a conversation",
+    lessons: [
+      {
+        id: "help-repeat",
+        title: "Ask someone to repeat a phrase",
+        explanation:
+          "You didn’t catch what someone said and want to hear it again.",
+        japanese: "もういちど",
+        english: "one more time",
+        prompt: "Which response asks them to say it again?",
+        stem: "",
+        choices: [
+          "もういちど おねがいします。",
+          "いちまい おねがいします。",
+          "もう だいじょうぶです。",
+        ],
+        answer: "もういちど おねがいします。",
+        answerEnglish: "One more time, please.",
+        feedback:
+          "もういちど おねがいします is a polite request to repeat something.",
+      },
+      {
+        id: "help-slowly",
+        title: "Ask someone to speak more slowly",
+        explanation: "You want the other person to slow down a little.",
+        japanese: "ゆっくり",
+        english: "slowly",
+        prompt: "Which request means “Please speak a little more slowly”?",
+        stem: "",
+        choices: [
+          "もうすこし まって ください。",
+          "もうすこし ゆっくり はなして ください。",
+          "もうすこし ゆっくり あるいて ください。",
+        ],
+        answer: "もうすこし ゆっくり はなして ください。",
+        answerEnglish: "Please speak a little more slowly.",
+        feedback:
+          "もうすこし means a little more. はなして ください means please speak.",
+      },
+      {
+        id: "help-understand",
+        title: "Say you don’t quite understand",
+        explanation: "You’d like to tell the speaker you’re still unsure.",
+        japanese: "すみません。",
+        english: "Excuse me.",
+        prompt: "Which response means “Sorry, I don’t quite understand”?",
+        stem: "",
+        choices: [
+          "すみません、もう わかりました。",
+          "すみません、いそいでいます。",
+          "すみません、よく わかりません。",
+        ],
+        answer: "すみません、よく わかりません。",
+        answerEnglish: "Sorry, I don’t quite understand.",
+        feedback:
+          "よく わかりません says you don’t understand clearly or fully.",
+      },
+    ],
+  },
 ] as const satisfies readonly DialogueGroup[];
