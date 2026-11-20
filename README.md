@@ -25,7 +25,7 @@ In Chrome or Edge, use the browser’s **Install NihongoLearn** action to open t
 
 Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
-To try the latest pushed web build with Python, download `NihongoLearn-web` from **Artifacts** on the latest successful [App checks run](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml). Unzip it, open the folder containing `index.html` in VS Code, and run `python -m http.server 8000 --bind 127.0.0.1`. Open `http://localhost:8000` in your browser.
+To try a prebuilt copy, download `NihongoLearn-web` from **Artifacts** on the latest successful App checks run for `codex/nihongolearn`. Unzip it, open the folder containing `index.html` in VS Code, and run `node serve.mjs` in its terminal. Open the local URL it prints. [Web builds](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml?query=branch%3Acodex%2Fnihongolearn)
 
 The Android test APK workflow builds an ARM64 APK with the JavaScript and audio bundled. Sign in to GitHub and download `NihongoLearn-test-arm64` from **Artifacts** on a successful run. Unzip it, transfer `app-release.apk` to the phone, and open it on the phone. The APK uses the test signing key. New builds also include `SHA256SUMS.txt` with the APK’s checksum and `BUILD.txt` with the source commit. [Android test APK runs](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/android-apk.yml)
 

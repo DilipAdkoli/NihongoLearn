@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const output = "dist";
@@ -32,7 +32,7 @@ await writeFile(
 );
 
 const files = (await filesUnder(""))
-  .filter((file) => file !== "offline-assets.json")
+  .filter((file) => file !== "offline-assets.json" && file !== "serve.mjs")
   .sort();
 const hash = createHash("sha256");
 for (const file of files) {
@@ -51,5 +51,9 @@ const assets = files.filter((file) => file !== "service-worker.js");
 await writeFile(
   join(output, "offline-assets.json"),
   JSON.stringify({ version, assets }) + "\n",
+);
+await copyFile(
+  new URL("./serve-web.mjs", import.meta.url),
+  join(output, "serve.mjs"),
 );
 console.log(`Prepared offline cache ${version} with ${assets.length} assets.`);
