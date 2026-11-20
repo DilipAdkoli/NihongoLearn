@@ -43,6 +43,19 @@ addEntry({
   meaning: "the day after tomorrow",
   romaji: "asatte",
 });
+addEntry({
+  spelling: "まっすぐ",
+  kana: "まっすぐ",
+  meaning: "straight ahead",
+  romaji: "massugu",
+});
+addEntry({ spelling: "角", kana: "かど", meaning: "corner", romaji: "kado" });
+addEntry({
+  spelling: "曲がる",
+  kana: "まがる",
+  meaning: "to turn",
+  romaji: "magaru",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

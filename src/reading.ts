@@ -297,4 +297,76 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    id: "post-office-directions",
+    title: "How to get to the post office",
+    passage: {
+      japanese:
+        "A: すみません。ゆうびんきょくは どこですか。\nB: この みちを まっすぐ いって、ふたつめの かどを みぎに まがって ください。\nA: あるいて なんぷん かかりますか。\nB: ごふん ぐらいです。ゆうびんきょくは ぎんこうの となりです。",
+      standardJapanese:
+        "A: すみません。郵便局はどこですか。\nB: この道をまっすぐ行って、二つ目の角を右に曲がってください。\nA: 歩いて何分かかりますか。\nB: 五分ぐらいです。郵便局は銀行の隣です。",
+      english:
+        "A: Excuse me. Where’s the post office?\nB: Go straight along this road and turn right at the second corner.\nA: How many minutes does it take on foot?\nB: About five minutes. The post office is next to the bank.",
+      lookupWords: ["郵便局", "銀行", "まっすぐ", "角", "曲がる"],
+    },
+    lessons: [
+      {
+        id: "post-office-destination",
+        title: "Where the visitor wants to go",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What place is the visitor looking for?",
+        stem: "",
+        choices: ["The library", "The post office", "The hospital"],
+        answer: "The post office",
+        feedback: "ゆうびんきょく means post office.",
+      },
+      {
+        id: "post-office-turn",
+        title: "Where to turn",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Where does the guide tell the visitor to turn?",
+        stem: "",
+        choices: [
+          "Right at the first corner",
+          "Left at the second corner",
+          "Right at the second corner",
+        ],
+        answer: "Right at the second corner",
+        feedback:
+          "ふたつめの かど means the second corner, and みぎに まがって means turn right.",
+      },
+      {
+        id: "post-office-walk",
+        title: "How long it takes",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "How long is the walk?",
+        stem: "",
+        choices: [
+          "About five minutes",
+          "About ten minutes",
+          "About fifteen minutes",
+        ],
+        answer: "About five minutes",
+        feedback: "ごふん means five minutes, and ぐらい means about.",
+      },
+      {
+        id: "post-office-landmark",
+        title: "The nearby landmark",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What is next to the post office?",
+        stem: "",
+        choices: ["A supermarket", "A school", "A bank"],
+        answer: "A bank",
+        feedback: "ぎんこうの となり means next to the bank.",
+      },
+    ],
+  },
 ];
