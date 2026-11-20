@@ -1,3 +1,4 @@
+import { glossaryEntries } from "../src/glossaryEntries";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -7,42 +8,7 @@ import {
   searchGlossary,
   type GlossaryEntry,
 } from "../src/glossary";
-import { weekdayWords } from "../src/kanji";
-import { kana } from "../src/learning";
 import { useStudy } from "../src/study";
-import { wordGroups } from "../src/vocabulary";
-
-const entries = new Map<string, GlossaryEntry>();
-function addEntry(entry: GlossaryEntry) {
-  const key = glossaryKey(entry);
-  const existing = entries.get(key);
-  entries.set(
-    key,
-    existing
-      ? { ...entry, ...existing, romaji: existing.romaji ?? entry.romaji }
-      : entry,
-  );
-}
-for (const group of wordGroups) {
-  for (const word of group.words)
-    addEntry({
-      spelling: word.spelling,
-      kana: word.kana,
-      meaning: word.meaning,
-      romaji: word.romaji,
-      audio: word.audio,
-    });
-}
-for (const word of weekdayWords) addEntry(word);
-for (const item of kana) {
-  if (item.example)
-    addEntry({
-      spelling: item.example,
-      kana: item.example,
-      meaning: item.meaning,
-      romaji: item.exampleReading,
-    });
-}
 
 export default function Dictionary() {
   const { data, saveWord } = useStudy();
@@ -54,7 +20,7 @@ export default function Dictionary() {
   const [limit, setLimit] = useState(24);
   const [failed, setFailed] = useState("");
   const saved = new Set(data.savedWords);
-  const source = [...entries.values()].filter(
+  const source = glossaryEntries.filter(
     (entry) => !savedOnly || saved.has(glossaryKey(entry)),
   );
   const results = searchGlossary(source, query);
@@ -112,6 +78,11 @@ export default function Dictionary() {
           </Pressable>
         ))}
       </View>
+      {savedOnly && source.length > 0 && (
+        <Link href="/saved-practice" style={[s.button, s.more, s.buttonLabel]}>
+          Practice saved words
+        </Link>
+      )}
       <TextInput
         accessibilityLabel="Search lesson glossary"
         value={query}
@@ -126,7 +97,7 @@ export default function Dictionary() {
         returnKeyType="search"
         style={s.input}
       />
-      {failed && (
+      {!!failed && (
         <Text accessibilityLiveRegion="polite" style={s.error}>
           Couldn’t play the audio for {failed}. Try again.
         </Text>

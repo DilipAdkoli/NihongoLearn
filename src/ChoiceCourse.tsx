@@ -25,7 +25,8 @@ type Course =
   | "reading"
   | "passage-listening"
   | "kanji"
-  | "conversation";
+  | "conversation"
+  | "saved-words";
 
 type PassageData = {
   japanese: string;
@@ -269,16 +270,20 @@ export function ChoiceCourse({
   title,
   course,
   groups,
+  backHref = "/learn",
+  backLabel = "‹ Back to Learn",
 }: {
   title: string;
   course: Course;
   groups: readonly CourseGroup[];
+  backHref?: "/learn" | "/dictionary";
+  backLabel?: string;
 }) {
   const { answer } = useStudy();
   return (
     <View style={s.page}>
-      <Link href="/learn" style={s.back}>
-        ‹ Back to Learn
+      <Link href={backHref} style={s.back}>
+        {backLabel}
       </Link>
       <Text accessibilityRole="header" style={s.title}>
         {title}

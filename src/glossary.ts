@@ -35,3 +35,22 @@ export function searchGlossary(
     return terms.every((term) => searchable.includes(term));
   });
 }
+
+export function wordChoices(
+  entry: GlossaryEntry,
+  entries: readonly GlossaryEntry[],
+) {
+  const alternatives = [
+    ...new Set(
+      entries
+        .filter(
+          (other) =>
+            other.kana !== entry.kana &&
+            other.meaning.toLowerCase() !== entry.meaning.toLowerCase(),
+        )
+        .map((other) => other.meaning.toLowerCase()),
+    ),
+  ];
+  const choices = [entry.meaning, ...alternatives.slice(0, 3)];
+  return choices.sort((a, b) => a.localeCompare(b));
+}
