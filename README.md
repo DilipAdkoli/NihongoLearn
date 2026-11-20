@@ -4,9 +4,24 @@
 
 ## Run the app
 
-Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
+Use Node.js 24 LTS (24.3 or newer). In VS Code, open the cloned `NihongoLearn` folder and run these commands in its terminal to try the development branch.
 
-For a web build that can reopen offline, run `npm run export:web` and serve `dist/` from the root of an HTTPS origin or from localhost. Open it once with a connection so the service worker can cache the app and audio.
+```powershell
+git fetch origin
+git switch codex/nihongolearn
+git pull --ff-only origin codex/nihongolearn
+npm.cmd ci
+npm.cmd run web
+```
+
+Open the local URL printed in the terminal. In Bash or a similar shell, use `npm` for the npm commands. To preview the exported build in PowerShell, press Ctrl+C to stop the development server, then run the following commands and open the URL it prints. The first visit caches the app and audio for later offline use.
+
+```powershell
+npm.cmd run export:web
+npm.cmd run preview:web
+```
+
+Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
 To try the latest pushed web build with Python, download `NihongoLearn-web` from **Artifacts** on the latest successful [App checks run](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml). Unzip it, open the folder containing `index.html` in VS Code, and run `python -m http.server 8000 --bind 127.0.0.1`. Open `http://localhost:8000` in your browser.
 
