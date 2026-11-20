@@ -137,3 +137,61 @@ export const verbs = [
     feedback: "いきませんでした gives both the negative and the past meaning.",
   },
 ] as const;
+
+export const adjectives = [
+  {
+    id: "i-adjective-noun",
+    title: "Describe a noun with an い-adjective",
+    explanation:
+      "An adjective such as おいしい (delicious) goes directly before the noun it describes.",
+    japanese: "おいしい パンです。",
+    english: "It’s delicious bread.",
+    prompt: "Choose the form that fits directly before パン.",
+    stem: "＿＿ パンです。",
+    choices: ["おいしいな", "おいしい", "おいしいです"],
+    answer: "おいしい",
+    feedback: "おいしい is an い-adjective. Put it directly before パン.",
+  },
+  {
+    id: "na-adjective-noun",
+    title: "Connect a な-adjective to a noun",
+    explanation:
+      "A な-adjective takes な before a noun. This includes きれい (clean or pretty), even though its kana spelling ends in い.",
+    japanese: "きれいな へやです。",
+    english: "It’s a clean room.",
+    prompt: "Choose the form for “a quiet town.”",
+    stem: "＿＿ まちです。",
+    choices: ["しずか", "しずかです", "しずかな"],
+    answer: "しずかな",
+    feedback:
+      "Use しずかな before the noun まち. At the end of a sentence, use しずかです.",
+  },
+  {
+    id: "i-adjective-negative",
+    title: "Make an い-adjective negative",
+    explanation:
+      "For many い-adjectives, replace the final い with くない, then add です for politeness. いい (good) is irregular and becomes よくない.",
+    japanese: "この スープは あつくないです。",
+    english: "This soup isn’t hot.",
+    prompt: "Choose the polite form for “The tea isn’t hot.”",
+    stem: "おちゃは＿＿。",
+    choices: ["あつくないです", "あついです", "あつくなかったです"],
+    answer: "あつくないです",
+    feedback:
+      "あつい becomes あつくない. Add です to make the statement polite.",
+  },
+  {
+    id: "na-adjective-negative",
+    title: "Make a な-adjective negative",
+    explanation:
+      "Use では ありません after a な-adjective for a polite negative. The linking な appears before nouns and drops here.",
+    japanese: "この へやは しずかでは ありません。",
+    english: "This room isn’t quiet.",
+    prompt: "Choose the polite negative for “This room isn’t clean.”",
+    stem: "この へやは＿＿。",
+    choices: ["きれいです", "きれいでは ありません", "きれいでした"],
+    answer: "きれいでは ありません",
+    feedback:
+      "きれい is a な-adjective and takes では ありません in this polite negative.",
+  },
+] as const;

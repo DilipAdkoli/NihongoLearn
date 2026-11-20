@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { grammar, particles, verbs } from "../src/grammar.ts";
+import { adjectives, grammar, particles, verbs } from "../src/grammar.ts";
 
 test("grammar lessons have stable IDs and a single selectable answer each", () => {
-  const lessons = [...grammar, ...particles, ...verbs];
+  const lessons = [...grammar, ...particles, ...verbs, ...adjectives];
   assert.equal(
     new Set(lessons.map((lesson) => lesson.id)).size,
     lessons.length,
@@ -22,5 +22,12 @@ test("polite verb practice covers non-past and past in both polarities", () => {
   assert.deepEqual(
     verbs.map((lesson) => lesson.answer),
     ["よみます", "のみません", "たべました", "いきませんでした"],
+  );
+});
+
+test("adjective exercises teach both noun modifiers and both negative patterns", () => {
+  assert.deepEqual(
+    adjectives.map((lesson) => lesson.answer),
+    ["おいしい", "しずかな", "あつくないです", "きれいでは ありません"],
   );
 });
