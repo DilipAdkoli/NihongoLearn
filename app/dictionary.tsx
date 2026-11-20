@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
 import { searchGlossary, type GlossaryEntry } from "../src/glossary";
+import { weekdayWords } from "../src/kanji";
 import { kana } from "../src/learning";
 import { wordGroups } from "../src/vocabulary";
 
@@ -27,6 +28,7 @@ for (const group of wordGroups) {
       audio: word.audio,
     });
 }
+for (const word of weekdayWords) addEntry(word);
 for (const item of kana) {
   if (item.example)
     addEntry({

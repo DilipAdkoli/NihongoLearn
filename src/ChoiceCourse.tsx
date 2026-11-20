@@ -19,7 +19,8 @@ export type ChoiceLesson = {
   audio?: number;
 };
 
-type Course = "grammar" | "vocabulary" | "reading" | "passage-listening";
+type Course =
+  "grammar" | "vocabulary" | "reading" | "passage-listening" | "kanji";
 
 type PassageData = {
   japanese: string;
@@ -46,7 +47,8 @@ function PracticeCard({
   lesson: ChoiceLesson;
   onAnswer: (attempt: Attempt) => Promise<void>;
 }) {
-  const [practice, setPractice] = useState(course !== "vocabulary");
+  const studyFirst = course === "vocabulary" || course === "kanji";
+  const [practice, setPractice] = useState(!studyFirst);
   const [audioError, setAudioError] = useState(false);
   const [choice, setChoice] = useState("");
   const [result, setResult] = useState<Attempt>();
@@ -82,7 +84,7 @@ function PracticeCard({
   }
 
   function retry() {
-    setPractice(course !== "vocabulary");
+    setPractice(!studyFirst);
     setResult(undefined);
     setChoice("");
   }
@@ -133,7 +135,9 @@ function PracticeCard({
           style={s.action}
           onPress={() => setPractice(true)}
         >
-          <Text style={s.actionLabel}>Practice word</Text>
+          <Text style={s.actionLabel}>
+            {course === "kanji" ? "Practice kanji" : "Practice word"}
+          </Text>
         </Pressable>
       ) : (
         <>

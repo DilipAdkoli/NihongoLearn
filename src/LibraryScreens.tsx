@@ -261,6 +261,20 @@ export function Learn() {
           <ChevronRight size={18} color={muted} />
         </Pressable>
       </Link>
+      <Link href="/kanji" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>First kanji in context</Text>
+            <Text style={s.detail}>
+              Learn the kanji used in the seven days of the week.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
@@ -476,6 +490,9 @@ export function Progress() {
   const writingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("writing:"),
   );
+  const kanjiAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("kanji:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -540,6 +557,9 @@ export function Progress() {
       )}
       {!!writingAttempts.length && (
         <Score label="Sentence building" attempts={writingAttempts} />
+      )}
+      {!!kanjiAttempts.length && (
+        <Score label="Kanji" attempts={kanjiAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
