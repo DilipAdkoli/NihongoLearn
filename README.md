@@ -14,7 +14,7 @@ npm.cmd ci
 npm.cmd run web
 ```
 
-Open the local URL printed in the terminal. In Bash or a similar shell, use `npm` for the npm commands. To preview the exported build in PowerShell, press Ctrl+C to stop the development server, then run the following commands and open the URL it prints. The first visit caches the app and audio for later offline use.
+Open the local URL printed in the terminal. In Bash or a similar shell, use `npm` for the npm commands. To preview the exported build in PowerShell, press Ctrl+C to stop the development server, then run the following commands and open the URL printed by the preview server. Wait for **Available offline** to confirm that the app and audio have been cached.
 
 ```powershell
 npm.cmd run export:web

@@ -22,6 +22,14 @@ import {
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StudyProvider } from "../src/study";
+import { useOfflineState } from "../src/useOfflineState";
+
+const offlineLabels = {
+  local: "Local study",
+  loading: "Preparing offline",
+  ready: "Available offline",
+  unavailable: "Offline unavailable",
+};
 
 const tabs = [
   { path: "/", name: "Overview", icon: House },
@@ -83,6 +91,7 @@ function NavItem({
 
 function Frame() {
   const path = usePathname();
+  const offlineState = useOfflineState();
   const { width } = useWindowDimensions();
   const wide = width >= 960;
   const session = path === "/session";
@@ -130,8 +139,16 @@ function Frame() {
                 <Brand />
               )}
               <View style={s.local}>
-                <View style={s.dot} />
-                <Text style={s.localText}>Local study</Text>
+                <View
+                  style={[
+                    s.dot,
+                    offlineState === "loading" && s.cachingDot,
+                    offlineState === "unavailable" && s.unavailableDot,
+                  ]}
+                />
+                <Text accessibilityLiveRegion="polite" style={s.localText}>
+                  {offlineLabels[offlineState]}
+                </Text>
               </View>
             </View>
           )}
@@ -278,6 +295,8 @@ const s = StyleSheet.create({
   local: { flexDirection: "row", alignItems: "center", gap: 7 },
   localText: { fontFamily: "DMSans", fontSize: 12, color: "#59684f" },
   dot: { height: 7, width: 7, borderRadius: 4, backgroundColor: "#73926a" },
+  cachingDot: { backgroundColor: "#8e6a28" },
+  unavailableDot: { backgroundColor: "#a94128" },
   scroll: { alignItems: "center" },
   content: { width: "100%", maxWidth: 1350, paddingTop: 27, paddingBottom: 38 },
   bottom: {
