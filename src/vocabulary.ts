@@ -311,6 +311,44 @@ export const wordGroups: readonly {
       },
     ],
   },
+  {
+    id: "weather",
+    title: "Weather",
+    words: [
+      {
+        id: "sunny",
+        kana: "はれ",
+        spelling: "晴れ",
+        romaji: "hare",
+        meaning: "sunny weather",
+        audio: require("../assets/audio/word-sunny.mp3"),
+      },
+      {
+        id: "cloudy",
+        kana: "くもり",
+        spelling: "曇り",
+        romaji: "kumori",
+        meaning: "cloudy weather",
+        audio: require("../assets/audio/word-cloudy.mp3"),
+      },
+      {
+        id: "rain",
+        kana: "あめ",
+        spelling: "雨",
+        romaji: "ame",
+        meaning: "rain",
+        audio: require("../assets/audio/word-rain.mp3"),
+      },
+      {
+        id: "snow",
+        kana: "ゆき",
+        spelling: "雪",
+        romaji: "yuki",
+        meaning: "snow",
+        audio: require("../assets/audio/word-snow.mp3"),
+      },
+    ],
+  },
 ];
 
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
