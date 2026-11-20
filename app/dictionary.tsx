@@ -1,6 +1,6 @@
 import { glossaryEntries } from "../src/glossaryEntries";
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
 import {
@@ -8,38 +8,18 @@ import {
   searchGlossary,
   type GlossaryEntry,
 } from "../src/glossary";
-import { useStudy } from "../src/study";
+import { useWordBookmarks } from "../src/useWordBookmarks";
 
 export default function Dictionary() {
-  const { data, saveWord } = useStudy();
+  const { saved, saving, saveFailed, toggleWord } = useWordBookmarks();
   const [savedOnly, setSavedOnly] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
-  const savingRef = useRef(false);
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(24);
   const [failed, setFailed] = useState("");
-  const saved = new Set(data.savedWords);
   const source = glossaryEntries.filter(
     (entry) => !savedOnly || saved.has(glossaryKey(entry)),
   );
   const results = searchGlossary(source, query);
-
-  async function toggleWord(entry: GlossaryEntry) {
-    if (savingRef.current) return;
-    savingRef.current = true;
-    setSaving(true);
-    setSaveFailed(false);
-    const key = glossaryKey(entry);
-    try {
-      await saveWord(key, !saved.has(key));
-    } catch {
-      setSaveFailed(true);
-    } finally {
-      savingRef.current = false;
-      setSaving(false);
-    }
-  }
 
   async function listen(entry: GlossaryEntry) {
     if (entry.audio === undefined) return;
@@ -148,7 +128,7 @@ export default function Dictionary() {
         </View>
       ) : (
         <Text accessibilityLiveRegion="polite" style={s.detail}>
-          {savedOnly && !data.savedWords.length
+          {savedOnly && !saved.size
             ? "Save a word to see it here."
             : "No matching lesson words."}
         </Text>

@@ -2,10 +2,12 @@ import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
+import { glossaryKey } from "./glossary";
 import { glossaryEntries } from "./glossaryEntries";
 import type { Attempt } from "./storage.types";
 import { matchesTypedAnswer } from "./typedAnswer";
 import { useStudy } from "./study";
+import { useWordBookmarks } from "./useWordBookmarks";
 
 export type ChoiceLesson = {
   id: string;
@@ -285,6 +287,7 @@ function PracticeCard({
 
 function PassageVocabulary({ terms }: { terms: readonly string[] }) {
   const [shown, setShown] = useState(false);
+  const { saved, saving, saveFailed, toggleWord } = useWordBookmarks();
   const words = terms.flatMap((term) => {
     const entry = glossaryEntries.find(
       (candidate) => candidate.spelling === term,
@@ -306,22 +309,43 @@ function PassageVocabulary({ terms }: { terms: readonly string[] }) {
         </Text>
       </Pressable>
       {shown &&
-        words.map((word) => (
-          <View key={word.spelling} style={s.example}>
-            <Text style={s.japanese}>{word.spelling}</Text>
-            <Text style={s.body}>
-              {word.kana !== word.spelling ? word.kana + " · " : ""}
-              {word.meaning}
-            </Text>
-            {word.audio !== undefined && (
-              <ClipButton
-                clip={word.audio}
-                label="Listen"
-                accessibilityLabel={`Listen to ${word.spelling}`}
-              />
-            )}
-          </View>
-        ))}
+        words.map((word) => {
+          const isSaved = saved.has(glossaryKey(word));
+          return (
+            <View key={word.spelling} style={s.example}>
+              <Text style={s.japanese}>{word.spelling}</Text>
+              <Text style={s.body}>
+                {word.kana !== word.spelling ? word.kana + " · " : ""}
+                {word.meaning}
+              </Text>
+              <View style={s.choices}>
+                {word.audio !== undefined && (
+                  <ClipButton
+                    clip={word.audio}
+                    label="Listen"
+                    accessibilityLabel={`Listen to ${word.spelling}`}
+                  />
+                )}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`${isSaved ? "Remove saved word" : "Save"} ${word.spelling}`}
+                  disabled={saving}
+                  onPress={() => toggleWord(word)}
+                  style={[s.choice, isSaved && s.selected]}
+                >
+                  <Text style={s.choiceLabel}>
+                    {isSaved ? "Saved" : "Save"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          );
+        })}
+      {shown && saveFailed && (
+        <Text accessibilityLiveRegion="polite" style={s.error}>
+          Couldn’t update saved words. Try again.
+        </Text>
+      )}
     </View>
   );
 }
