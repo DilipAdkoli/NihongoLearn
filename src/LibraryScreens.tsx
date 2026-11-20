@@ -224,6 +224,20 @@ export function Learn() {
           <ChevronRight size={18} color={muted} />
         </Pressable>
       </Link>
+      <Link href="/dictionary" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Lesson glossary</Text>
+            <Text style={s.detail}>
+              Look up words in Japanese, romaji, or English.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
