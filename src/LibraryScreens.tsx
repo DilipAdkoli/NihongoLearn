@@ -247,6 +247,20 @@ export function Learn() {
           <ChevronRight size={18} color={muted} />
         </Pressable>
       </Link>
+      <Link href="/writing" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Build a sentence</Text>
+            <Text style={s.detail}>
+              Put words and particles in order to express a meaning.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
@@ -459,6 +473,9 @@ export function Progress() {
   const passageAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("passage-listening:"),
   );
+  const writingAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("writing:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -520,6 +537,9 @@ export function Progress() {
       )}
       {!!passageAttempts.length && (
         <Score label="Passage listening" attempts={passageAttempts} />
+      )}
+      {!!writingAttempts.length && (
+        <Score label="Sentence building" attempts={writingAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
