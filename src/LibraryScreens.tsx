@@ -19,7 +19,7 @@ import {
   RotateCcw,
   Sprout,
 } from "lucide-react-native";
-import { grammar, grammarKey } from "./grammar";
+
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
@@ -174,6 +174,20 @@ export function Learn() {
             <Text style={s.rowTitle}>First Japanese sentences</Text>
             <Text style={s.detail}>
               Build polite statements and questions with です, は, and か.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
+      <Link href="/vocabulary" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Everyday vocabulary</Text>
+            <Text style={s.detail}>
+              Learn and hear words for food, drinks, and familiar objects.
             </Text>
           </View>
           <ChevronRight size={18} color={muted} />
@@ -344,9 +358,14 @@ function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
 export function Progress() {
   const { data } = useStudy();
   const studied = kana.filter((item) => data.seen.includes(item.id)).length;
-  const grammarIds = new Set(grammar.map((lesson) => grammarKey(lesson.id)));
-  const grammarAttempts = data.attempts.filter((a) => grammarIds.has(a.kanaId));
-  const kanaAttempts = data.attempts.filter((a) => !grammarIds.has(a.kanaId));
+  const grammarAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("grammar:"),
+  );
+  const vocabularyAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("vocabulary:"),
+  );
+  const kanaIds = new Set(kana.map((item) => item.id));
+  const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
     <View style={s.page}>
       <Heading
@@ -397,6 +416,9 @@ export function Progress() {
       </View>
       {!!grammarAttempts.length && (
         <Score label="Grammar" attempts={grammarAttempts} />
+      )}
+      {!!vocabularyAttempts.length && (
+        <Score label="Vocabulary" attempts={vocabularyAttempts} />
       )}
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>

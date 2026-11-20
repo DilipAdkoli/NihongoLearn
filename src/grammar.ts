@@ -39,5 +39,3 @@ export const grammar = [
     feedback: "Sentence-final か turns the polite statement into a question.",
   },
 ] as const;
-
-export const grammarKey = (id: string) => `grammar:${id}`;
