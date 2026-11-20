@@ -108,6 +108,7 @@ const clips = new Map<string, number>([
 ]);
 
 let stopCurrent: (() => void) | undefined;
+const playbackInactivityLimit = 8000;
 
 export async function playKana(id: string): Promise<void> {
   const clip = clips.get(id.replace(/^kata-/, ""));
@@ -120,19 +121,32 @@ export async function playClip(clip: number): Promise<void> {
 
   const player = createAudioPlayer(clip, { updateInterval: 100 });
   await new Promise<void>((resolve, reject) => {
+    let lastPosition = 0;
+    let settled = false;
+    let timeout = setTimeout(reportStall, playbackInactivityLimit);
     const subscription = player.addListener(
       "playbackStatusUpdate",
       (status) => {
-        if (status.error) finish(new Error(status.error));
-        else if (status.didJustFinish) finish();
+        if (settled) return;
+        if (status.error) {
+          finish(new Error(status.error));
+        } else if (status.didJustFinish) {
+          finish();
+        } else if (status.currentTime > lastPosition) {
+          lastPosition = status.currentTime;
+          clearTimeout(timeout);
+          timeout = setTimeout(reportStall, playbackInactivityLimit);
+        }
       },
     );
-    const timeout = setTimeout(
-      () => finish(new Error("Pronunciation playback timed out.")),
-      8000,
-    );
+
+    function reportStall() {
+      finish(new Error("Pronunciation playback timed out."));
+    }
 
     function finish(error?: Error) {
+      if (settled) return;
+      settled = true;
       clearTimeout(timeout);
       subscription.remove();
       stopCurrent = undefined;

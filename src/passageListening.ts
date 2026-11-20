@@ -110,4 +110,43 @@ export const passageListening: readonly CourseGroup[] = [
       },
     ),
   },
+  {
+    title: "An evening routine",
+    passage: {
+      japanese:
+        "まいばん、しちじに うちに かえります。\nはちじに ばんごはんを たべます。\nそれから、にほんごを べんきょうします。\nじゅういちじに ねます。",
+      english:
+        "Every evening, I get home at seven.\nI eat dinner at eight.\nThen I study Japanese.\nI go to bed at eleven.",
+      audio: [
+        require("../assets/audio/passage-evening-normal.mp3"),
+        require("../assets/audio/passage-evening-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "evening-dinner",
+        title: "Dinner time",
+        prompt: "When does the speaker have dinner?",
+        choices: ["At eight", "At seven", "At eleven"],
+        answer: "At eight",
+        feedback: "ばんごはん means dinner. はちじ is eight o’clock.",
+      },
+      {
+        id: "evening-study",
+        title: "After dinner",
+        prompt: "What does the speaker do after dinner?",
+        choices: ["Goes home", "Studies Japanese", "Goes to work"],
+        answer: "Studies Japanese",
+        feedback: "にほんごを べんきょうします means I study Japanese.",
+      },
+      {
+        id: "evening-bedtime",
+        title: "Bedtime",
+        prompt: "When does the speaker go to bed?",
+        choices: ["At eight", "At ten", "At eleven"],
+        answer: "At eleven",
+        feedback: "じゅういちじに ねます means I go to bed at eleven.",
+      },
+    ),
+  },
 ];
