@@ -1,6 +1,7 @@
 import { actionPatterns } from "./actionPatterns.ts";
 import type { CourseGroup } from "./ChoiceCourse";
 import { comparisons } from "./comparisons.ts";
+import { connectors } from "./connectors.ts";
 import { existence } from "./existence.ts";
 import {
   adjectives,
@@ -27,4 +28,5 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Requests with the て-form", lessons: teForm },
   { title: "Actions, permission, and wants", lessons: actionPatterns },
   { title: "Plain verb forms", lessons: plainVerbs },
+  { title: "Reasons and connections", lessons: connectors },
 ];

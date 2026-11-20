@@ -1,0 +1,67 @@
+export const connectors = [
+  {
+    id: "reason-kara",
+    title: "Give a reason with から",
+    explanation:
+      "Put から after a clause that gives a reason. In あめですから、バスで いきます, the rain is the reason for taking the bus.",
+    japanese: "あめですから、バスで いきます。",
+    english: "Because it’s raining, I’ll take the bus.",
+    prompt: "Say “Because it’s cold, I’ll drink tea.”",
+    stem: "さむいです＿＿、おちゃを のみます。",
+    choices: ["まで", "から", "も"],
+    answer: "から",
+    feedback: "さむいですから means “because it’s cold.”",
+  },
+  {
+    id: "reason-question",
+    title: "Ask why with どうして",
+    explanation:
+      "どうして asks for the reason someone does something. Use it with a polite question ending in か.",
+    japanese: "どうして バスで いきますか。",
+    english: "Why are you taking the bus?",
+    prompt: "Ask “Why do you run every morning?”",
+    stem: "＿＿ まいあさ はしりますか。",
+    choices: ["どうして", "どこ", "だれ"],
+    answer: "どうして",
+    feedback: "どうして asks why the person runs every morning.",
+  },
+  {
+    id: "result-dakara",
+    title: "Link a reason to its result with だから",
+    explanation:
+      "Use だから (so) at the start of a sentence to show that it follows from the reason in the previous sentence.",
+    japanese: "あめです。だから、バスで いきます。",
+    english: "It’s raining, so I’ll take the bus.",
+    prompt: "Show that being tired is the reason you’ll go to bed early.",
+    stem: "つかれました。＿＿、はやく ねます。",
+    choices: ["でも", "いつ", "だから"],
+    answer: "だから",
+    feedback: "だから connects being tired to the decision to go to bed early.",
+  },
+  {
+    id: "sequence-sorekara",
+    title: "Say what happens next with それから",
+    explanation:
+      "それから means after that or then. Use it at the start of the next sentence to show the order of events.",
+    japanese: "パンを たべます。それから、おちゃを のみます。",
+    english: "I’ll eat bread. Then I’ll drink tea.",
+    prompt: "Say you’ll go to school after you have breakfast.",
+    stem: "あさごはんを たべます。＿＿、がっこうに いきます。",
+    choices: ["それから", "でも", "どうして"],
+    answer: "それから",
+    feedback: "それから puts going to school after breakfast.",
+  },
+  {
+    id: "contrast-demo",
+    title: "Make a contrast with でも",
+    explanation:
+      "でも at the start of a sentence means but. Use it when the next idea contrasts with the one before it.",
+    japanese: "あしたは いそがしいです。でも、えきに いきます。",
+    english: "I’m busy tomorrow, but I’ll go to the station.",
+    prompt: "Say “It’s raining, but I’ll walk.”",
+    stem: "あめです。＿＿、あるきます。",
+    choices: ["それから", "だから", "でも"],
+    answer: "でも",
+    feedback: "でも links the rain to the contrasting decision to walk.",
+  },
+] as const;
