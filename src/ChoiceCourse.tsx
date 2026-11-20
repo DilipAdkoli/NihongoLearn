@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, type Href } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
@@ -18,6 +18,7 @@ export type ChoiceLesson = {
   answer: string;
   feedback: string;
   audio?: number;
+  promptAudio?: number;
   answerAudio?: number;
   acceptedAnswers?: readonly string[];
 };
@@ -35,7 +36,8 @@ type Course =
   | "time"
   | "calendar"
   | "vocabulary-recall"
-  | "counters";
+  | "counters"
+  | "sound-listening";
 
 type PassageData = {
   japanese: string;
@@ -123,7 +125,11 @@ function PracticeCard({
     const attempt: Attempt = saving.current ?? {
       id: `${course}-${lesson.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       kanaId: lessonKey(course, lesson.id),
-      mode: accepted ? "recall" : "recognition",
+      mode: accepted
+        ? "recall"
+        : lesson.promptAudio === undefined
+          ? "recognition"
+          : "listening",
       answer: choice.trim(),
       correct: accepted
         ? matchesTypedAnswer(choice, accepted)
@@ -191,6 +197,13 @@ function PracticeCard({
           {!questionHeading && <Text style={s.body}>{lesson.prompt}</Text>}
           {!!lesson.stem && lesson.stem !== lesson.title && (
             <Text style={s.japanese}>{lesson.stem}</Text>
+          )}
+          {lesson.promptAudio !== undefined && (
+            <ClipButton
+              clip={lesson.promptAudio}
+              label="Listen"
+              accessibilityLabel={`Listen to ${lesson.title.toLowerCase()}`}
+            />
           )}
           {accepted ? (
             <TextInput
@@ -397,8 +410,7 @@ export function ChoiceCourse({
   description?: string;
   course: Course;
   groups: readonly CourseGroup[];
-  backHref?:
-    "/learn" | "/review" | "/dictionary" | "/loanwords" | "/vocabulary";
+  backHref?: Href;
   backLabel?: string;
   showBack?: boolean;
   browseTopics?: boolean;

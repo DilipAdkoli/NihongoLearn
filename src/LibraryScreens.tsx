@@ -564,6 +564,9 @@ export function Progress() {
   const passageAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("passage-listening:"),
   );
+  const soundAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("sound-listening:"),
+  );
   const writingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("writing:"),
   );
@@ -652,6 +655,9 @@ export function Progress() {
       )}
       {!!readingAttempts.length && (
         <Score label="Reading" attempts={readingAttempts} />
+      )}
+      {!!soundAttempts.length && (
+        <Score label="Sound distinctions" attempts={soundAttempts} />
       )}
       {!!passageAttempts.length && (
         <Score label="Passage listening" attempts={passageAttempts} />
