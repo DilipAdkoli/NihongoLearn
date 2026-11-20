@@ -42,6 +42,7 @@ test("lessons, attempts and preferences persist across closing and reopening the
     attempts: [],
     dailyGoal: 0,
     overviewPath: 0,
+    japaneseTextSize: 0,
     romaji: true,
     sound: true,
   });
@@ -73,6 +74,7 @@ test("lessons, attempts and preferences persist across closing and reopening the
   await store.setWordSaved("みず:water", true);
   await store.setDailyGoal(10);
   await store.setOverviewPath(1);
+  await store.setJapaneseTextSize(2);
   db.close();
   db = new DatabaseSync(filename);
   const reopened = createSqliteStorage(async () => connect(db));
@@ -82,6 +84,7 @@ test("lessons, attempts and preferences persist across closing and reopening the
     attempts: [first, second],
     dailyGoal: 10,
     overviewPath: 1,
+    japaneseTextSize: 2,
     romaji: false,
     sound: false,
   });
@@ -139,6 +142,7 @@ test("version 1 migrates atomically and keeps saved answers and preferences", as
     attempts: [first],
     dailyGoal: 0,
     overviewPath: 0,
+    japaneseTextSize: 0,
     romaji: true,
     sound: false,
   });

@@ -26,6 +26,8 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
+import { JapaneseText } from "./JapaneseText";
+import { japaneseTextSizes } from "./japaneseTextSize";
 import { missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
@@ -122,7 +124,9 @@ function KanaChart({
                             pressed && s.pressed,
                           ]}
                         >
-                          <Text style={s.glyph}>{item.glyph}</Text>
+                          <JapaneseText style={s.glyph}>
+                            {item.glyph}
+                          </JapaneseText>
                           {romaji && (
                             <Text style={s.detail}>{item.reading}</Text>
                           )}
@@ -439,9 +443,9 @@ export function Review() {
           <View style={s.chips}>
             {focus.map(({ id }) => (
               <View style={s.chip} key={id}>
-                <Text style={s.glyph}>
+                <JapaneseText style={s.glyph}>
                   {kana.find((item) => item.id === id)?.glyph}
-                </Text>
+                </JapaneseText>
               </View>
             ))}
           </View>
@@ -523,7 +527,7 @@ export function Review() {
               <View style={s.chips}>
                 {items.map((item) => (
                   <View key={item.id} style={s.chartTile}>
-                    <Text style={s.glyph}>{item.glyph}</Text>
+                    <JapaneseText style={s.glyph}>{item.glyph}</JapaneseText>
                     <Text style={s.detail}>{item.reading}</Text>
                   </View>
                 ))}
@@ -736,7 +740,7 @@ export function Progress() {
             return (
               <View key={item.id} style={[s.row, index > 0 && s.rule]}>
                 <View style={s.glyphTile}>
-                  <Text style={s.glyph}>{item.glyph}</Text>
+                  <JapaneseText style={s.glyph}>{item.glyph}</JapaneseText>
                 </View>
                 <View style={s.grow}>
                   <Text style={s.rowTitle}>{item.reading}</Text>
@@ -763,6 +767,7 @@ export function Settings() {
     changePreference,
     changeDailyGoal,
     changeOverviewPath,
+    changeJapaneseTextSize,
     mergeProgress,
   } = useStudy();
   const [pending, setPending] = useState(false);
@@ -862,6 +867,36 @@ export function Settings() {
               }
               trackColor={{ false: "#bbc4be", true: green }}
             />
+          </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Japanese text size</Text>
+              <JapaneseText style={s.glyph}>あいうえお</JapaneseText>
+              <View
+                style={s.chips}
+                accessibilityRole="radiogroup"
+                accessibilityLabel="Japanese text size"
+              >
+                {japaneseTextSizes.map((size) => (
+                  <Pressable
+                    key={size.id}
+                    accessibilityRole="radio"
+                    aria-checked={data.japaneseTextSize === size.id}
+                    disabled={pending}
+                    onPress={() =>
+                      savePreference(() => changeJapaneseTextSize(size.id))
+                    }
+                    style={[
+                      s.chip,
+                      { minHeight: 44, justifyContent: "center" },
+                      data.japaneseTextSize === size.id && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{size.title}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
           </View>
           <View style={[s.row, s.rule]}>
             <HardDrive size={22} color={green} />

@@ -1,4 +1,5 @@
 import type { DailyGoal } from "./dailyGoal";
+import type { JapaneseTextSize } from "./japaneseTextSize";
 import type { OverviewPath } from "./overviewPath";
 
 export type Attempt = {
@@ -16,6 +17,7 @@ export type StudyData = {
   attempts: Attempt[];
   dailyGoal: DailyGoal;
   overviewPath: OverviewPath;
+  japaneseTextSize: JapaneseTextSize;
   sound: boolean;
   romaji: boolean;
 };
@@ -29,5 +31,6 @@ export type StudyStorage = {
   setWordSaved(id: string, saved: boolean): Promise<void>;
   setDailyGoal(goal: DailyGoal): Promise<void>;
   setOverviewPath(path: OverviewPath): Promise<void>;
+  setJapaneseTextSize(size: JapaneseTextSize): Promise<void>;
   setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };

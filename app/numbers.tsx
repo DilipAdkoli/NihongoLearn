@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { JapaneseText } from "../src/JapaneseText";
 import { countingTable, numberPractice } from "../src/numbers";
 
 export default function Numbers() {
@@ -25,8 +26,8 @@ export default function Numbers() {
         {countingTable.map(({ value, kanji, kana }) => (
           <View key={value} style={s.tile}>
             <Text style={s.body}>{value}</Text>
-            <Text style={s.kanji}>{kanji}</Text>
-            <Text style={s.body}>{kana}</Text>
+            <JapaneseText style={s.kanji}>{kanji}</JapaneseText>
+            <JapaneseText style={s.body}>{kana}</JapaneseText>
           </View>
         ))}
       </View>

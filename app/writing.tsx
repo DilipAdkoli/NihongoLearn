@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { JapaneseText } from "../src/JapaneseText";
 import type { Attempt } from "../src/storage.types";
 import { useStudy } from "../src/study";
 import { isSentenceAnswer, writingTasks } from "../src/writing";
@@ -68,7 +69,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
             }
             style={[s.tile, s.added]}
           >
-            <Text style={s.tileText}>{task.tiles[index]}</Text>
+            <JapaneseText style={s.tileText}>{task.tiles[index]}</JapaneseText>
           </Pressable>
         ))}
       </View>
@@ -89,7 +90,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
               }
               style={[s.tile, chosen && s.muted]}
             >
-              <Text style={s.tileText}>{tile}</Text>
+              <JapaneseText style={s.tileText}>{tile}</JapaneseText>
             </Pressable>
           );
         })}

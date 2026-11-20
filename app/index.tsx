@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
+import { JapaneseText } from "../src/JapaneseText";
 import { kana, lessons } from "../src/learning";
 import { overviewPaths } from "../src/overviewPath";
 import { starterPath } from "../src/starterPath";
@@ -309,9 +310,9 @@ export default function Home() {
                   <Check size={12} color="#356446" />
                 </View>
               )}
-              <Text style={[s.character, phone && { fontSize: 31 }]}>
+              <JapaneseText style={[s.character, phone && { fontSize: 31 }]}>
                 {item.glyph}
-              </Text>
+              </JapaneseText>
               {data.romaji && <Text style={s.romaji}>{item.reading}</Text>}
             </Pressable>
           ))}

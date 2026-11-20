@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import { JapaneseText } from "../src/JapaneseText";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
@@ -73,12 +74,12 @@ export default function Loanwords() {
       <View style={s.grid}>
         {results.map(({ sound, reading, word, meaning, note }) => (
           <View key={sound} style={s.card}>
-            <Text accessibilityRole="header" style={s.kana}>
+            <JapaneseText accessibilityRole="header" style={s.kana}>
               {sound} <Text style={s.reading}>{reading}</Text>
-            </Text>
-            <Text style={s.example}>
+            </JapaneseText>
+            <JapaneseText style={s.example}>
               {word} <Text style={s.body}>· {meaning}</Text>
-            </Text>
+            </JapaneseText>
             <Text style={s.body}>{note}</Text>
             <Pressable
               accessibilityRole="button"

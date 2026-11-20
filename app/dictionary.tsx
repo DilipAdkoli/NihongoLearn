@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
+import { JapaneseText } from "../src/JapaneseText";
 import {
   glossaryKey,
   searchGlossary,
@@ -103,9 +104,13 @@ export default function Dictionary() {
           {results.slice(0, limit).map((entry) => (
             <View key={glossaryKey(entry)} style={s.row}>
               <View style={s.grow}>
-                <Text style={s.word}>{entry.spelling}</Text>
+                <JapaneseText style={s.word}>{entry.spelling}</JapaneseText>
                 <Text style={s.detail}>
-                  {entry.kana !== entry.spelling ? entry.kana + " · " : ""}
+                  {entry.kana !== entry.spelling && (
+                    <JapaneseText style={s.detail}>
+                      {entry.kana} ·{" "}
+                    </JapaneseText>
+                  )}
                   {entry.meaning}
                   {entry.romaji ? " · " + entry.romaji : ""}
                 </Text>

@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { JapaneseText } from "../src/JapaneseText";
 import { datePractice, japaneseDate } from "../src/calendar";
 
 export default function CalendarLesson() {
@@ -22,10 +23,10 @@ export default function CalendarLesson() {
       <View style={s.days}>
         {Array.from({ length: 10 }, (_, index) => index + 1).map((day) => (
           <View key={day} style={s.day}>
-            <Text style={s.japanese}>{day}日</Text>
-            <Text style={s.body}>
+            <JapaneseText style={s.japanese}>{day}日</JapaneseText>
+            <JapaneseText style={s.body}>
               {japaneseDate(1, day).kana.split(" ")[1]}
-            </Text>
+            </JapaneseText>
           </View>
         ))}
       </View>

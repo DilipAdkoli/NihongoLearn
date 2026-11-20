@@ -1,5 +1,6 @@
 import type { DailyGoal } from "./dailyGoal";
 import type { parseBackup } from "./backup";
+import type { JapaneseTextSize } from "./japaneseTextSize";
 import type { SessionMode } from "./learning";
 import type { OverviewPath } from "./overviewPath";
 import {
@@ -22,6 +23,7 @@ type StudyContext = {
   saveWord: (id: string, saved: boolean) => Promise<void>;
   changeDailyGoal: (goal: DailyGoal) => Promise<void>;
   changeOverviewPath: (path: OverviewPath) => Promise<void>;
+  changeJapaneseTextSize: (size: JapaneseTextSize) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -145,6 +147,10 @@ export function StudyProvider({ children }: PropsWithChildren) {
     async changeOverviewPath(path) {
       await storage.setOverviewPath(path);
       setData((old) => old && { ...old, overviewPath: path });
+    },
+    async changeJapaneseTextSize(size) {
+      await storage.setJapaneseTextSize(size);
+      setData((old) => old && { ...old, japaneseTextSize: size });
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);

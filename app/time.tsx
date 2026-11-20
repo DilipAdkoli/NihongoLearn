@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { JapaneseText } from "../src/JapaneseText";
 import { japaneseTime, timePractice } from "../src/time";
 
 export default function TimeLesson() {
@@ -24,9 +25,9 @@ export default function TimeLesson() {
         {[japaneseTime(4, 0), japaneseTime(7, 15), japaneseTime(12, 30)].map(
           ({ japanese, kana, clock }) => (
             <View key={clock} style={s.example}>
-              <Text style={s.word}>{japanese}</Text>
+              <JapaneseText style={s.word}>{japanese}</JapaneseText>
               <Text style={s.body}>
-                {kana} · {clock}
+                <JapaneseText style={s.body}>{kana}</JapaneseText> · {clock}
               </Text>
             </View>
           ),

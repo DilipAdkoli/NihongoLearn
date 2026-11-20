@@ -2,6 +2,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { playClip } from "../src/audio";
+import { JapaneseText } from "../src/JapaneseText";
 
 import { soundComparisons, type SoundWord } from "../src/soundRules";
 
@@ -17,7 +18,7 @@ function Word({ word }: { word: SoundWord }) {
   }
   return (
     <View style={s.word}>
-      <Text style={s.glyph}>{word.kana}</Text>
+      <JapaneseText style={s.glyph}>{word.kana}</JapaneseText>
       <Text style={s.detail}>{word.reading}</Text>
       <Text style={s.body}>{word.meaning}</Text>
       <Pressable

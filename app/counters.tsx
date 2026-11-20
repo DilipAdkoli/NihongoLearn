@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { JapaneseText } from "../src/JapaneseText";
 import { counterPractice, japaneseCount, type Counter } from "../src/counters";
 
 const examples: readonly {
@@ -61,9 +62,9 @@ export default function Counters() {
             {samples.map((value) => {
               const { written, reading } = japaneseCount(value, counter);
               return (
-                <Text key={value} style={s.example}>
+                <JapaneseText key={value} style={s.example}>
                   {written} · {reading}
-                </Text>
+                </JapaneseText>
               );
             })}
           </View>

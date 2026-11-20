@@ -1,4 +1,8 @@
 import { readDailyGoal, type DailyGoal } from "./dailyGoal.ts";
+import {
+  readJapaneseTextSize,
+  type JapaneseTextSize,
+} from "./japaneseTextSize.ts";
 import { readOverviewPath, type OverviewPath } from "./overviewPath.ts";
 import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
@@ -38,6 +42,9 @@ export async function loadStudy(): Promise<StudyData> {
     overviewPath: readOverviewPath(
       Number(storage.getItem(namespace + "overview-path")),
     ),
+    japaneseTextSize: readJapaneseTextSize(
+      Number(storage.getItem(namespace + "japanese-text-size")),
+    ),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
   };
@@ -73,4 +80,13 @@ export async function setDailyGoal(goal: DailyGoal): Promise<void> {
 
 export async function setOverviewPath(path: OverviewPath): Promise<void> {
   globalThis.localStorage.setItem(namespace + "overview-path", String(path));
+}
+
+export async function setJapaneseTextSize(
+  size: JapaneseTextSize,
+): Promise<void> {
+  globalThis.localStorage.setItem(
+    namespace + "japanese-text-size",
+    String(size),
+  );
 }

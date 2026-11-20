@@ -1,4 +1,5 @@
 import { readDailyGoal } from "./dailyGoal.ts";
+import { readJapaneseTextSize } from "./japaneseTextSize.ts";
 import { readOverviewPath } from "./overviewPath.ts";
 import type { Attempt, StudyStorage } from "./storage.types";
 
@@ -120,6 +121,10 @@ export function createSqliteStorage(
         overviewPath: readOverviewPath(
           settings.find((setting) => setting.key === "overview-path")?.value,
         ),
+        japaneseTextSize: readJapaneseTextSize(
+          settings.find((setting) => setting.key === "japanese-text-size")
+            ?.value,
+        ),
         sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
         romaji:
           settings.find((setting) => setting.key === "romaji")?.value !== 0,
@@ -149,5 +154,6 @@ export function createSqliteStorage(
     setPreference: (name, value) => setSetting(name, Number(value)),
     setDailyGoal: (goal) => setSetting("daily-goal", goal),
     setOverviewPath: (path) => setSetting("overview-path", path),
+    setJapaneseTextSize: (size) => setSetting("japanese-text-size", size),
   };
 }

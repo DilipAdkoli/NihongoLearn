@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import { glossaryKey } from "./glossary";
 import { glossaryEntries } from "./glossaryEntries";
+import { JapaneseText, useJapaneseTextStyle } from "./JapaneseText";
+import { hasJapanese } from "./japaneseTextSize";
 import type { Attempt } from "./storage.types";
 import { matchesTypedAnswer } from "./typedAnswer";
 import { useStudy } from "./study";
@@ -128,6 +130,8 @@ function PracticeCard({
   const active = useRef(false);
   const saving = useRef<Attempt | null>(null);
   const accepted = lesson.acceptedAnswers;
+  const inputStyle = useJapaneseTextStyle(s.answerInput, !!accepted);
+  const heading = questionHeading ? lesson.prompt : lesson.title;
   const canCheck = !!choice.trim() && !pending;
 
   async function check() {
@@ -170,9 +174,13 @@ function PracticeCard({
 
   return (
     <View style={s.card}>
-      <Text accessibilityRole="header" style={s.heading}>
-        {questionHeading ? lesson.prompt : lesson.title}
-      </Text>
+      <JapaneseText
+        accessibilityRole="header"
+        style={s.heading}
+        scaleText={hasJapanese(heading)}
+      >
+        {heading}
+      </JapaneseText>
       {(!practice ||
         (course === "grammar" && !reviewQuestions) ||
         course === "conversation") && (
@@ -182,9 +190,19 @@ function PracticeCard({
           )}
           <View style={s.example}>
             {lesson.japanese !== lesson.title && (
-              <Text style={s.japanese}>{lesson.japanese}</Text>
+              <JapaneseText
+                style={s.japanese}
+                scaleText={hasJapanese(lesson.japanese)}
+              >
+                {lesson.japanese}
+              </JapaneseText>
             )}
-            <Text style={s.body}>{lesson.english}</Text>
+            <JapaneseText
+              style={s.body}
+              scaleText={hasJapanese(lesson.english)}
+            >
+              {lesson.english}
+            </JapaneseText>
             {lesson.audio !== undefined && (
               <ClipButton
                 clip={lesson.audio}
@@ -209,7 +227,12 @@ function PracticeCard({
         <>
           {!questionHeading && <Text style={s.body}>{lesson.prompt}</Text>}
           {!!lesson.stem && lesson.stem !== lesson.title && (
-            <Text style={s.japanese}>{lesson.stem}</Text>
+            <JapaneseText
+              style={s.japanese}
+              scaleText={hasJapanese(lesson.stem)}
+            >
+              {lesson.stem}
+            </JapaneseText>
           )}
           {lesson.promptAudio !== undefined && (
             <ClipButton
@@ -229,7 +252,7 @@ function PracticeCard({
               editable={!pending && !failed && !result}
               value={choice}
               onChangeText={setChoice}
-              style={s.answerInput}
+              style={inputStyle}
             />
           ) : (
             <View style={s.choices}>
@@ -245,7 +268,12 @@ function PracticeCard({
                   onPress={() => setChoice(value)}
                   style={[s.choice, value === choice && s.selected]}
                 >
-                  <Text style={s.choiceLabel}>{value}</Text>
+                  <JapaneseText
+                    style={s.choiceLabel}
+                    scaleText={hasJapanese(value)}
+                  >
+                    {value}
+                  </JapaneseText>
                 </Pressable>
               ))}
             </View>
@@ -314,7 +342,7 @@ function PassageVocabulary({ terms }: { terms: readonly string[] }) {
           const isSaved = saved.has(glossaryKey(word));
           return (
             <View key={word.spelling} style={s.example}>
-              <Text style={s.japanese}>{word.spelling}</Text>
+              <JapaneseText style={s.japanese}>{word.spelling}</JapaneseText>
               <Text style={s.body}>
                 {word.kana !== word.spelling ? word.kana + " · " : ""}
                 {word.meaning}
@@ -437,9 +465,9 @@ function Passage({
         </Text>
       )}
       {(!audio || transcript) && (
-        <Text style={s.japanese}>
+        <JapaneseText style={s.japanese}>
           {showKanji && standardJapanese ? standardJapanese : japanese}
-        </Text>
+        </JapaneseText>
       )}
       {translated && <Text style={s.body}>{english}</Text>}
       <View style={s.choices}>
@@ -636,6 +664,7 @@ const s = StyleSheet.create({
   choices: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   choice: {
     minWidth: 60,
+    maxWidth: "100%",
     minHeight: 44,
     justifyContent: "center",
     alignItems: "center",
@@ -643,8 +672,9 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  choiceLabel: { fontSize: 18, color: "#203730" },
+  choiceLabel: { fontSize: 18, textAlign: "center", color: "#203730" },
   selected: { backgroundColor: "#dfe8d9", borderColor: "#215848" },
   answerInput: {
     paddingHorizontal: 10,

@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import { JapaneseText } from "../src/JapaneseText";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { playKana } from "../src/audio";
@@ -45,7 +46,7 @@ export default function CompareKana() {
           <View style={s.row}>
             {items.map(({ glyph, id, reading, tip }) => (
               <View key={id} style={s.card}>
-                <Text style={s.glyph}>{glyph}</Text>
+                <JapaneseText style={s.glyph}>{glyph}</JapaneseText>
                 {data.romaji && <Text style={s.detail}>{reading}</Text>}
                 <Text style={s.detail}>{tip}</Text>
                 {data.sound && (

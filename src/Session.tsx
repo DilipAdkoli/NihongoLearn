@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { playKana } from "./audio";
+import { JapaneseText } from "./JapaneseText";
 import {
   evaluateAnswer,
   kana,
@@ -99,14 +100,14 @@ function LessonCard({
   return (
     <>
       <View style={s.studyCard}>
-        <Text
+        <JapaneseText
           style={s.glyph}
           accessibilityLabel={
             romaji ? `${item.script} ${item.reading}` : undefined
           }
         >
           {item.glyph}
-        </Text>
+        </JapaneseText>
         {romaji && <Text style={s.reading}>{item.reading}</Text>}
         {sound && (
           <ListenButton
@@ -119,12 +120,12 @@ function LessonCard({
       {item.example && (
         <View style={s.example}>
           <Text style={s.label}>IN A WORD</Text>
-          <Text style={s.exampleWord}>
+          <JapaneseText style={s.exampleWord}>
             {item.example}
             {romaji && (
               <Text style={s.exampleReading}> {item.exampleReading}</Text>
             )}
-          </Text>
+          </JapaneseText>
           <Text style={s.body}>{item.meaning}</Text>
         </View>
       )}
@@ -336,7 +337,8 @@ export default function Session({
                         ? "ROMAJI"
                         : item.script.toUpperCase()}
                     </Text>
-                    <Text
+                    <JapaneseText
+                      scaleText={exercise.mode !== "recognition"}
                       style={
                         exercise.mode === "recognition"
                           ? s.promptReading
@@ -346,7 +348,7 @@ export default function Session({
                       {exercise.mode === "recognition"
                         ? item.reading
                         : item.glyph}
-                    </Text>
+                    </JapaneseText>
                   </View>
                 )}
                 {exercise.mode !== "recall" ? (
@@ -373,7 +375,9 @@ export default function Session({
                           pressed && s.pressed,
                         ]}
                       >
-                        <Text style={s.choiceGlyph}>{choice}</Text>
+                        <JapaneseText style={s.choiceGlyph}>
+                          {choice}
+                        </JapaneseText>
                       </Pressable>
                     ))}
                   </View>
