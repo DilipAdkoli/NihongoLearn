@@ -82,6 +82,7 @@ export const passageListening: readonly CourseGroup[] = [
     ),
   },
   {
+    id: "train-announcement",
     title: "Train announcement",
     passage: {
       japanese: "つぎは、きょうとです。\nおでぐちは、みぎがわです。",

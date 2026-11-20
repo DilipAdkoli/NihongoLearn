@@ -1,4 +1,4 @@
-import { Link, type Href } from "expo-router";
+import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
@@ -57,6 +57,11 @@ export type CourseGroup = {
 
 export function lessonKey(course: Course, id: string) {
   return `${course}:${id}`;
+}
+
+export function useChoiceTopic() {
+  const { topic } = useLocalSearchParams<{ topic?: string }>();
+  return typeof topic === "string" ? topic : undefined;
 }
 
 function ClipButton({

@@ -151,6 +151,12 @@ const lessonLinks = [
     icon: CircleHelp,
   },
   {
+    href: "/travel-path",
+    title: "Japanese for travel",
+    detail: "Follow five steps from reading signs to buying a train ticket",
+    icon: Sprout,
+  },
+  {
     href: "/numbers",
     title: "Count from 1 to 99",
     detail: "Read Japanese numbers and practice the tens",

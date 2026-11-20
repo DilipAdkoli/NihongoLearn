@@ -1,5 +1,9 @@
 import { lessons } from "./learning.ts";
-import type { StudyData } from "./storage.types";
+import {
+  completeSteps,
+  type LearningStep,
+  type PathStudy,
+} from "./learningPath.ts";
 
 const steps = [
   {
@@ -51,20 +55,8 @@ const steps = [
     href: { pathname: "/conversation", params: { topic: "cafe" } },
     answers: ["conversation:order-tea", "conversation:thank-server"],
   },
-] as const;
+] as const satisfies readonly LearningStep[];
 
-export function starterPath(data: Pick<StudyData, "seen" | "attempts">) {
-  const seen = new Set(data.seen);
-  const correct = new Set(
-    data.attempts
-      .filter((attempt) => attempt.correct)
-      .map((attempt) => attempt.kanaId),
-  );
-  return steps.map((step) => ({
-    ...step,
-    complete:
-      "seen" in step
-        ? step.seen.every((id) => seen.has(id))
-        : step.answers.every((id) => correct.has(id)),
-  }));
+export function starterPath(data: PathStudy) {
+  return completeSteps(steps, data);
 }

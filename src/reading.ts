@@ -1,6 +1,7 @@
 import type { ChoiceLesson } from "./ChoiceCourse";
 
 export const reading: readonly {
+  id?: string;
   title: string;
   passage: { japanese: string; standardJapanese: string; english: string };
   lessons: readonly ChoiceLesson[];
@@ -79,6 +80,7 @@ export const reading: readonly {
     ],
   },
   {
+    id: "station-area",
     title: "Around the station",
     passage: {
       japanese:

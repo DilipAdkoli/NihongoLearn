@@ -1,5 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
-import { ChoiceCourse } from "../src/ChoiceCourse";
+import { ChoiceCourse, useChoiceTopic } from "../src/ChoiceCourse";
 import { conversation } from "../src/conversation";
 
 type ResponseId = (typeof conversation)[number]["lessons"][number]["id"];
@@ -26,8 +25,7 @@ const dialogueGroups = conversation.map((group) => ({
 }));
 
 export default function Conversation() {
-  const { topic } = useLocalSearchParams<{ topic?: string }>();
-  const initialTopic = typeof topic === "string" ? topic : undefined;
+  const initialTopic = useChoiceTopic();
   return (
     <ChoiceCourse
       key={initialTopic}

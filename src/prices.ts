@@ -30,6 +30,7 @@ export const prices = [
     ],
   },
   {
+    id: "thousands",
     title: "Thousands and 万",
     lessons: [
       priceQuestion("A book", 3_000, [300, 330, 30_000]),
