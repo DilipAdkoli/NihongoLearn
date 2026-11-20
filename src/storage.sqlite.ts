@@ -1,4 +1,5 @@
 import { readDailyGoal } from "./dailyGoal.ts";
+import { readOverviewPath } from "./overviewPath.ts";
 import type { Attempt, StudyStorage } from "./storage.types";
 
 type BindValue = string | number;
@@ -116,6 +117,9 @@ export function createSqliteStorage(
         dailyGoal: readDailyGoal(
           settings.find((setting) => setting.key === "daily-goal")?.value,
         ),
+        overviewPath: readOverviewPath(
+          settings.find((setting) => setting.key === "overview-path")?.value,
+        ),
         sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
         romaji:
           settings.find((setting) => setting.key === "romaji")?.value !== 0,
@@ -144,5 +148,6 @@ export function createSqliteStorage(
     setWordSaved: (id, saved) => setSetting("word:" + id, Number(saved)),
     setPreference: (name, value) => setSetting(name, Number(value)),
     setDailyGoal: (goal) => setSetting("daily-goal", goal),
+    setOverviewPath: (path) => setSetting("overview-path", path),
   };
 }

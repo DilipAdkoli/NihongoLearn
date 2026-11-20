@@ -1,4 +1,5 @@
 import { readDailyGoal, type DailyGoal } from "./dailyGoal.ts";
+import { readOverviewPath, type OverviewPath } from "./overviewPath.ts";
 import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 export type { Attempt, StudyData } from "./storage.types";
@@ -34,6 +35,9 @@ export async function loadStudy(): Promise<StudyData> {
     savedWords: savedWords.sort(),
     attempts,
     dailyGoal: readDailyGoal(Number(storage.getItem(namespace + "daily-goal"))),
+    overviewPath: readOverviewPath(
+      Number(storage.getItem(namespace + "overview-path")),
+    ),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
   };
@@ -65,4 +69,8 @@ export async function setWordSaved(id: string, saved: boolean): Promise<void> {
 
 export async function setDailyGoal(goal: DailyGoal): Promise<void> {
   globalThis.localStorage.setItem(namespace + "daily-goal", String(goal));
+}
+
+export async function setOverviewPath(path: OverviewPath): Promise<void> {
+  globalThis.localStorage.setItem(namespace + "overview-path", String(path));
 }

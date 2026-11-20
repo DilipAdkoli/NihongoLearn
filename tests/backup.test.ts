@@ -9,6 +9,7 @@ test("backup exports versioned Unicode study data and preferences", () => {
     savedWords: ["みず:water"],
     sound: false,
     dailyGoal: 0,
+    overviewPath: 0,
     romaji: true,
     attempts: [
       {
@@ -46,6 +47,7 @@ test("import parses exported progress without changing device preferences", () =
     attempts: [attempt],
     sound: true,
     dailyGoal: 0,
+    overviewPath: 0,
     romaji: false,
   };
   assert.deepEqual(parseBackup(createBackup(data, new Date(0)).content), {

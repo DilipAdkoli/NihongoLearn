@@ -1,6 +1,7 @@
 import type { DailyGoal } from "./dailyGoal";
 import type { parseBackup } from "./backup";
 import type { SessionMode } from "./learning";
+import type { OverviewPath } from "./overviewPath";
 import {
   createContext,
   useContext,
@@ -20,6 +21,7 @@ type StudyContext = {
   mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
   saveWord: (id: string, saved: boolean) => Promise<void>;
   changeDailyGoal: (goal: DailyGoal) => Promise<void>;
+  changeOverviewPath: (path: OverviewPath) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -139,6 +141,10 @@ export function StudyProvider({ children }: PropsWithChildren) {
     async changeDailyGoal(goal) {
       await storage.setDailyGoal(goal);
       setData((old) => old && { ...old, dailyGoal: goal });
+    },
+    async changeOverviewPath(path) {
+      await storage.setOverviewPath(path);
+      setData((old) => old && { ...old, overviewPath: path });
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);

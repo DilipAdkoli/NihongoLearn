@@ -28,6 +28,7 @@ import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
 import { missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, type Script } from "./learning";
+import { overviewPaths } from "./overviewPath";
 import { placementSample } from "./placement";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
@@ -751,7 +752,13 @@ export function Progress() {
 }
 
 export function Settings() {
-  const { data, changePreference, changeDailyGoal, mergeProgress } = useStudy();
+  const {
+    data,
+    changePreference,
+    changeDailyGoal,
+    changeOverviewPath,
+    mergeProgress,
+  } = useStudy();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const saving = useRef(false);
@@ -930,6 +937,35 @@ export function Settings() {
                     ]}
                   >
                     <Text style={s.rowTitle}>{goal || "Off"}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Path on Overview</Text>
+              <View
+                style={s.chips}
+                accessibilityRole="radiogroup"
+                accessibilityLabel="Path on Overview"
+              >
+                {overviewPaths.map((path) => (
+                  <Pressable
+                    key={path.id}
+                    accessibilityRole="radio"
+                    aria-checked={data.overviewPath === path.id}
+                    disabled={pending}
+                    onPress={() =>
+                      savePreference(() => changeOverviewPath(path.id))
+                    }
+                    style={[
+                      s.chip,
+                      { minHeight: 44, justifyContent: "center" },
+                      data.overviewPath === path.id && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{path.title}</Text>
                   </Pressable>
                 ))}
               </View>

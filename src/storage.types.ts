@@ -1,4 +1,5 @@
 import type { DailyGoal } from "./dailyGoal";
+import type { OverviewPath } from "./overviewPath";
 
 export type Attempt = {
   id: string;
@@ -14,6 +15,7 @@ export type StudyData = {
   savedWords: string[];
   attempts: Attempt[];
   dailyGoal: DailyGoal;
+  overviewPath: OverviewPath;
   sound: boolean;
   romaji: boolean;
 };
@@ -26,5 +28,6 @@ export type StudyStorage = {
   recordAttempt(attempt: Attempt): Promise<void>;
   setWordSaved(id: string, saved: boolean): Promise<void>;
   setDailyGoal(goal: DailyGoal): Promise<void>;
+  setOverviewPath(path: OverviewPath): Promise<void>;
   setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };

@@ -31,6 +31,7 @@ test("web progress survives reopening and retries preserve the original attempt"
     savedWords: [],
     attempts: [],
     dailyGoal: 0,
+    overviewPath: 0,
     romaji: true,
     sound: true,
   });
@@ -63,6 +64,7 @@ test("web progress survives reopening and retries preserve the original attempt"
       store.setPreference("romaji", false),
       store.setWordSaved("みず:water", true),
       store.setDailyGoal(20),
+      store.setOverviewPath(1),
     ]);
   `);
   run(
@@ -73,6 +75,7 @@ test("web progress survives reopening and retries preserve the original attempt"
     savedWords: ["みず:water"],
     attempts: [first, second],
     dailyGoal: 20,
+    overviewPath: 1,
     romaji: false,
     sound: false,
   });

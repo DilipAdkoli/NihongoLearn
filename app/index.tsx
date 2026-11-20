@@ -20,7 +20,9 @@ import {
 } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
 import { kana, lessons } from "../src/learning";
+import { overviewPaths } from "../src/overviewPath";
 import { starterPath } from "../src/starterPath";
+import { travelPath } from "../src/travelPath";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
 
@@ -82,7 +84,9 @@ function SectionTitle({
 export default function Home() {
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
-  const path = starterPath(data);
+  const pathInfo = overviewPaths[data.overviewPath];
+  const path =
+    pathInfo.href === "/travel-path" ? travelPath(data) : starterPath(data);
   const nextStep = path.find((step) => !step.complete);
   const completedSteps = path.filter((step) => step.complete).length;
   const goal = data.dailyGoal;
@@ -201,20 +205,20 @@ export default function Home() {
         <View style={s.starterCard}>
           <View style={s.reviewCopy}>
             <Text accessibilityRole="header" style={s.reviewTitle}>
-              Beginner starter path
+              {pathInfo.title}
             </Text>
             <Text style={s.metricLabel}>
               {completedSteps} of {path.length} steps complete
             </Text>
             <Text style={s.nextStep}>{nextStep.title}</Text>
           </View>
-          <Link href="/starter-path" asChild>
+          <Link href={pathInfo.href} asChild>
             <Pressable
               accessibilityRole="link"
               style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
             >
               <Text style={s.linkText}>
-                {completedSteps ? "Continue path" : "Open starter path"}
+                {completedSteps ? "Continue path" : pathInfo.action}
               </Text>
               <ArrowRight size={16} color="#345b45" />
             </Pressable>
