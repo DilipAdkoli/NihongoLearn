@@ -132,4 +132,59 @@ export const conversation = [
       },
     ],
   },
+  {
+    title: "At a shop",
+    lessons: [
+      {
+        id: "shop-ask-price",
+        title: "Ask how much it costs",
+        explanation: "You’re holding a notebook and want to ask its price.",
+        japanese: "この ノート",
+        english: "this notebook",
+        prompt: "Which question means “How much is this notebook?”",
+        stem: "",
+        choices: [
+          "この ノートは どこですか。",
+          "この ノートは いくらですか。",
+          "これは だれの ノートですか。",
+        ],
+        answer: "この ノートは いくらですか。",
+        feedback: "いくら asks how much the notebook costs.",
+      },
+      {
+        id: "shop-take-item",
+        title: "Say you’ll take it",
+        explanation: "The clerk tells you the price. You’ve decided to buy it.",
+        japanese: "はっぴゃくえんです。",
+        english: "That’s 800 yen.",
+        prompt: "Which response means “I’ll take this, please”?",
+        stem: "",
+        choices: [
+          "これを ください。",
+          "これを みて ください。",
+          "これは なんですか。",
+        ],
+        answer: "これを ください。",
+        feedback: "Use [item] を ください to ask for an item politely.",
+      },
+      {
+        id: "shop-card-payment",
+        title: "Ask to pay by card",
+        explanation:
+          "You’re at the register and would like to pay with a card.",
+        japanese: "カードで",
+        english: "by card",
+        prompt: "Which question asks “May I pay by card?”",
+        stem: "",
+        choices: [
+          "カードは どこですか。",
+          "カードで はらいません。",
+          "カードで はらっても いいですか。",
+        ],
+        answer: "カードで はらっても いいですか。",
+        feedback:
+          "で marks the payment method. はらっても いいですか asks permission to pay.",
+      },
+    ],
+  },
 ] as const satisfies readonly CourseGroup[];

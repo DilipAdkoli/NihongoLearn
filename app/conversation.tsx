@@ -11,6 +11,9 @@ const responseAudio: Record<ResponseId, number> = {
   "find-station": require("../assets/audio/dialogue-find-station.mp3"),
   "ask-train-destination": require("../assets/audio/dialogue-train-destination.mp3"),
   "buy-one-ticket": require("../assets/audio/dialogue-one-ticket.mp3"),
+  "shop-ask-price": require("../assets/audio/dialogue-shop-price.mp3"),
+  "shop-take-item": require("../assets/audio/dialogue-shop-take-item.mp3"),
+  "shop-card-payment": require("../assets/audio/dialogue-shop-card-payment.mp3"),
 };
 
 const dialogueGroups = conversation.map((group) => ({
