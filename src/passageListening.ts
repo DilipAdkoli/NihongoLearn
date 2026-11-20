@@ -203,4 +203,56 @@ export const passageListening: readonly CourseGroup[] = [
       },
     ),
   },
+  {
+    id: "pharmacy-directions",
+    title: "Listen to directions to a pharmacy",
+    passage: {
+      japanese:
+        "A: やっきょくは どこですか。\nB: この みちを まっすぐ いって、ひとつめの かどを ひだりに まがって ください。\nA: あるいて なんぷん かかりますか。\nB: さんぷん ぐらいです。やっきょくは びょういんの となりです。",
+      standardJapanese:
+        "A: 薬局はどこですか。\nB: この道をまっすぐ行って、一つ目の角を左に曲がってください。\nA: 歩いて何分かかりますか。\nB: 三分ぐらいです。薬局は病院の隣です。",
+      english:
+        "A: Where’s the pharmacy?\nB: Go straight along this road and turn left at the first corner.\nA: How many minutes does it take on foot?\nB: About three minutes. The pharmacy is next to the hospital.",
+      lookupWords: ["薬局", "病院", "角", "曲がる"],
+      audio: [
+        require("../assets/audio/passage-pharmacy-directions-normal.mp3"),
+        require("../assets/audio/passage-pharmacy-directions-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "pharmacy-turn",
+        title: "The visitor’s turn",
+        prompt: "Where should the visitor turn?",
+        choices: [
+          "Left at the second corner",
+          "Right at the first corner",
+          "Left at the first corner",
+        ],
+        answer: "Left at the first corner",
+        feedback:
+          "ひとつめの かど is the first corner. ひだりに means to the left.",
+      },
+      {
+        id: "pharmacy-walk",
+        title: "On foot",
+        prompt: "How long is the walk?",
+        choices: [
+          "About three minutes",
+          "About five minutes",
+          "About eight minutes",
+        ],
+        answer: "About three minutes",
+        feedback: "さんぷん ぐらい means about three minutes.",
+      },
+      {
+        id: "pharmacy-landmark",
+        title: "Find the pharmacy",
+        prompt: "What is the pharmacy next to?",
+        choices: ["A school", "A hospital", "A bank"],
+        answer: "A hospital",
+        feedback: "びょういん means hospital, and の となり means next to.",
+      },
+    ),
+  },
 ];
