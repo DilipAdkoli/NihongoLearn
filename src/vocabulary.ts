@@ -159,6 +159,80 @@ export const wordGroups: readonly { title: string; words: readonly Word[] }[] =
         },
       ],
     },
+    {
+      title: "Directions",
+      words: [
+        {
+          id: "right",
+          kana: "みぎ",
+          spelling: "右",
+          romaji: "migi",
+          meaning: "right",
+          audio: require("../assets/audio/word-right.mp3"),
+        },
+        {
+          id: "left",
+          kana: "ひだり",
+          spelling: "左",
+          romaji: "hidari",
+          meaning: "left",
+          audio: require("../assets/audio/word-left.mp3"),
+        },
+        {
+          id: "in-front",
+          kana: "まえ",
+          spelling: "前",
+          romaji: "mae",
+          meaning: "front",
+          audio: require("../assets/audio/word-in-front.mp3"),
+        },
+        {
+          id: "next-to",
+          kana: "となり",
+          spelling: "隣",
+          romaji: "tonari",
+          meaning: "next to",
+          audio: require("../assets/audio/word-next-to.mp3"),
+        },
+      ],
+    },
+    {
+      title: "Places and signs",
+      words: [
+        {
+          id: "next",
+          kana: "つぎ",
+          spelling: "次",
+          romaji: "tsugi",
+          meaning: "next",
+          audio: require("../assets/audio/word-next.mp3"),
+        },
+        {
+          id: "exit",
+          kana: "でぐち",
+          spelling: "出口",
+          romaji: "deguchi",
+          meaning: "exit",
+          audio: require("../assets/audio/word-exit.mp3"),
+        },
+        {
+          id: "entrance",
+          kana: "いりぐち",
+          spelling: "入口",
+          romaji: "iriguchi",
+          meaning: "entrance",
+          audio: require("../assets/audio/word-entrance.mp3"),
+        },
+        {
+          id: "park",
+          kana: "こうえん",
+          spelling: "公園",
+          romaji: "kouen",
+          meaning: "park",
+          audio: require("../assets/audio/word-park.mp3"),
+        },
+      ],
+    },
   ];
 
 export const vocabulary = wordGroups.map(({ title, words }) => ({
