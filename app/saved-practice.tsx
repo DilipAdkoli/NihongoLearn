@@ -4,13 +4,23 @@ import { Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { glossaryKey, wordChoices, wordRecallAnswers } from "../src/glossary";
 import { glossaryEntries } from "../src/glossaryEntries";
+import {
+  savedRecallCourse,
+  savedWordRecallQueue,
+} from "../src/savedWordReview";
 import { useStudy } from "../src/study";
 
 function SavedPracticeBatch({ recall }: { recall: boolean }) {
   const { data } = useStudy();
   const title = recall ? "Recall saved words" : "Saved word practice";
-  const course = recall ? "saved-word-recall" : "saved-words";
+  const course = recall ? savedRecallCourse : "saved-words";
   const [batch] = useState(() => {
+    if (recall) {
+      const now = Date.now();
+      const queue = savedWordRecallQueue(data, glossaryEntries, now);
+      const due = queue.filter((word) => word.dueAt <= now);
+      return (due.length ? due : queue).slice(0, 8).map((word) => word.entry);
+    }
     const saved = new Set(data.savedWords);
     const prefix = `${course}:`;
     const lastAttempt = new Map<string, number>();
@@ -53,6 +63,11 @@ function SavedPracticeBatch({ recall }: { recall: boolean }) {
   return (
     <ChoiceCourse
       title={title}
+      description={
+        recall
+          ? "Start with saved words that are due. You can practice early when you’re caught up."
+          : undefined
+      }
       course={course}
       backHref="/dictionary"
       backLabel="‹ Back to glossary"

@@ -26,12 +26,14 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
+import { glossaryEntries } from "./glossaryEntries";
 import { JapaneseText } from "./JapaneseText";
 import { japaneseTextSizes } from "./japaneseTextSize";
 import { missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
 import { placementSample } from "./placement";
+import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
@@ -402,7 +404,9 @@ function ReviewLink({ href, label }: { href: Href; label: string }) {
 
 export function Review() {
   const { data } = useStudy();
-  const { queue, due } = useReviewQueue(data);
+  const { queue, due, now } = useReviewQueue(data);
+  const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
+  const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
   const grammarCount = missedLessons(data.attempts, "grammar").length;
   const recognitionCount = missedLessons(data.attempts, "vocabulary").length;
   const recallCount = missedLessons(data.attempts, "vocabulary-recall").length;
@@ -481,6 +485,22 @@ export function Review() {
           )}
         </View>
       </View>
+      {savedRecall.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Saved word recall
+          </Text>
+          <Text style={s.body}>
+            {savedRecallDue
+              ? `${savedRecallDue} saved ${savedRecallDue === 1 ? "word is" : "words are"} ready for recall.`
+              : `Next saved word review ${new Date(savedRecall[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.`}
+          </Text>
+          <ReviewLink
+            href={{ pathname: "/saved-practice", params: { mode: "recall" } }}
+            label={savedRecallDue ? "Review saved words" : "Recall words early"}
+          />
+        </View>
+      )}
       {grammarCount > 0 && (
         <View style={s.feature}>
           <Text accessibilityRole="header" style={s.featureTitle}>
@@ -603,7 +623,7 @@ export function Progress() {
     a.kanaId.startsWith("saved-words:"),
   );
   const savedRecallAttempts = data.attempts.filter((a) =>
-    a.kanaId.startsWith("saved-word-recall:"),
+    a.kanaId.startsWith(`${savedRecallCourse}:`),
   );
   const loanwordAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("loanwords:"),
