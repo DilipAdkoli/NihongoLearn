@@ -21,6 +21,8 @@ import {
 } from "lucide-react-native";
 
 import { ActivityChart } from "./ActivityChart";
+import { createBackup } from "./backup";
+import { saveBackup } from "./saveBackup";
 import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
@@ -614,6 +616,20 @@ export function Settings() {
       setPending(false);
     }
   }
+  async function exportProgress() {
+    if (saving.current) return;
+    saving.current = true;
+    setPending(true);
+    setMessage("");
+    try {
+      await saveBackup(createBackup(data, new Date()));
+    } catch {
+      setMessage("Couldn’t save the backup. Try again.");
+    } finally {
+      saving.current = false;
+      setPending(false);
+    }
+  }
   return (
     <View style={s.page}>
       <Heading title="Settings" detail="Choose how you study on this device." />
@@ -655,11 +671,6 @@ export function Settings() {
               trackColor={{ false: "#bbc4be", true: green }}
             />
           </View>
-          {message ? (
-            <Text accessibilityRole="alert" style={s.error}>
-              {message}
-            </Text>
-          ) : null}
           <View style={[s.row, s.rule]}>
             <HardDrive size={22} color={green} />
             <View style={s.grow}>
@@ -669,6 +680,32 @@ export function Settings() {
               </Text>
             </View>
           </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Export study history</Text>
+              <Text style={s.detail}>
+                Save a JSON copy of your answers, studied kana, and preferences.
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                disabled={pending}
+                accessibilityState={{ disabled: pending }}
+                onPress={exportProgress}
+                style={[
+                  s.action,
+                  { alignSelf: "flex-start", marginTop: 8 },
+                  pending && s.pressed,
+                ]}
+              >
+                <Text style={s.actionLabel}>Export progress</Text>
+              </Pressable>
+            </View>
+          </View>
+          {message ? (
+            <Text accessibilityRole="alert" style={s.error}>
+              {message}
+            </Text>
+          ) : null}
         </View>
       </View>
       <View style={s.section}>
