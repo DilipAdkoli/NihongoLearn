@@ -18,8 +18,19 @@ const peopleReadings: Partial<Record<number, string>> = {
   4: "よにん",
   7: "しちにん",
 };
+const doubledPrefixes: Partial<Record<number, string>> = {
+  1: "いっ",
+  6: "ろっ",
+  8: "はっ",
+  10: "じゅっ",
+};
+const soundChangingCounters = {
+  long: { kanji: "本", plain: "ほん", voiced: "ぼん", doubled: "ぽん" },
+  animals: { kanji: "匹", plain: "ひき", voiced: "びき", doubled: "ぴき" },
+};
 
-export type Counter = "general" | "flat" | "people";
+export type Counter =
+  "general" | "flat" | "people" | keyof typeof soundChangingCounters;
 
 export function japaneseCount(value: number, counter: Counter) {
   if (!Number.isInteger(value) || value < 1 || value > 10) {
@@ -39,6 +50,17 @@ export function japaneseCount(value: number, counter: Counter) {
         written: kanji + "人",
         reading: peopleReadings[value] ?? kana + "にん",
       };
+    case "long":
+    case "animals": {
+      const ending = soundChangingCounters[counter];
+      const prefix = doubledPrefixes[value];
+      return {
+        written: kanji + ending.kanji,
+        reading: prefix
+          ? prefix + ending.doubled
+          : kana + (value === 3 ? ending.voiced : ending.plain),
+      };
+    }
   }
 }
 
@@ -67,12 +89,36 @@ const drills = [
     title: "Four people",
     alternatives: ["よんにん", "よんまい", "ふたり"],
   },
+  {
+    counter: "long",
+    number: 1,
+    title: "One bottle",
+    alternatives: ["いちほん", "いちまい", "にほん"],
+  },
+  {
+    counter: "long",
+    number: 3,
+    title: "Three pencils",
+    alternatives: ["さんほん", "さんびき", "ろっぽん"],
+  },
+  {
+    counter: "animals",
+    number: 3,
+    title: "Three cats",
+    alternatives: ["さんひき", "さんぼん", "はっぴき"],
+  },
+  {
+    counter: "animals",
+    number: 6,
+    title: "Six small dogs",
+    alternatives: ["ろくひき", "ろっぽん", "ごひき"],
+  },
 ] as const;
 
 export const counterPractice = drills.map((drill, index) => {
   const { written, reading } = japaneseCount(drill.number, drill.counter);
   const choices: string[] = [...drill.alternatives];
-  choices.splice(index, 0, reading);
+  choices.splice(index % (choices.length + 1), 0, reading);
   return {
     id: `${drill.counter}-${drill.number}`,
     title: drill.title,

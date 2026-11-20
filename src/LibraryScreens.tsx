@@ -172,8 +172,8 @@ const lessonLinks = [
 
   {
     href: "/counters",
-    title: "Count things and people",
-    detail: "Practice つ, 枚, and 人",
+    title: "Count things, people, and animals",
+    detail: "Practice つ, 枚, 人, 本, and 匹",
     icon: BookOpen,
   },
   {

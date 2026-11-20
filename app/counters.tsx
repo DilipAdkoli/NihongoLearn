@@ -3,7 +3,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { counterPractice, japaneseCount, type Counter } from "../src/counters";
 
-const examples: readonly { counter: Counter; label: string; clue: string }[] = [
+const examples: readonly {
+  counter: Counter;
+  label: string;
+  clue: string;
+  samples?: readonly number[];
+}[] = [
   {
     counter: "general",
     label: "General things",
@@ -19,6 +24,18 @@ const examples: readonly { counter: Counter; label: string; clue: string }[] = [
     label: "People",
     clue: "Use 人 when counting people. 一人 and 二人 are read ひとり and ふたり. 四人 is よにん.",
   },
+  {
+    counter: "long",
+    label: "Bottles and long objects",
+    clue: "Use 本 (ほん) for long things such as bottles, pens, and umbrellas. The first sound changes in readings such as いっぽん and さんぼん. 十本 can also be read じっぽん.",
+    samples: [1, 2, 3, 6, 8, 10],
+  },
+  {
+    counter: "animals",
+    label: "Small animals",
+    clue: "Use 匹 (ひき) for animals such as cats and dogs. The first sound changes from ひ to ぴ or び in いっぴき and さんびき. 十匹 can also be read じっぴき.",
+    samples: [1, 2, 3, 6, 8, 10],
+  },
 ];
 
 export default function Counters() {
@@ -28,20 +45,20 @@ export default function Counters() {
         ‹ Back to Learn
       </Link>
       <Text accessibilityRole="header" style={s.title}>
-        Count things and people
+        Count things, people, and animals
       </Text>
       <Text style={s.body}>
         Japanese often uses a counter with the number. Choose the counter for
         what you’re counting.
       </Text>
-      {examples.map(({ counter, label, clue }) => (
+      {examples.map(({ counter, label, clue, samples = [1, 2, 3, 4, 10] }) => (
         <View key={counter} style={s.card}>
           <Text accessibilityRole="header" style={s.heading}>
             {label}
           </Text>
           <Text style={s.body}>{clue}</Text>
           <View style={s.examples}>
-            {[1, 2, 3, 4, 10].map((value) => {
+            {samples.map((value) => {
               const { written, reading } = japaneseCount(value, counter);
               return (
                 <Text key={value} style={s.example}>
