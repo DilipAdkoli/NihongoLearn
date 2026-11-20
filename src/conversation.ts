@@ -73,4 +73,63 @@ export const conversation: readonly CourseGroup[] = [
       },
     ],
   },
+  {
+    title: "At the station",
+    lessons: [
+      {
+        id: "find-station",
+        title: "Ask where the station is",
+        explanation:
+          "You are on the street and need directions to the station.",
+        japanese: "すみません。",
+        english: "Excuse me.",
+        prompt: "Which question asks where the station is?",
+        stem: "",
+        choices: [
+          "えきは なんじですか。",
+          "えきは どこですか。",
+          "えきは いくらですか。",
+        ],
+        answer: "えきは どこですか。",
+        feedback:
+          "どこ means where. えきは どこですか asks where the station is.",
+      },
+      {
+        id: "ask-train-destination",
+        title: "Check the destination",
+        explanation:
+          "You are on the platform and want to know if this train goes to Kyoto.",
+        japanese: "この でんしゃ",
+        english: "this train",
+        prompt: "Which question checks the destination?",
+        stem: "",
+        choices: [
+          "この でんしゃは きょうとに いきますか。",
+          "きょうとから きましたか。",
+          "この でんしゃは なんじですか。",
+        ],
+        answer: "この でんしゃは きょうとに いきますか。",
+        feedback:
+          "きょうとに marks Kyoto as the destination. いきますか asks whether the train goes there.",
+      },
+      {
+        id: "buy-one-ticket",
+        title: "Ask for one ticket",
+        explanation:
+          "Use the counter 枚 (まい) for flat items such as paper tickets. 一枚 is read いちまい.",
+        japanese: "いらっしゃいませ。",
+        english: "Welcome.",
+        prompt: "Which response asks for one ticket?",
+        stem: "",
+        choices: [
+          "きっぷを にまい おねがいします。",
+          "きっぷを いちまい おねがいします。",
+          "きっぷは どこですか。",
+        ],
+        answer: "きっぷを いちまい おねがいします。",
+        feedback:
+          "きっぷ means ticket. いちまい specifies one, and おねがいします makes a polite request.",
+      },
+    ],
+  },
 ];
