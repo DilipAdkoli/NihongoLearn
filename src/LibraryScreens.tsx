@@ -150,6 +150,12 @@ const lessonLinks = [
     detail: "Read Japanese numbers and practice the tens",
     icon: BookOpen,
   },
+  {
+    href: "/prices",
+    title: "Read prices in yen",
+    detail: "Hundreds, thousands, and the 万 unit",
+    icon: BookOpen,
+  },
 
   {
     href: "/counters",
@@ -585,6 +591,9 @@ export function Progress() {
   const countingAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("numbers:"),
   );
+  const priceAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("prices:"),
+  );
   const timeAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("time:"),
   );
@@ -655,6 +664,9 @@ export function Progress() {
       )}
       {!!readingAttempts.length && (
         <Score label="Reading" attempts={readingAttempts} />
+      )}
+      {!!priceAttempts.length && (
+        <Score label="Prices in yen" attempts={priceAttempts} />
       )}
       {!!soundAttempts.length && (
         <Score label="Sound distinctions" attempts={soundAttempts} />

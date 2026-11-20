@@ -37,6 +37,7 @@ type Course =
   | "calendar"
   | "vocabulary-recall"
   | "counters"
+  | "prices"
   | "sound-listening";
 
 type PassageData = {

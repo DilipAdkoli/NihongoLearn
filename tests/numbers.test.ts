@@ -29,8 +29,28 @@ test("counting composes single digits, teen numbers, and larger tens", () => {
     kanji: "九十九",
     kana: "きゅうじゅうきゅう",
   });
-  for (const value of [0, 100, 2.4, NaN])
+  for (const value of [0, 100_000, 2.4, NaN])
     assert.throws(() => japaneseNumber(value), RangeError);
+});
+
+test("larger numbers handle irregular readings and empty places", () => {
+  for (const [value, kanji, kana] of [
+    [100, "百", "ひゃく"],
+    [300, "三百", "さんびゃく"],
+    [600, "六百", "ろっぴゃく"],
+    [800, "八百", "はっぴゃく"],
+    [3_001, "三千一", "さんぜんいち"],
+    [8_000, "八千", "はっせん"],
+    [10_000, "一万", "いちまん"],
+    [14_500, "一万四千五百", "いちまんよんせんごひゃく"],
+    [
+      99_999,
+      "九万九千九百九十九",
+      "きゅうまんきゅうせんきゅうひゃくきゅうじゅうきゅう",
+    ],
+  ] as const) {
+    assert.deepEqual(japaneseNumber(value), { value, kanji, kana });
+  }
 });
 
 test("each counting quiz offers four choices and one correct answer", () => {
