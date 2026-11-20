@@ -144,6 +144,12 @@ const lessonLinks = [
   },
 
   {
+    href: "/time",
+    title: "Tell the time",
+    detail: "Read hours, minutes, and half past",
+    icon: BookOpen,
+  },
+  {
     href: "/conversation",
     title: "Everyday dialogue",
     detail: "Introductions and ordering tea",
@@ -494,6 +500,9 @@ export function Progress() {
   const countingAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("numbers:"),
   );
+  const timeAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("time:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -573,6 +582,9 @@ export function Progress() {
       )}
       {!!countingAttempts.length && (
         <Score label="Counting" attempts={countingAttempts} />
+      )}
+      {!!timeAttempts.length && (
+        <Score label="Telling time" attempts={timeAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>

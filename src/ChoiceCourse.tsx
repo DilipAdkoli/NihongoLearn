@@ -28,7 +28,8 @@ type Course =
   | "conversation"
   | "saved-words"
   | "loanwords"
-  | "numbers";
+  | "numbers"
+  | "time";
 
 type PassageData = {
   japanese: string;
