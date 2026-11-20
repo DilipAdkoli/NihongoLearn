@@ -138,6 +138,9 @@ export default function Writing() {
         Tap words to put them in order. Tap a word in your sentence to remove
         it.
       </Text>
+      <Link href="/write-japanese" style={s.back}>
+        Type a sentence ›
+      </Link>
       {writingTasks.map((task) => (
         <Sentence key={task.id} task={task} />
       ))}

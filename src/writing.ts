@@ -75,3 +75,30 @@ export function isSentenceAnswer(
       order.every((token, i) => token === answer[i]),
   );
 }
+
+const spellings = [
+  ["昨日", "きのう"],
+  ["明日", "あした"],
+  ["お茶", "おちゃ"],
+  ["飲", "の"],
+  ["駅", "えき"],
+  ["行", "い"],
+  ["家", "いえ"],
+  ["本", "ほん"],
+  ["読", "よ"],
+  ["左", "ひだり"],
+  ["公園", "こうえん"],
+  ["写真", "しゃしん"],
+  ["撮", "と"],
+  ["良い", "いい"],
+  ["喫茶店", "きっさてん"],
+] as const;
+
+export function normalizeSentenceAnswer(text: string) {
+  const compact = text.normalize("NFKC").replace(/[\s。．、，,.!?？！]/gu, "");
+  return spellings.reduce(
+    (normalized, [spelling, reading]) =>
+      normalized.replaceAll(spelling, reading),
+    compact,
+  );
+}

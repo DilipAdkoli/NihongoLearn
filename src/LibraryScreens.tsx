@@ -232,6 +232,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/write-japanese",
+    title: "Write a sentence in Japanese",
+    detail: "Type Japanese sentences in kana or kanji",
+    icon: BookOpen,
+  },
+  {
     href: "/kanji",
     title: "First kanji in context",
     detail: "Weekdays, places, and directions",
@@ -679,6 +685,9 @@ export function Progress() {
   const writingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("writing:"),
   );
+  const typedSentenceAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("writing-type:"),
+  );
   const kanjiAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("kanji:"),
   );
@@ -782,6 +791,9 @@ export function Progress() {
       )}
       {!!writingAttempts.length && (
         <Score label="Sentence building" attempts={writingAttempts} />
+      )}
+      {!!typedSentenceAttempts.length && (
+        <Score label="Typed sentences" attempts={typedSentenceAttempts} />
       )}
       {!!kanjiAttempts.length && (
         <Score label="Kanji" attempts={kanjiAttempts} />

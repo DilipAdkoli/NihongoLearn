@@ -27,6 +27,7 @@ export type ChoiceLesson = {
   promptAudio?: number;
   answerAudio?: number;
   acceptedAnswers?: readonly string[];
+  normalizeAnswer?: (text: string) => string;
 };
 
 type Course =
@@ -46,6 +47,7 @@ type Course =
   | "counters"
   | "prices"
   | "beginner-check"
+  | "writing-type"
   | "sound-listening";
 
 type PassageData = {
@@ -150,7 +152,7 @@ function PracticeCard({
           : "listening",
       answer: choice.trim(),
       correct: accepted
-        ? matchesTypedAnswer(choice, accepted)
+        ? matchesTypedAnswer(choice, accepted, lesson.normalizeAnswer)
         : choice === lesson.answer,
       at: Date.now(),
     };
@@ -249,10 +251,12 @@ function PracticeCard({
               placeholderTextColor="#566860"
               autoCorrect={false}
               autoCapitalize="none"
-              maxLength={50}
+              maxLength={course === "writing-type" ? 120 : 50}
               editable={!pending && !failed && !result}
               value={choice}
               onChangeText={setChoice}
+              onSubmitEditing={check}
+              returnKeyType="done"
               style={inputStyle}
             />
           ) : (
