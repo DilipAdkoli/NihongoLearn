@@ -8,6 +8,7 @@ import {
   teForm,
   verbs,
 } from "../src/grammar";
+import { questionWords } from "../src/questions";
 
 export default function Grammar() {
   return (
@@ -18,6 +19,7 @@ export default function Grammar() {
       groups={[
         { title: "Statements and questions", lessons: grammar },
         { title: "Pointing to things and places", lessons: demonstratives },
+        { title: "Ask everyday questions", lessons: questionWords },
         { title: "Say what’s present and where", lessons: existence },
         { title: "Objects, places, and destinations", lessons: particles },
         { title: "Polite verb forms", lessons: verbs },

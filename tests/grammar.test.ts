@@ -9,11 +9,13 @@ import {
   teForm,
   verbs,
 } from "../src/grammar.ts";
+import { questionWords } from "../src/questions.ts";
 
 test("grammar lessons have stable IDs and a single selectable answer each", () => {
   const lessons = [
     ...grammar,
     ...demonstratives,
+    ...questionWords,
     ...existence,
     ...particles,
     ...verbs,
@@ -66,5 +68,12 @@ test("existence practice distinguishes objects and animals and teaches location 
   assert.deepEqual(
     existence.map((lesson) => lesson.answer),
     ["あります", "います", "に", "が", "の"],
+  );
+});
+
+test("everyday questions cover time, people, things, prices, and methods", () => {
+  assert.deepEqual(
+    questionWords.map((lesson) => lesson.answer),
+    ["いつ", "だれ", "なん", "いくら", "どうやって"],
   );
 });
