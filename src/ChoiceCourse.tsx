@@ -503,7 +503,9 @@ function Passage({
           </Text>
         </Pressable>
       </View>
-      {lookupWords && <PassageVocabulary terms={lookupWords} />}
+      {lookupWords && (!audio || transcript) && (
+        <PassageVocabulary terms={lookupWords} />
+      )}
     </View>
   );
 }

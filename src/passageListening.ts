@@ -25,7 +25,10 @@ export const passageListening: readonly CourseGroup[] = [
     passage: {
       japanese:
         "きのう、いえで ほんを よみました。\nそれから、おちゃを のみました。",
+      standardJapanese:
+        "昨日、家で本を読みました。\nそれから、お茶を飲みました。",
       english: "Yesterday, I read a book at home.\nAfter that, I drank tea.",
+      lookupWords: ["本", "お茶"],
       audio: [
         require("../assets/audio/passage-yesterday-normal.mp3"),
         require("../assets/audio/passage-yesterday-slow.mp3"),
@@ -56,7 +59,9 @@ export const passageListening: readonly CourseGroup[] = [
     title: "Tomorrow’s plans",
     passage: {
       japanese: "あした、えきに いきます。\nえきで ともだちに あいます。",
+      standardJapanese: "明日、駅に行きます。\n駅で友だちに会います。",
       english: "Tomorrow, I’ll go to the station.\nI’ll meet a friend there.",
+      lookupWords: ["駅", "友だち", "行く"],
       audio: [
         require("../assets/audio/passage-tomorrow-normal.mp3"),
         require("../assets/audio/passage-tomorrow-slow.mp3"),
@@ -86,7 +91,9 @@ export const passageListening: readonly CourseGroup[] = [
     title: "Train announcement",
     passage: {
       japanese: "つぎは、きょうとです。\nおでぐちは、みぎがわです。",
+      standardJapanese: "次は、京都です。\nお出口は、右側です。",
       english: "The next stop is Kyoto.\nThe doors will open on the right.",
+      lookupWords: ["次", "出口", "右"],
       audio: [
         require("../assets/audio/passage-kyoto-normal.mp3"),
         require("../assets/audio/passage-kyoto-slow.mp3"),
@@ -116,8 +123,11 @@ export const passageListening: readonly CourseGroup[] = [
     passage: {
       japanese:
         "まいばん、しちじに うちに かえります。\nはちじに ばんごはんを たべます。\nそれから、にほんごを べんきょうします。\nじゅういちじに ねます。",
+      standardJapanese:
+        "毎晩、七時にうちに帰ります。\n八時に晩ごはんを食べます。\nそれから、日本語を勉強します。\n十一時に寝ます。",
       english:
         "Every evening, I get home at seven.\nI eat dinner at eight.\nThen I study Japanese.\nI go to bed at eleven.",
+      lookupWords: ["帰る", "食べる", "寝る"],
       audio: [
         require("../assets/audio/passage-evening-normal.mp3"),
         require("../assets/audio/passage-evening-slow.mp3"),
