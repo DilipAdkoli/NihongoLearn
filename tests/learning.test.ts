@@ -7,7 +7,7 @@ import {
   makeExercises,
 } from "../src/learning.ts";
 
-test("the basic hiragana lessons have unique kana and examples readable with taught characters", () => {
+test("hiragana lessons have unique kana and examples readable with taught characters", () => {
   assert.deepEqual(
     kana
       .filter((item) => lessons[0].ids.includes(item.id))
@@ -24,7 +24,7 @@ test("the basic hiragana lessons have unique kana and examples readable with tau
     lessons.flatMap((lesson) => lesson.ids),
     kana.map((item) => item.id),
   );
-  assert.equal(kana.length, 46);
+  assert.equal(kana.length, 71);
   assert.equal(new Set(kana.map((item) => item.glyph)).size, kana.length);
   const readings = new Map(kana.map((item) => [item.glyph, item.reading]));
   for (const item of kana) {
@@ -83,4 +83,14 @@ test("recall accepts both the spelling and common pronunciation of を", () => {
   assert.ok(evaluateAnswer(question, "wo"));
   assert.ok(evaluateAnswer(question, "o"));
   assert.equal(evaluateAnswer(question, "w"), false);
+});
+
+test("ぢ and づ accept their standard readings and keyboard spellings", () => {
+  const [, di] = makeExercises(["di"]);
+  const [, du] = makeExercises(["du"]);
+  assert.ok(evaluateAnswer(di, "ji"));
+  assert.ok(evaluateAnswer(di, "di"));
+  assert.ok(evaluateAnswer(du, "zu"));
+  assert.ok(evaluateAnswer(du, "du"));
+  assert.equal(evaluateAnswer(du, "tsu"), false);
 });
