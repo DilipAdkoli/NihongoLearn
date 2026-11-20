@@ -77,7 +77,7 @@ const clips = new Map<string, number>([
 let stopCurrent: (() => void) | undefined;
 
 export async function playKana(id: string): Promise<void> {
-  const clip = clips.get(id);
+  const clip = clips.get(id.replace(/^kata-/, ""));
   if (clip === undefined) throw new Error("Pronunciation unavailable.");
   stopCurrent?.();
 

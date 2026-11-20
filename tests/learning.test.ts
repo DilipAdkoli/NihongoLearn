@@ -7,7 +7,7 @@ import {
   makeExercises,
 } from "../src/learning.ts";
 
-test("hiragana lessons have unique kana and examples readable with taught characters", () => {
+test("kana lessons have unique glyphs and examples readable with taught characters", () => {
   assert.deepEqual(
     kana
       .filter((item) => lessons[0].ids.includes(item.id))
@@ -24,7 +24,8 @@ test("hiragana lessons have unique kana and examples readable with taught charac
     lessons.flatMap((lesson) => lesson.ids),
     kana.map((item) => item.id),
   );
-  assert.equal(kana.length, 71);
+  assert.equal(kana.filter((item) => item.script === "hiragana").length, 71);
+  assert.equal(kana.filter((item) => item.script === "katakana").length, 46);
   assert.equal(new Set(kana.map((item) => item.glyph)).size, kana.length);
   const readings = new Map(kana.map((item) => [item.glyph, item.reading]));
   for (const item of kana) {
@@ -53,6 +54,13 @@ test("recognition includes exactly one correct glyph among four distinct choices
   for (const item of kana) {
     const [question] = makeExercises([item.id]);
     assert.equal(question.choices.length, 4);
+    assert.ok(
+      question.choices.every((glyph) =>
+        kana.some(
+          (entry) => entry.glyph === glyph && entry.script === item.script,
+        ),
+      ),
+    );
     assert.equal(new Set(question.choices).size, 4);
     const row = lessons.find((lesson) => lesson.ids.includes(item.id));
     const sameRow = question.choices.filter((glyph) =>

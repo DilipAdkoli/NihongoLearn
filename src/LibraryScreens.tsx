@@ -18,7 +18,7 @@ import {
   RotateCcw,
   Sprout,
 } from "lucide-react-native";
-import { kana, lessons } from "./learning";
+import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
@@ -53,8 +53,15 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-function KanaChart({ seen }: { seen: readonly string[] }) {
+function KanaChart({
+  seen,
+  script,
+}: {
+  seen: readonly string[];
+  script: Script;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const characters = kana.filter((item) => item.script === script);
   return (
     <View style={s.list}>
       <Pressable
@@ -64,9 +71,12 @@ function KanaChart({ seen }: { seen: readonly string[] }) {
         style={({ pressed }) => [s.row, pressed && s.pressed]}
       >
         <View style={s.grow}>
-          <Text style={s.rowTitle}>Hiragana chart</Text>
+          <Text style={s.rowTitle}>
+            {script === "hiragana" ? "Hiragana" : "Katakana"} chart
+          </Text>
           <Text style={s.detail}>
-            {seen.length} of {kana.length} studied
+            {characters.filter((item) => seen.includes(item.id)).length} of{" "}
+            {characters.length} studied
           </Text>
         </View>
         <ChevronRight
@@ -77,34 +87,36 @@ function KanaChart({ seen }: { seen: readonly string[] }) {
       </Pressable>
       {expanded && (
         <View style={s.chart}>
-          {lessons.map((lesson) => (
-            <View key={lesson.title}>
-              <Text style={s.rowTitle}>{lesson.notebook}</Text>
-              <View style={s.chartRow}>
-                {kana
-                  .filter((item) => lesson.ids.includes(item.id))
-                  .map((item) => {
-                    const studied = seen.includes(item.id);
-                    return (
-                      <Pressable
-                        key={item.id}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Study ${item.glyph}, ${item.reading}${studied ? ", already studied" : ""}`}
-                        onPress={() => startLesson([item.id])}
-                        style={({ pressed }) => [
-                          s.chartTile,
-                          studied && s.chartStudied,
-                          pressed && s.pressed,
-                        ]}
-                      >
-                        <Text style={s.glyph}>{item.glyph}</Text>
-                        <Text style={s.detail}>{item.reading}</Text>
-                      </Pressable>
-                    );
-                  })}
+          {lessons
+            .filter((lesson) => lesson.script === script)
+            .map((lesson) => (
+              <View key={lesson.title}>
+                <Text style={s.rowTitle}>{lesson.notebook}</Text>
+                <View style={s.chartRow}>
+                  {kana
+                    .filter((item) => lesson.ids.includes(item.id))
+                    .map((item) => {
+                      const studied = seen.includes(item.id);
+                      return (
+                        <Pressable
+                          key={item.id}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Study ${item.glyph}, ${item.reading}${studied ? ", already studied" : ""}`}
+                          onPress={() => startLesson([item.id])}
+                          style={({ pressed }) => [
+                            s.chartTile,
+                            studied && s.chartStudied,
+                            pressed && s.pressed,
+                          ]}
+                        >
+                          <Text style={s.glyph}>{item.glyph}</Text>
+                          <Text style={s.detail}>{item.reading}</Text>
+                        </Pressable>
+                      );
+                    })}
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
         </View>
       )}
     </View>
@@ -113,43 +125,63 @@ function KanaChart({ seen }: { seen: readonly string[] }) {
 
 export function Learn() {
   const { data } = useStudy();
+  const [script, setScript] = useState<Script>("hiragana");
   return (
     <View style={s.page}>
       <Heading
         title="Learn"
-        detail="Build your hiragana reading skills, one sound at a time."
+        detail="Build your kana reading skills, one sound at a time."
       />
-      <KanaChart seen={data.seen} />
-      {lessons.map((lesson, index) => {
-        const studied = lesson.ids.filter((id) =>
-          data.seen.includes(id),
-        ).length;
-        return (
-          <View key={lesson.title} style={s.feature}>
-            <View style={s.iconLabel}>
-              <BookOpen size={18} color={green} />
-              <Text style={s.kicker}>HIRAGANA / LESSON {index + 1}</Text>
+      <View accessibilityRole="tablist" style={s.chartRow}>
+        {(["hiragana", "katakana"] as const).map((option) => (
+          <Pressable
+            key={option}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: script === option }}
+            onPress={() => setScript(option)}
+            style={[s.chartTile, script === option && s.chartStudied]}
+          >
+            <Text style={s.rowTitle}>
+              {option === "hiragana" ? "Hiragana" : "Katakana"}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+      <KanaChart key={script} seen={data.seen} script={script} />
+      {lessons
+        .filter((lesson) => lesson.script === script)
+        .map((lesson, index) => {
+          const studied = lesson.ids.filter((id) =>
+            data.seen.includes(id),
+          ).length;
+          return (
+            <View key={lesson.title} style={s.feature}>
+              <View style={s.iconLabel}>
+                <BookOpen size={18} color={green} />
+                <Text style={s.kicker}>
+                  {script.toUpperCase()} / LESSON {index + 1}
+                </Text>
+              </View>
+              <Text style={s.featureTitle}>{lesson.title}</Text>
+              <Text style={s.body}>{lesson.detail}</Text>
+              <View style={s.featureFooter}>
+                <Action
+                  label={
+                    studied === lesson.ids.length
+                      ? "Revisit lesson"
+                      : studied
+                        ? "Continue lesson"
+                        : "Start lesson"
+                  }
+                  onPress={() => startLesson(lesson.ids)}
+                />
+                <Text style={s.detail}>
+                  {studied} of {lesson.ids.length} characters studied
+                </Text>
+              </View>
             </View>
-            <Text style={s.featureTitle}>{lesson.title}</Text>
-            <Text style={s.body}>{lesson.detail}</Text>
-            <View style={s.featureFooter}>
-              <Action
-                label={
-                  studied === lesson.ids.length
-                    ? "Revisit lesson"
-                    : studied
-                      ? "Continue lesson"
-                      : "Start lesson"
-                }
-                onPress={() => startLesson(lesson.ids)}
-              />
-              <Text style={s.detail}>
-                {studied} of {lesson.ids.length} characters studied
-              </Text>
-            </View>
-          </View>
-        );
-      })}
+          );
+        })}
     </View>
   );
 }
@@ -278,7 +310,7 @@ export function Progress() {
       <View style={s.feature}>
         <View style={s.iconLabel}>
           <Sprout size={19} color={green} />
-          <Text style={s.kicker}>HIRAGANA</Text>
+          <Text style={s.kicker}>KANA</Text>
         </View>
         <Text style={s.featureTitle}>
           {studied} of {kana.length} studied

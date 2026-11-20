@@ -67,7 +67,10 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
   return (
     <>
       <View style={s.studyCard}>
-        <Text style={s.glyph} accessibilityLabel={`Hiragana ${item.reading}`}>
+        <Text
+          style={s.glyph}
+          accessibilityLabel={`${item.script} ${item.reading}`}
+        >
           {item.glyph}
         </Text>
         <Text style={s.reading}>{item.reading}</Text>
@@ -88,14 +91,16 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
         )}
       </View>
       <Text style={s.cue}>{item.cue}</Text>
-      <View style={s.example}>
-        <Text style={s.label}>IN A WORD</Text>
-        <Text style={s.exampleWord}>
-          {item.example}{" "}
-          <Text style={s.exampleReading}>{item.exampleReading}</Text>
-        </Text>
-        <Text style={s.body}>{item.meaning}</Text>
-      </View>
+      {item.example && (
+        <View style={s.example}>
+          <Text style={s.label}>IN A WORD</Text>
+          <Text style={s.exampleWord}>
+            {item.example}{" "}
+            <Text style={s.exampleReading}>{item.exampleReading}</Text>
+          </Text>
+          <Text style={s.body}>{item.meaning}</Text>
+        </View>
+      )}
     </>
   );
 }
@@ -192,13 +197,15 @@ export default function Session({
   );
   const title =
     stage === "lesson"
-      ? (lesson?.title ?? "Study hiragana")
+      ? (lesson?.title ?? "Study kana")
       : stage === "results"
         ? "Practice complete"
         : exercise?.mode === "recognition"
-          ? "Choose the hiragana"
+          ? `Choose the ${item?.script ?? "kana"}`
           : "Type the reading";
-  const heading = review ? "Review" : "Hiragana lesson";
+  const heading = review
+    ? "Review"
+    : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
   return (
@@ -270,7 +277,9 @@ export default function Session({
               <>
                 <View style={s.prompt}>
                   <Text style={s.label}>
-                    {exercise.mode === "recognition" ? "ROMAJI" : "HIRAGANA"}
+                    {exercise.mode === "recognition"
+                      ? "ROMAJI"
+                      : item.script.toUpperCase()}
                   </Text>
                   <Text
                     style={

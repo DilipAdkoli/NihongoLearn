@@ -1,6 +1,6 @@
 # NihongoLearn 🇯🇵
 
-> **Development checkpoint — hiragana curriculum.** The Expo app teaches all 46 basic hiragana and 25 kana with dakuten or handakuten across 15 lessons with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
+> **Development checkpoint — kana curriculum.** The Expo app teaches all 46 basic hiragana and 25 kana with dakuten or handakuten across 15 lessons, plus all 46 basic katakana across 10 lessons, with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
 
 ## Run the app
 

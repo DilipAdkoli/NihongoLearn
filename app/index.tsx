@@ -87,6 +87,9 @@ export default function Home() {
   );
   const lessonIndex = nextIndex < 0 ? lessons.length - 1 : nextIndex;
   const lesson = lessons[lessonIndex];
+  const lessonNumber = lessons
+    .slice(0, lessonIndex + 1)
+    .filter((entry) => entry.script === lesson.script).length;
   const notebook = kana.filter((item) => lesson.ids.includes(item.id));
   const correct = data.attempts.filter((a) => a.correct).length;
   const date = new Intl.DateTimeFormat("en", {
@@ -117,7 +120,8 @@ export default function Home() {
           <View style={s.lessonTag}>
             <View style={s.tagLine} />
             <Text style={s.tagText}>
-              HIRAGANA / LESSON {String(lessonIndex + 1).padStart(2, "0")}
+              {lesson.script.toUpperCase()} / LESSON{" "}
+              {String(lessonNumber).padStart(2, "0")}
             </Text>
           </View>
           <Text
@@ -196,7 +200,7 @@ export default function Home() {
       <View style={s.notebook}>
         <View style={s.bookHead}>
           <BookMarked size={17} color="#5b6956" />
-          <Text style={s.bookLabel}>HIRAGANA</Text>
+          <Text style={s.bookLabel}>{lesson.script.toUpperCase()}</Text>
           <View style={s.separator} />
           <Text style={s.bookGroup}>{lesson.notebook}</Text>
         </View>

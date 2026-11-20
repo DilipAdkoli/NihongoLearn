@@ -1,6 +1,9 @@
+export type Script = "hiragana" | "katakana";
+
 export type Kana = {
   id: string;
   glyph: string;
+  script: Script;
   reading: string;
   aliases?: readonly string[];
   cue: string;
@@ -9,7 +12,7 @@ export type Kana = {
   meaning: string;
 };
 
-export const kana: readonly Kana[] = [
+const hiragana: readonly Omit<Kana, "script">[] = [
   {
     id: "a",
     glyph: "あ",
@@ -654,7 +657,7 @@ export const kana: readonly Kana[] = [
   },
 ];
 
-export const lessons = [
+const hiraganaLessons = [
   {
     title: "The five vowels",
     notebook: "Vowel row",
@@ -750,6 +753,101 @@ export const lessons = [
   },
 ];
 
+const katakanaExamples: readonly [string, string, string, string][] = [
+  ["a", "アイス", "aisu", "ice cream"],
+  ["i", "インク", "inku", "ink"],
+  ["u", "ウニ", "uni", "sea urchin"],
+  ["e", "エリア", "eria", "area"],
+  ["o", "オイル", "oiru", "oil"],
+  ["ka", "カメラ", "kamera", "camera"],
+  ["ki", "キウイ", "kiui", "kiwi"],
+  ["ku", "クミン", "kumin", "cumin"],
+  ["ke", "ケア", "kea", "care"],
+  ["ko", "ココア", "kokoa", "cocoa"],
+  ["sa", "サイン", "sain", "signature"],
+  ["shi", "シアトル", "shiatoru", "Seattle"],
+  ["su", "スイス", "suisu", "Switzerland"],
+  ["se", "セロリ", "serori", "celery"],
+  ["so", "ソフト", "sofuto", "software"],
+  ["ta", "タイ", "tai", "Thailand"],
+  ["chi", "チタン", "chitan", "titanium"],
+  ["tsu", "ツナ", "tsuna", "tuna"],
+  ["te", "テニス", "tenisu", "tennis"],
+  ["to", "トマト", "tomato", "tomato"],
+  ["na", "ナイル", "nairu", "Nile"],
+  ["ni", "マニラ", "manira", "Manila"],
+  ["nu", "イヌ", "inu", "dog (species name)"],
+  ["ne", "ネクタイ", "nekutai", "necktie"],
+  ["no", "ノルマ", "noruma", "quota"],
+  ["ha", "ハム", "hamu", "ham"],
+  ["hi", "ヒント", "hinto", "hint"],
+  ["fu", "フランス", "furansu", "France"],
+  ["he", "ヘルス", "herusu", "health"],
+  ["ho", "ホテル", "hoteru", "hotel"],
+  ["ma", "マスク", "masuku", "mask"],
+  ["mi", "ミルク", "miruku", "milk"],
+  ["mu", "ムスク", "musuku", "musk"],
+  ["me", "メモ", "memo", "note"],
+  ["mo", "モナコ", "monako", "Monaco"],
+  ["ya", "タイヤ", "taiya", "tire"],
+  ["yu", "ユニオン", "yunion", "union"],
+  ["yo", "ヨハネ", "yohane", "John (biblical name)"],
+  ["ra", "ラテン", "raten", "Latin"],
+  ["ri", "リスト", "risuto", "list"],
+  ["ru", "アルミ", "arumi", "aluminum"],
+  ["re", "レモン", "remon", "lemon"],
+  ["ro", "ロマン", "roman", "romance"],
+  ["wa", "ワイン", "wain", "wine"],
+  ["wo", "", "", ""],
+  ["n", "インク", "inku", "ink"],
+];
+
+const katakana: Kana[] = katakanaExamples.map(
+  ([id, example, exampleReading, meaning]) => {
+    const source = hiragana.find((item) => item.id === id);
+    if (!source) throw new Error(`Missing hiragana counterpart for ${id}`);
+    const glyph = String.fromCharCode(source.glyph.charCodeAt(0) + 0x60);
+    return {
+      ...source,
+      id: `kata-${id}`,
+      glyph,
+      script: "katakana",
+      cue:
+        id === "wo"
+          ? "ヲ is rare in modern writing. It corresponds to を and is usually pronounced o."
+          : `This is the katakana counterpart of ${source.glyph}. ${source.cue}`,
+      example,
+      exampleReading,
+      meaning,
+    };
+  },
+);
+
+export const kana: readonly Kana[] = [
+  ...hiragana.map((item): Kana => ({ ...item, script: "hiragana" })),
+  ...katakana,
+];
+
+export const lessons = [
+  ...hiraganaLessons.map((lesson) => ({
+    ...lesson,
+    script: "hiragana" as const,
+  })),
+  ...hiraganaLessons.slice(0, 10).map((lesson) => {
+    const ids = lesson.ids.map((id) => `kata-${id}`);
+    const glyphs = katakana
+      .filter((item) => ids.includes(item.id))
+      .map((item) => item.glyph);
+    return {
+      script: "katakana" as const,
+      title: lesson.title.replace("ん", "ン"),
+      notebook: lesson.notebook.replace("ん", "ン"),
+      detail: `Study ${glyphs.join("・")} and practice recalling each reading.`,
+      ids,
+    };
+  }),
+];
+
 export type Exercise = {
   kanaId: string;
   mode: "recognition" | "recall";
@@ -775,7 +873,11 @@ export function makeExercises(ids: string[]): Exercise[] {
     const nearby = shuffled(neighbors).slice(0, 3);
     const fill = shuffled(
       kana.filter(
-        (other) => other.id !== item.id && !row?.ids.includes(other.id),
+        (other) =>
+          other.id !== item.id &&
+          other.script === item.script &&
+          !row?.ids.includes(other.id) &&
+          other.reading !== item.reading,
       ),
     ).slice(0, 3 - nearby.length);
     const distractors = [...nearby, ...fill].map((other) => other.glyph);
