@@ -195,3 +195,71 @@ export const adjectives = [
       "きれい is a な-adjective and takes では ありません in this polite negative.",
   },
 ] as const;
+
+export const teForm = [
+  {
+    id: "te-ichidan",
+    title: "Form て with an ichidan verb",
+    explanation:
+      "For an ichidan verb, drop the final る and add て. For example, たべる becomes たべて. Some verbs that end in る belong to other groups.",
+    japanese: "たべて ください。",
+    english: "Please eat.",
+    prompt: "Use the て-form of みる (to look) to say “Please look.”",
+    stem: "＿＿ ください。",
+    choices: ["みって", "みて", "みるて"],
+    answer: "みて",
+    feedback: "みる is an ichidan verb. Drop る and add て to make みて.",
+  },
+  {
+    id: "te-godan-u-tsu-ru",
+    title: "Use って for certain godan verbs",
+    explanation:
+      "Godan verbs ending in う, つ, or る use って in this form. まつ (to wait) becomes まって, and かう (to buy) becomes かって.",
+    japanese: "ここで まって ください。",
+    english: "Please wait here.",
+    prompt: "Use the て-form of かう (to buy) to say “Please buy bread.”",
+    stem: "パンを ＿＿ ください。",
+    choices: ["かいて", "かうて", "かって"],
+    answer: "かって",
+    feedback: "The う in かう becomes って in this form.",
+  },
+  {
+    id: "te-godan-mu-bu-nu",
+    title: "Use んで with む, ぶ, and ぬ verbs",
+    explanation:
+      "Godan verbs ending in む, ぶ, or ぬ take んで. For example, よむ (to read) becomes よんで.",
+    japanese: "この ほんを よんで ください。",
+    english: "Please read this book.",
+    prompt: "Use the て-form of のむ (to drink) to say “Please drink water.”",
+    stem: "みずを ＿＿ ください。",
+    choices: ["のんで", "のむて", "のって"],
+    answer: "のんで",
+    feedback: "Replace the final む of のむ with んで.",
+  },
+  {
+    id: "te-godan-ku-gu-su",
+    title: "Read the endings いて, いで, and して",
+    explanation:
+      "For most godan verbs ending in く, use いて. For ぐ, use いで, and for す, use して. いく (to go) is a major exception and becomes いって.",
+    japanese: "なまえを かいて ください。",
+    english: "Please write your name.",
+    prompt: "Use the て-form of いく to say “Please go to the station.”",
+    stem: "えきに ＿＿ ください。",
+    choices: ["いいて", "いって", "いくて"],
+    answer: "いって",
+    feedback: "いく is an exception. Its て-form is いって.",
+  },
+  {
+    id: "te-irregular",
+    title: "Make requests with する and くる",
+    explanation:
+      "The irregular verbs する (to do) and くる (to come) become して and きて. Put ください after the て-form for a polite request.",
+    japanese: "ここに きて ください。",
+    english: "Please come here.",
+    prompt: "Complete “Please do your homework” using the て-form of する.",
+    stem: "しゅくだいを ＿＿ ください。",
+    choices: ["すって", "するて", "して"],
+    answer: "して",
+    feedback: "する becomes して, so して ください means “please do it.”",
+  },
+] as const;
