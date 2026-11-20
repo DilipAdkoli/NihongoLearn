@@ -1,4 +1,4 @@
-import type { Attempt, StudyData } from "./storage.types";
+import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 export type { Attempt, StudyData } from "./storage.types";
 
@@ -6,7 +6,6 @@ export type { Attempt, StudyData } from "./storage.types";
 const namespace = "nihongolearn:v1:";
 const seenPrefix = namespace + "seen:";
 const attemptPrefix = namespace + "attempt:";
-const soundKey = namespace + "sound";
 
 export async function loadStudy(): Promise<StudyData> {
   const storage = globalThis.localStorage;
@@ -25,7 +24,12 @@ export async function loadStudy(): Promise<StudyData> {
 
   seen.sort();
   attempts.sort((a, b) => a.at - b.at || a.id.localeCompare(b.id));
-  return { seen, attempts, sound: storage.getItem(soundKey) !== "off" };
+  return {
+    seen,
+    attempts,
+    sound: storage.getItem(namespace + "sound") !== "off",
+    romaji: storage.getItem(namespace + "romaji") !== "off",
+  };
 }
 
 export async function markSeen(id: string): Promise<void> {
@@ -39,6 +43,9 @@ export async function recordAttempt(attempt: Attempt): Promise<void> {
   }
 }
 
-export async function setSound(value: boolean): Promise<void> {
-  globalThis.localStorage.setItem(soundKey, value ? "on" : "off");
+export async function setPreference(
+  name: StudyPreference,
+  value: boolean,
+): Promise<void> {
+  globalThis.localStorage.setItem(namespace + name, value ? "on" : "off");
 }

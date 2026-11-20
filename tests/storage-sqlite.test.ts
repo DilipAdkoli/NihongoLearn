@@ -39,6 +39,7 @@ test("lessons, attempts and preferences persist across closing and reopening the
   assert.deepEqual(await store.loadStudy(), {
     seen: [],
     attempts: [],
+    romaji: true,
     sound: true,
   });
   const first: Attempt = {
@@ -64,17 +65,20 @@ test("lessons, attempts and preferences persist across closing and reopening the
   ]);
   await Promise.all([store.recordAttempt(second), store.recordAttempt(first)]);
   await store.recordAttempt({ ...first, answer: "changed" });
-  await store.setSound(false);
+  await store.setPreference("sound", false);
+  await store.setPreference("romaji", false);
   db.close();
   db = new DatabaseSync(filename);
   const reopened = createSqliteStorage(async () => connect(db));
   assert.deepEqual(await reopened.loadStudy(), {
     seen: ["a", "i"],
     attempts: [first, second],
+    romaji: false,
     sound: false,
   });
-  await reopened.setSound(true);
+  await reopened.setPreference("sound", true);
   assert.equal((await reopened.loadStudy()).sound, true);
+  assert.equal((await reopened.loadStudy()).romaji, false);
 });
 
 test("opening a database with an unknown schema preserves its version", async (t) => {
@@ -121,6 +125,7 @@ test("version 1 migrates atomically and keeps saved answers and preferences", as
   assert.deepEqual(await store.loadStudy(), {
     seen: ["a"],
     attempts: [first],
+    romaji: true,
     sound: false,
   });
   await store.recordAttempt(next);

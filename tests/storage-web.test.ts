@@ -26,7 +26,12 @@ test("web progress survives reopening and retries preserve the original attempt"
     );
   const reload = () =>
     JSON.parse(run("console.log(JSON.stringify(await store.loadStudy()))"));
-  assert.deepEqual(reload(), { seen: [], attempts: [], sound: true });
+  assert.deepEqual(reload(), {
+    seen: [],
+    attempts: [],
+    romaji: true,
+    sound: true,
+  });
 
   const first = {
     id: "session-1",
@@ -52,7 +57,8 @@ test("web progress survives reopening and retries preserve the original attempt"
       store.markSeen('i'),
       store.recordAttempt(${JSON.stringify(second)}),
       store.recordAttempt(${JSON.stringify(first)}),
-      store.setSound(false),
+      store.setPreference("sound", false),
+      store.setPreference("romaji", false),
     ]);
   `);
   run(
@@ -61,8 +67,10 @@ test("web progress survives reopening and retries preserve the original attempt"
   assert.deepEqual(reload(), {
     seen: ["a", "i"],
     attempts: [first, second],
+    romaji: false,
     sound: false,
   });
-  run("await store.setSound(true)");
+  run('await store.setPreference("sound", true)');
   assert.equal(reload().sound, true);
+  assert.equal(reload().romaji, false);
 });

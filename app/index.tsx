@@ -209,7 +209,9 @@ export default function Home() {
             <Pressable
               key={item.id}
               accessibilityRole="button"
-              accessibilityLabel={"Study " + item.glyph + ", " + item.reading}
+              accessibilityLabel={
+                "Study " + item.glyph + (data.romaji ? ", " + item.reading : "")
+              }
               onPress={() => startLesson([item.id])}
               style={({ pressed }) => [
                 s.tile,
@@ -225,7 +227,7 @@ export default function Home() {
               <Text style={[s.character, phone && { fontSize: 31 }]}>
                 {item.glyph}
               </Text>
-              <Text style={s.romaji}>{item.reading}</Text>
+              {data.romaji && <Text style={s.romaji}>{item.reading}</Text>}
             </Pressable>
           ))}
         </View>

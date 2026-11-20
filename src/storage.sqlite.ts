@@ -79,7 +79,7 @@ export function createSqliteStorage(
   return {
     async loadStudy() {
       const db = await database();
-      const [seen, attempts, sound] = await Promise.all([
+      const [seen, attempts, settings] = await Promise.all([
         db.getAllAsync<{ kana_id: string }>(
           "SELECT kana_id FROM seen_kana ORDER BY kana_id",
         ),
@@ -87,8 +87,8 @@ export function createSqliteStorage(
           `SELECT id, kana_id AS kanaId, mode, answer, correct, attempted_at AS at
            FROM attempts ORDER BY attempted_at, id`,
         ),
-        db.getFirstAsync<{ value: number }>(
-          "SELECT value FROM settings WHERE key = 'sound'",
+        db.getAllAsync<{ key: string; value: number }>(
+          "SELECT key, value FROM settings",
         ),
       ]);
       return {
@@ -97,7 +97,9 @@ export function createSqliteStorage(
           ...row,
           correct: row.correct === 1,
         })),
-        sound: sound?.value !== 0,
+        sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
+        romaji:
+          settings.find((setting) => setting.key === "romaji")?.value !== 0,
       };
     },
     async markSeen(id) {
@@ -120,10 +122,11 @@ export function createSqliteStorage(
         attempt.at,
       );
     },
-    async setSound(value) {
+    async setPreference(name, value) {
       const db = await database();
       await db.runAsync(
-        "INSERT INTO settings (key, value) VALUES ('sound', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        name,
         Number(value),
       );
     },

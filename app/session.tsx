@@ -27,6 +27,7 @@ export default function SessionRoute() {
       ids={ids}
       mode={mode}
       sound={data.sound}
+      romaji={data.romaji}
       onSeen={see}
       onAttempt={answer}
       onClose={() => (router.canGoBack() ? router.back() : router.replace("/"))}

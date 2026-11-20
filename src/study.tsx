@@ -9,13 +9,13 @@ import {
 import { ActivityIndicator, Button, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as storage from "./storage";
-import type { Attempt, StudyData } from "./storage.types";
+import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 type StudyContext = {
   data: StudyData;
   see: (id: string) => Promise<void>;
   answer: (attempt: Attempt) => Promise<void>;
-  changeSound: (enabled: boolean) => Promise<void>;
+  changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
 const Context = createContext<StudyContext | null>(null);
@@ -87,9 +87,9 @@ export function StudyProvider({ children }: PropsWithChildren) {
           : old,
       );
     },
-    async changeSound(enabled) {
-      await storage.setSound(enabled);
-      setData((old) => old && { ...old, sound: enabled });
+    async changePreference(name, enabled) {
+      await storage.setPreference(name, enabled);
+      setData((old) => old && { ...old, [name]: enabled });
     },
   };
   return <Context.Provider value={value}>{children}</Context.Provider>;

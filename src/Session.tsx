@@ -23,6 +23,7 @@ type SessionProps = {
   ids: string[];
   mode: SessionMode;
   sound: boolean;
+  romaji: boolean;
   onSeen: (id: string) => Promise<void>;
   onAttempt: (attempt: Attempt) => Promise<void>;
   onClose: () => void;
@@ -84,28 +85,43 @@ function ListenButton({ id, label }: { id: string; label: string }) {
   );
 }
 
-function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
+function LessonCard({
+  item,
+  sound,
+  romaji,
+}: {
+  item: Kana;
+  sound: boolean;
+  romaji: boolean;
+}) {
   return (
     <>
       <View style={s.studyCard}>
         <Text
           style={s.glyph}
-          accessibilityLabel={`${item.script} ${item.reading}`}
+          accessibilityLabel={
+            romaji ? `${item.script} ${item.reading}` : undefined
+          }
         >
           {item.glyph}
         </Text>
-        <Text style={s.reading}>{item.reading}</Text>
+        {romaji && <Text style={s.reading}>{item.reading}</Text>}
         {sound && (
-          <ListenButton id={item.id} label={`Listen to ${item.reading}`} />
+          <ListenButton
+            id={item.id}
+            label={romaji ? `Listen to ${item.reading}` : "Listen to the sound"}
+          />
         )}
       </View>
-      <Text style={s.cue}>{item.cue}</Text>
+      {romaji && <Text style={s.cue}>{item.cue}</Text>}
       {item.example && (
         <View style={s.example}>
           <Text style={s.label}>IN A WORD</Text>
           <Text style={s.exampleWord}>
-            {item.example}{" "}
-            <Text style={s.exampleReading}>{item.exampleReading}</Text>
+            {item.example}
+            {romaji && (
+              <Text style={s.exampleReading}> {item.exampleReading}</Text>
+            )}
           </Text>
           <Text style={s.body}>{item.meaning}</Text>
         </View>
@@ -118,6 +134,7 @@ export default function Session({
   ids,
   mode,
   sound,
+  romaji,
   onSeen,
   onAttempt,
   onClose,
@@ -285,7 +302,12 @@ export default function Session({
               {title}
             </Text>
             {stage === "lesson" && item && (
-              <LessonCard key={item.id} item={item} sound={sound} />
+              <LessonCard
+                key={item.id}
+                item={item}
+                sound={sound}
+                romaji={romaji}
+              />
             )}
             {stage === "quiz" && item && (
               <>

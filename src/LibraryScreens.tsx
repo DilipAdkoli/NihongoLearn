@@ -25,7 +25,7 @@ import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
-import type { Attempt } from "./storage.types";
+import type { Attempt, StudyPreference } from "./storage.types";
 
 const ink = "#203730";
 const green = "#215848";
@@ -60,9 +60,11 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
 function KanaChart({
   seen,
   script,
+  romaji,
 }: {
   seen: readonly string[];
   script: Script;
+  romaji: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const characters = kana.filter((item) => item.script === script);
@@ -105,7 +107,7 @@ function KanaChart({
                         <Pressable
                           key={item.id}
                           accessibilityRole="button"
-                          accessibilityLabel={`Study ${item.glyph}, ${item.reading}${studied ? ", already studied" : ""}`}
+                          accessibilityLabel={`Study ${item.glyph}${romaji ? ", " + item.reading : ""}${studied ? ", already studied" : ""}`}
                           onPress={() => startLesson([item.id])}
                           style={({ pressed }) => [
                             s.chartTile,
@@ -114,7 +116,9 @@ function KanaChart({
                           ]}
                         >
                           <Text style={s.glyph}>{item.glyph}</Text>
-                          <Text style={s.detail}>{item.reading}</Text>
+                          {romaji && (
+                            <Text style={s.detail}>{item.reading}</Text>
+                          )}
                         </Pressable>
                       );
                     })}
@@ -151,7 +155,12 @@ export function Learn() {
           </Pressable>
         ))}
       </View>
-      <KanaChart key={script} seen={data.seen} script={script} />
+      <KanaChart
+        key={script}
+        seen={data.seen}
+        script={script}
+        romaji={data.romaji}
+      />
       <Link href="/sound-rules" asChild>
         <Pressable
           accessibilityRole="link"
@@ -547,19 +556,19 @@ export function Progress() {
 }
 
 export function Settings() {
-  const { data, changeSound } = useStudy();
+  const { data, changePreference } = useStudy();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const saving = useRef(false);
-  async function updateSound(value: boolean) {
+  async function updatePreference(name: StudyPreference, value: boolean) {
     if (saving.current) return;
     saving.current = true;
     setPending(true);
     setMessage("");
     try {
-      await changeSound(value);
+      await changePreference(name, value);
     } catch {
-      setMessage("Your sound setting could not be saved. Try again.");
+      setMessage("Your study preference could not be saved. Try again.");
     } finally {
       saving.current = false;
       setPending(false);
@@ -585,7 +594,24 @@ export function Settings() {
               value={data.sound}
               disabled={pending}
               accessibilityLabel="Pronunciation audio"
-              onValueChange={updateSound}
+              onValueChange={(value) => updatePreference("sound", value)}
+              trackColor={{ false: "#bbc4be", true: green }}
+            />
+          </View>
+          <View style={[s.row, s.rule]}>
+            <BookOpen size={22} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Kana reading hints</Text>
+              <Text style={s.detail}>
+                Show romaji and pronunciation tips on kana study cards and
+                charts.
+              </Text>
+            </View>
+            <Switch
+              value={data.romaji}
+              disabled={pending}
+              accessibilityLabel="Kana reading hints"
+              onValueChange={(value) => updatePreference("romaji", value)}
               trackColor={{ false: "#bbc4be", true: green }}
             />
           </View>

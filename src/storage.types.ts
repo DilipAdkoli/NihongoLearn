@@ -11,11 +11,14 @@ export type StudyData = {
   seen: string[];
   attempts: Attempt[];
   sound: boolean;
+  romaji: boolean;
 };
+
+export type StudyPreference = "sound" | "romaji";
 
 export type StudyStorage = {
   loadStudy(): Promise<StudyData>;
   markSeen(id: string): Promise<void>;
   recordAttempt(attempt: Attempt): Promise<void>;
-  setSound(value: boolean): Promise<void>;
+  setPreference(name: StudyPreference, value: boolean): Promise<void>;
 };

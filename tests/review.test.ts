@@ -19,6 +19,7 @@ test("studied kana without typed recall are ready now", () => {
       {
         seen: ["i", "removed"],
         attempts: [{ ...recall, mode: "recognition" }],
+        romaji: true,
         sound: true,
       },
       ["a", "i"],
@@ -47,7 +48,12 @@ test("FSRS replay prioritizes a failed recall and ignores recognition scores", (
     correct: false,
   };
   const queue = reviewQueue(
-    { seen: ["a", "i"], attempts: [recognition, failed, recall], sound: true },
+    {
+      seen: ["a", "i"],
+      attempts: [recognition, failed, recall],
+      romaji: true,
+      sound: true,
+    },
     ["a", "i"],
     time,
   );
@@ -57,7 +63,12 @@ test("FSRS replay prioritizes a failed recall and ignores recognition scores", (
   assert.deepEqual(
     queue,
     reviewQueue(
-      { seen: ["a", "i"], attempts: [recall, failed], sound: true },
+      {
+        seen: ["a", "i"],
+        attempts: [recall, failed],
+        romaji: true,
+        sound: true,
+      },
       ["a", "i"],
       time,
     ),
