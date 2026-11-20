@@ -17,6 +17,7 @@ import {
   type Kana,
   type SessionMode,
 } from "./learning";
+import { recommendedLesson } from "./placement";
 import type { Attempt } from "./storage.types";
 
 type SessionProps = {
@@ -28,6 +29,7 @@ type SessionProps = {
   onAttempt: (attempt: Attempt) => Promise<void>;
   onClose: () => void;
   onFinish: () => void;
+  onRecommendedLesson: (ids: string[]) => void;
 };
 
 function Action({
@@ -139,6 +141,7 @@ export default function Session({
   onAttempt,
   onClose,
   onFinish,
+  onRecommendedLesson,
 }: SessionProps) {
   const listening = mode === "listening";
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
@@ -230,15 +233,22 @@ export default function Session({
         : exercise?.mode !== "recall"
           ? `Choose the ${item?.script ?? "kana"}`
           : "Type the reading";
-  const heading = listening
-    ? "Listening practice"
-    : mode === "contrast"
-      ? "Compare kana"
-      : mode === "review"
-        ? "Review"
-        : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
+  const heading =
+    mode === "placement"
+      ? "Basic kana check"
+      : listening
+        ? "Listening practice"
+        : mode === "contrast"
+          ? "Compare kana"
+          : mode === "review"
+            ? "Review"
+            : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
+  const suggestion =
+    stage === "results" && mode === "placement"
+      ? recommendedLesson(attempts)
+      : undefined;
   return (
     <ScrollView
       ref={scroll}
@@ -433,6 +443,22 @@ export default function Session({
                   })}
                 </View>
               </>
+            )}
+            {stage === "results" && mode === "placement" && (
+              <View style={s.resultCard}>
+                <Text style={s.label}>WHERE TO PRACTICE NEXT</Text>
+                <Text style={s.body}>
+                  {suggestion
+                    ? suggestion.title
+                    : "All sampled characters were correct. Try a marked or contracted row next."}
+                </Text>
+                {suggestion && (
+                  <Action
+                    label="Open suggested lesson"
+                    onPress={() => onRecommendedLesson(suggestion.ids)}
+                  />
+                )}
+              </View>
             )}
             {!!error && (
               <Text accessibilityLiveRegion="polite" style={s.error}>

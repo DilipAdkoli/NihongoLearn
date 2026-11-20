@@ -26,6 +26,7 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
+import { placementSample } from "./placement";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
 import type { Attempt, StudyPreference } from "./storage.types";
@@ -241,6 +242,19 @@ export function Learn() {
         script={script}
         romaji={data.romaji}
       />
+      <View style={s.feature}>
+        <Text style={s.featureTitle}>Check your basic {script}</Text>
+        <Text style={s.body}>
+          Try ten characters across the basic rows. Get a lesson suggestion
+          based on your answers.
+        </Text>
+        <View style={s.featureFooter}>
+          <Action
+            label="Start kana check"
+            onPress={() => startLesson(placementSample(script), "placement")}
+          />
+        </View>
+      </View>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {

@@ -1,7 +1,8 @@
 import type { Attempt } from "./storage.types";
 import { yoon } from "./yoon.ts";
 
-export type SessionMode = "study" | "review" | "contrast" | "listening";
+export type SessionMode =
+  "study" | "review" | "contrast" | "listening" | "placement";
 
 export type Script = "hiragana" | "katakana";
 
