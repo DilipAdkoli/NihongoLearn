@@ -116,10 +116,15 @@ export async function playKana(id: string): Promise<void> {
   await playClip(clip);
 }
 
-export async function playClip(clip: number): Promise<void> {
+export async function playClip(
+  clip: number,
+  { signal, repeat = false }: { signal?: AbortSignal; repeat?: boolean } = {},
+): Promise<void> {
+  if (signal?.aborted) return;
   stopCurrent?.();
 
   const player = createAudioPlayer(clip, { updateInterval: 100 });
+  player.loop = repeat;
   await new Promise<void>((resolve, reject) => {
     let lastPosition = 0;
     let settled = false;
@@ -130,9 +135,9 @@ export async function playClip(clip: number): Promise<void> {
         if (settled) return;
         if (status.error) {
           finish(new Error(status.error));
-        } else if (status.didJustFinish) {
+        } else if (status.didJustFinish && !repeat) {
           finish();
-        } else if (status.currentTime > lastPosition) {
+        } else if (status.currentTime !== lastPosition) {
           lastPosition = status.currentTime;
           clearTimeout(timeout);
           timeout = setTimeout(reportStall, playbackInactivityLimit);
@@ -144,18 +149,24 @@ export async function playClip(clip: number): Promise<void> {
       finish(new Error("Pronunciation playback timed out."));
     }
 
+    function stop() {
+      finish();
+    }
+
     function finish(error?: Error) {
       if (settled) return;
       settled = true;
       clearTimeout(timeout);
       subscription.remove();
+      signal?.removeEventListener("abort", stop);
       stopCurrent = undefined;
       player.remove();
       if (error) reject(error);
       else resolve();
     }
 
-    stopCurrent = () => finish();
+    stopCurrent = stop;
+    signal?.addEventListener("abort", stop, { once: true });
     try {
       player.play();
     } catch (error) {

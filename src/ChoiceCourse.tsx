@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import type { Attempt } from "./storage.types";
@@ -261,13 +261,33 @@ function Passage({ japanese, english, audio }: PassageData) {
   const [translated, setTranslated] = useState(false);
   const [transcript, setTranscript] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const playback = useRef<AbortController | null>(null);
+  useEffect(() => () => playback.current?.abort(), []);
+
   async function listen(clip: number) {
+    playback.current?.abort();
+    const controller = new AbortController();
+    playback.current = controller;
     setAudioError(false);
+    setPlaying(true);
     try {
-      await playClip(clip);
+      await playClip(clip, { signal: controller.signal, repeat });
     } catch {
-      setAudioError(true);
+      if (!controller.signal.aborted) setAudioError(true);
+    } finally {
+      if (playback.current === controller && !controller.signal.aborted) {
+        playback.current = null;
+        setPlaying(false);
+      }
     }
+  }
+
+  function stop() {
+    playback.current?.abort();
+    playback.current = null;
+    setPlaying(false);
   }
 
   return (
@@ -288,6 +308,26 @@ function Passage({ japanese, english, audio }: PassageData) {
           >
             <Text style={s.body}>Listen slowly</Text>
           </Pressable>
+          <Pressable
+            accessibilityRole="checkbox"
+            aria-checked={repeat}
+            disabled={playing}
+            onPress={() => setRepeat((enabled) => !enabled)}
+            style={[s.choice, repeat && s.selected, playing && s.disabled]}
+          >
+            <Text style={s.body}>
+              {repeat ? "Repeat playback on" : "Repeat playback off"}
+            </Text>
+          </Pressable>
+          {playing && (
+            <Pressable
+              accessibilityRole="button"
+              style={s.choice}
+              onPress={stop}
+            >
+              <Text style={s.body}>Stop playback</Text>
+            </Pressable>
+          )}
         </View>
       )}
       {audioError && (
