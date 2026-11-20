@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams, type Href } from "expo-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import { glossaryKey } from "./glossary";
@@ -9,6 +9,7 @@ import { hasJapanese } from "./japaneseTextSize";
 import type { Attempt } from "./storage.types";
 import { matchesTypedAnswer } from "./typedAnswer";
 import { useStudy } from "./study";
+import { useClipPlayback } from "./useClipPlayback";
 import { useWordBookmarks } from "./useWordBookmarks";
 
 export type ChoiceLesson = {
@@ -389,35 +390,8 @@ function Passage({
   const [translated, setTranslated] = useState(false);
   const [transcript, setTranscript] = useState(false);
   const [showKanji, setShowKanji] = useState(false);
-  const [audioError, setAudioError] = useState(false);
   const [repeat, setRepeat] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const playback = useRef<AbortController | null>(null);
-  useEffect(() => () => playback.current?.abort(), []);
-
-  async function listen(clip: number) {
-    playback.current?.abort();
-    const controller = new AbortController();
-    playback.current = controller;
-    setAudioError(false);
-    setPlaying(true);
-    try {
-      await playClip(clip, { signal: controller.signal, repeat });
-    } catch {
-      if (!controller.signal.aborted) setAudioError(true);
-    } finally {
-      if (playback.current === controller && !controller.signal.aborted) {
-        playback.current = null;
-        setPlaying(false);
-      }
-    }
-  }
-
-  function stop() {
-    playback.current?.abort();
-    playback.current = null;
-    setPlaying(false);
-  }
+  const { play, stop, playing, audioError } = useClipPlayback();
 
   return (
     <View style={s.card}>
@@ -426,14 +400,14 @@ function Passage({
           <Pressable
             accessibilityRole="button"
             style={s.action}
-            onPress={() => listen(audio[0])}
+            onPress={() => play(audio[0], { repeat })}
           >
             <Text style={s.actionLabel}>Listen</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
             style={s.choice}
-            onPress={() => listen(audio[1])}
+            onPress={() => play(audio[1], { repeat })}
           >
             <Text style={s.body}>Listen slowly</Text>
           </Pressable>

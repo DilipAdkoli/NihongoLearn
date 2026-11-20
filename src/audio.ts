@@ -116,9 +116,15 @@ export async function playKana(id: string): Promise<void> {
   await playClip(clip);
 }
 
+export type ClipOptions = {
+  signal?: AbortSignal;
+  repeat?: boolean;
+  rate?: number;
+};
+
 export async function playClip(
   clip: number,
-  { signal, repeat = false }: { signal?: AbortSignal; repeat?: boolean } = {},
+  { signal, repeat = false, rate = 1 }: ClipOptions = {},
 ): Promise<void> {
   if (signal?.aborted) return;
   stopCurrent?.();
@@ -168,6 +174,7 @@ export async function playClip(
     stopCurrent = stop;
     signal?.addEventListener("abort", stop, { once: true });
     try {
+      if (rate !== 1) player.setPlaybackRate(rate, "high");
       player.play();
     } catch (error) {
       finish(

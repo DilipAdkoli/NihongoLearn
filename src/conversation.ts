@@ -1,4 +1,8 @@
-import type { CourseGroup } from "./ChoiceCourse";
+import type { ChoiceLesson, CourseGroup } from "./ChoiceCourse";
+
+type DialogueGroup = Omit<CourseGroup, "lessons"> & {
+  lessons: readonly (ChoiceLesson & { answerEnglish: string })[];
+};
 
 export const conversation = [
   {
@@ -15,6 +19,7 @@ export const conversation = [
         stem: "",
         choices: ["いただきます。", "はじめまして。", "おやすみなさい。"],
         answer: "はじめまして。",
+        answerEnglish: "Nice to meet you.",
         feedback: "はじめまして is a standard greeting at a first meeting.",
       },
       {
@@ -31,6 +36,7 @@ export const conversation = [
           "ミカでは ありません。",
         ],
         answer: "わたしは ミカです。",
+        answerEnglish: "I’m Mika.",
         feedback:
           "わたしは sets the topic to yourself. ミカです gives your name politely.",
       },
@@ -54,6 +60,7 @@ export const conversation = [
           "おちゃですか。",
         ],
         answer: "おちゃを おねがいします。",
+        answerEnglish: "Tea, please.",
         feedback:
           "おちゃ means tea. を おねがいします is a polite way to ask for an item.",
       },
@@ -71,6 +78,7 @@ export const conversation = [
           "はじめまして。",
         ],
         answer: "ありがとうございます。",
+        answerEnglish: "Thank you very much.",
         feedback: "ありがとうございます is a polite way to thank someone.",
       },
     ],
@@ -94,6 +102,7 @@ export const conversation = [
           "えきは いくらですか。",
         ],
         answer: "えきは どこですか。",
+        answerEnglish: "Where is the station?",
         feedback:
           "どこ means where. えきは どこですか asks where the station is.",
       },
@@ -112,6 +121,7 @@ export const conversation = [
           "この でんしゃは なんじですか。",
         ],
         answer: "この でんしゃは きょうとに いきますか。",
+        answerEnglish: "Does this train go to Kyoto?",
         feedback:
           "きょうとに marks Kyoto as the destination. いきますか asks whether the train goes there.",
       },
@@ -130,6 +140,7 @@ export const conversation = [
           "きっぷは どこですか。",
         ],
         answer: "きっぷを いちまい おねがいします。",
+        answerEnglish: "One ticket, please.",
         feedback:
           "きっぷ means ticket. いちまい specifies one, and おねがいします makes a polite request.",
       },
@@ -153,6 +164,7 @@ export const conversation = [
           "これは だれの ノートですか。",
         ],
         answer: "この ノートは いくらですか。",
+        answerEnglish: "How much is this notebook?",
         feedback: "いくら asks how much the notebook costs.",
       },
       {
@@ -169,6 +181,7 @@ export const conversation = [
           "これは なんですか。",
         ],
         answer: "これを ください。",
+        answerEnglish: "I’ll take this, please.",
         feedback: "Use [item] を ください to ask for an item politely.",
       },
       {
@@ -186,9 +199,10 @@ export const conversation = [
           "カードで はらっても いいですか。",
         ],
         answer: "カードで はらっても いいですか。",
+        answerEnglish: "May I pay by card?",
         feedback:
           "で marks the payment method. はらっても いいですか asks permission to pay.",
       },
     ],
   },
-] as const satisfies readonly CourseGroup[];
+] as const satisfies readonly DialogueGroup[];

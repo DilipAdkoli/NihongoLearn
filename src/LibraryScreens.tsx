@@ -202,6 +202,12 @@ const lessonLinks = [
     icon: AudioLines,
   },
   {
+    href: "/repeat-phrases",
+    title: "Listen and repeat",
+    detail: "Say model phrases aloud at normal or slower speed",
+    icon: AudioLines,
+  },
+  {
     href: "/vocabulary",
     title: "Everyday vocabulary",
     detail: "Food, travel, routines, and weather",
