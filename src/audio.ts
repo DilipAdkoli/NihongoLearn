@@ -6,6 +6,11 @@ const clips = new Map<string, number>([
   ["u", require("../assets/audio/u.mp3")],
   ["e", require("../assets/audio/e.mp3")],
   ["o", require("../assets/audio/o.mp3")],
+  ["ka", require("../assets/audio/ka.mp3")],
+  ["ki", require("../assets/audio/ki.mp3")],
+  ["ku", require("../assets/audio/ku.mp3")],
+  ["ke", require("../assets/audio/ke.mp3")],
+  ["ko", require("../assets/audio/ko.mp3")],
 ]);
 
 let stopCurrent: (() => void) | undefined;

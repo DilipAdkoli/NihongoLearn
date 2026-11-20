@@ -18,7 +18,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { kana } from "../src/learning";
+import { kana, lessons } from "../src/learning";
 import { startLesson, useStudy } from "../src/study";
 
 function Metric({
@@ -81,8 +81,13 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const narrow = width < 700;
   const phone = width < 520;
-  const ids = kana.map((k) => k.id);
-  const seen = ids.filter((id) => data.seen.includes(id)).length;
+  const seen = kana.filter((item) => data.seen.includes(item.id)).length;
+  const nextIndex = lessons.findIndex((lesson) =>
+    lesson.ids.some((id) => !data.seen.includes(id)),
+  );
+  const lessonIndex = nextIndex < 0 ? lessons.length - 1 : nextIndex;
+  const lesson = lessons[lessonIndex];
+  const notebook = kana.filter((item) => lesson.ids.includes(item.id));
   const correct = data.attempts.filter((a) => a.correct).length;
   const date = new Intl.DateTimeFormat("en", {
     weekday: "short",
@@ -111,26 +116,25 @@ export default function Home() {
         >
           <View style={s.lessonTag}>
             <View style={s.tagLine} />
-            <Text style={s.tagText}>HIRAGANA / LESSON 01</Text>
+            <Text style={s.tagText}>
+              HIRAGANA / LESSON {String(lessonIndex + 1).padStart(2, "0")}
+            </Text>
           </View>
           <Text
             accessibilityRole="header"
             style={[s.heroTitle, phone && { fontSize: 37, lineHeight: 44 }]}
           >
-            The five vowels
+            {lesson.title}
           </Text>
-          <Text style={s.heroDetail}>
-            Meet あ, い, う, え, and お. Hear each sound, then practice reading
-            it from memory.
-          </Text>
+          <Text style={s.heroDetail}>{lesson.detail}</Text>
           <View style={s.heroActions}>
             <Pressable
               accessibilityRole="button"
-              onPress={() => startLesson(ids)}
+              onPress={() => startLesson(lesson.ids)}
               style={({ pressed }) => [s.start, pressed && s.pressed]}
             >
               <Text style={s.startText}>
-                {seen === 5 ? "Revisit lesson" : "Start lesson"}
+                {nextIndex < 0 ? "Revisit lesson" : "Start lesson"}
               </Text>
               <ArrowRight size={17} color="#fffdf6" />
             </Pressable>
@@ -163,7 +167,7 @@ export default function Home() {
       <View style={[s.metrics, phone && s.phoneMetrics]}>
         <Metric
           label="Kana studied"
-          value={seen + " / 5"}
+          value={seen + " / " + kana.length}
           icon={BookOpen}
           tone="sage"
         />
@@ -194,10 +198,10 @@ export default function Home() {
           <BookMarked size={17} color="#5b6956" />
           <Text style={s.bookLabel}>HIRAGANA</Text>
           <View style={s.separator} />
-          <Text style={s.bookGroup}>Vowel row</Text>
+          <Text style={s.bookGroup}>{lesson.notebook}</Text>
         </View>
         <View style={s.tiles}>
-          {kana.map((item) => (
+          {notebook.map((item) => (
             <Pressable
               key={item.id}
               accessibilityRole="button"

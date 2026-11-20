@@ -54,6 +54,67 @@ export const kana: readonly Kana[] = [
     exampleReading: "ooi",
     meaning: "numerous",
   },
+  {
+    id: "ka",
+    glyph: "か",
+    reading: "ka",
+    cue: "Add a short k sound before a.",
+    example: "あか",
+    exampleReading: "aka",
+    meaning: "red",
+  },
+  {
+    id: "ki",
+    glyph: "き",
+    reading: "ki",
+    cue: "Add k before i. Keep the vowel short.",
+    example: "あき",
+    exampleReading: "aki",
+    meaning: "autumn",
+  },
+  {
+    id: "ku",
+    glyph: "く",
+    reading: "ku",
+    cue: "Add k before u. Keep your lips relaxed.",
+    example: "いく",
+    exampleReading: "iku",
+    meaning: "to go",
+  },
+  {
+    id: "ke",
+    glyph: "け",
+    reading: "ke",
+    cue: "Add a short k sound before e.",
+    example: "いけ",
+    exampleReading: "ike",
+    meaning: "pond",
+  },
+  {
+    id: "ko",
+    glyph: "こ",
+    reading: "ko",
+    cue: "Add a short k sound before o.",
+    example: "こえ",
+    exampleReading: "koe",
+    meaning: "voice",
+  },
+];
+
+export const lessons = [
+  {
+    title: "The five vowels",
+    notebook: "Vowel row",
+    detail:
+      "Meet あ, い, う, え, and お. Hear each sound, then practice reading it from memory.",
+    ids: ["a", "i", "u", "e", "o"],
+  },
+  {
+    title: "The K row",
+    notebook: "K row",
+    detail: "Add a k sound to the five vowels to read か, き, く, け, and こ.",
+    ids: ["ka", "ki", "ku", "ke", "ko"],
+  },
 ];
 
 export type Exercise = {
@@ -74,8 +135,9 @@ function shuffled<T>(items: readonly T[]): T[] {
 export function makeExercises(ids: string[]): Exercise[] {
   const selected = shuffled(kana.filter((item) => ids.includes(item.id)));
   const recognition = selected.map((item): Exercise => {
+    const row = lessons.find((lesson) => lesson.ids.includes(item.id));
     const otherGlyphs = kana
-      .filter((other) => other.id !== item.id)
+      .filter((other) => other.id !== item.id && row?.ids.includes(other.id))
       .map((other) => other.glyph);
     const distractors = shuffled(otherGlyphs).slice(0, 3);
     return {

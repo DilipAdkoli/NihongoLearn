@@ -1,14 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import Session from "../src/Session";
-import { kana } from "../src/learning";
+import { lessons } from "../src/learning";
 import { useStudy } from "../src/study";
 
 export default function SessionRoute() {
   const params = useLocalSearchParams<{ ids?: string; review?: string }>();
   const ids =
-    typeof params.ids === "string"
-      ? params.ids.split(",")
-      : kana.map((k) => k.id);
+    typeof params.ids === "string" ? params.ids.split(",") : lessons[0].ids;
   const { data, see, answer } = useStudy();
   return (
     <Session

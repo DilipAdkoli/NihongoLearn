@@ -19,7 +19,7 @@ import {
   RotateCcw,
   Sprout,
 } from "lucide-react-native";
-import { kana } from "./learning";
+import { kana, lessons } from "./learning";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
 
@@ -27,7 +27,7 @@ const ink = "#203730";
 const green = "#215848";
 const muted = "#566860";
 const coral = "#c95634";
-const allIds = kana.map((item) => item.id);
+const firstLessonIds = lessons[0].ids;
 
 function Heading({ title, detail }: { title: string; detail: string }) {
   return (
@@ -55,31 +55,42 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
 
 export function Learn() {
   const { data } = useStudy();
-  const visited = kana.filter((item) => data.seen.includes(item.id)).length;
   return (
     <View style={s.page}>
       <Heading
         title="Learn"
         detail="Build your hiragana reading skills, one sound at a time."
       />
-      <View style={s.feature}>
-        <View style={s.iconLabel}>
-          <BookOpen size={18} color={green} />
-          <Text style={s.kicker}>HIRAGANA</Text>
-        </View>
-        <Text style={s.featureTitle}>The five vowels</Text>
-        <Text style={s.body}>
-          Read and hear each vowel, then identify the characters and type their
-          sounds from memory.
-        </Text>
-        <View style={s.featureFooter}>
-          <Action
-            label={visited ? "Revisit lesson" : "Start lesson"}
-            onPress={() => startLesson(allIds)}
-          />
-          <Text style={s.detail}>{visited} of 5 characters studied</Text>
-        </View>
-      </View>
+      {lessons.map((lesson, index) => {
+        const studied = lesson.ids.filter((id) =>
+          data.seen.includes(id),
+        ).length;
+        return (
+          <View key={lesson.title} style={s.feature}>
+            <View style={s.iconLabel}>
+              <BookOpen size={18} color={green} />
+              <Text style={s.kicker}>HIRAGANA / LESSON {index + 1}</Text>
+            </View>
+            <Text style={s.featureTitle}>{lesson.title}</Text>
+            <Text style={s.body}>{lesson.detail}</Text>
+            <View style={s.featureFooter}>
+              <Action
+                label={
+                  studied === lesson.ids.length
+                    ? "Revisit lesson"
+                    : studied
+                      ? "Continue lesson"
+                      : "Start lesson"
+                }
+                onPress={() => startLesson(lesson.ids)}
+              />
+              <Text style={s.detail}>
+                {studied} of {lesson.ids.length} characters studied
+              </Text>
+            </View>
+          </View>
+        );
+      })}
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           Explore a character
@@ -187,7 +198,7 @@ export function Review() {
                     focus.map((item) => item.id),
                     true,
                   )
-                : startLesson(allIds)
+                : startLesson(firstLessonIds)
             }
           />
         </View>
@@ -227,12 +238,14 @@ export function Progress() {
       <View style={s.feature}>
         <View style={s.iconLabel}>
           <Sprout size={19} color={green} />
-          <Text style={s.kicker}>HIRAGANA VOWELS</Text>
+          <Text style={s.kicker}>HIRAGANA</Text>
         </View>
-        <Text style={s.featureTitle}>{studied} of 5 studied</Text>
+        <Text style={s.featureTitle}>
+          {studied} of {kana.length} studied
+        </Text>
         <View
           style={s.track}
-          accessibilityLabel={`${studied} of five characters studied`}
+          accessibilityLabel={`${studied} of ${kana.length} characters studied`}
         >
           {kana.map((item) => (
             <View
@@ -248,7 +261,7 @@ export function Progress() {
           <View style={s.featureFooter}>
             <Action
               label="Start learning"
-              onPress={() => startLesson(allIds)}
+              onPress={() => startLesson(firstLessonIds)}
             />
           </View>
         )}
@@ -328,7 +341,7 @@ export function Settings() {
             <View style={s.grow}>
               <Text style={s.rowTitle}>Pronunciation audio</Text>
               <Text style={s.detail}>
-                Play the Japanese vowel sounds during a lesson.
+                Play the Japanese kana sounds during a lesson.
               </Text>
             </View>
             <Switch

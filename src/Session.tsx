@@ -9,7 +9,13 @@ import {
   View,
 } from "react-native";
 import { playKana } from "./audio";
-import { evaluateAnswer, kana, makeExercises, type Kana } from "./learning";
+import {
+  evaluateAnswer,
+  kana,
+  lessons,
+  makeExercises,
+  type Kana,
+} from "./learning";
 import type { Attempt } from "./storage.types";
 
 type SessionProps = {
@@ -179,9 +185,14 @@ export default function Session({
     else setIndex(index + 1);
   }
 
+  const lesson = lessons.find(
+    (entry) =>
+      entry.ids.length === items.length &&
+      items.every((item) => entry.ids.includes(item.id)),
+  );
   const title =
     stage === "lesson"
-      ? "The first five vowels"
+      ? (lesson?.title ?? "Study hiragana")
       : stage === "results"
         ? "Practice complete"
         : exercise?.mode === "recognition"
