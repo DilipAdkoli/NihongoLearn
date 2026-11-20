@@ -137,6 +137,12 @@ function KanaChart({
 
 const lessonLinks = [
   {
+    href: "/conversation",
+    title: "Everyday dialogue",
+    detail: "Introductions and ordering tea",
+    icon: AudioLines,
+  },
+  {
     href: "/vocabulary",
     title: "Everyday vocabulary",
     detail: "Food, drinks, and familiar objects",
@@ -473,6 +479,9 @@ export function Progress() {
   const kanjiAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("kanji:"),
   );
+  const conversationAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("conversation:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -540,6 +549,9 @@ export function Progress() {
       )}
       {!!kanjiAttempts.length && (
         <Score label="Kanji" attempts={kanjiAttempts} />
+      )}
+      {!!conversationAttempts.length && (
+        <Score label="Dialogue" attempts={conversationAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>

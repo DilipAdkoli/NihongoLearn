@@ -20,7 +20,12 @@ export type ChoiceLesson = {
 };
 
 type Course =
-  "grammar" | "vocabulary" | "reading" | "passage-listening" | "kanji";
+  | "grammar"
+  | "vocabulary"
+  | "reading"
+  | "passage-listening"
+  | "kanji"
+  | "conversation";
 
 type PassageData = {
   japanese: string;
@@ -94,7 +99,7 @@ function PracticeCard({
       <Text accessibilityRole="header" style={s.heading}>
         {lesson.title}
       </Text>
-      {(!practice || course === "grammar") && (
+      {(!practice || course === "grammar" || course === "conversation") && (
         <>
           {!!lesson.explanation && (
             <Text style={s.body}>{lesson.explanation}</Text>
