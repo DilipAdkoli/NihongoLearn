@@ -81,4 +81,33 @@ export const passageListening: readonly CourseGroup[] = [
       },
     ),
   },
+  {
+    title: "Train announcement",
+    passage: {
+      japanese: "つぎは、きょうとです。\nおでぐちは、みぎがわです。",
+      english: "The next stop is Kyoto.\nThe doors will open on the right.",
+      audio: [
+        require("../assets/audio/passage-kyoto-normal.mp3"),
+        require("../assets/audio/passage-kyoto-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "train-next-stop",
+        title: "Next stop",
+        prompt: "Which station is next?",
+        choices: ["Tokyo", "Kyoto", "Osaka"],
+        answer: "Kyoto",
+        feedback: "つぎ means next. きょうと is Kyoto.",
+      },
+      {
+        id: "train-exit-side",
+        title: "Exit side",
+        prompt: "Which side will the doors open on?",
+        choices: ["Right", "Left", "Both sides"],
+        answer: "Right",
+        feedback: "みぎがわ means the right side. おでぐち refers to the exit.",
+      },
+    ),
+  },
 ];
