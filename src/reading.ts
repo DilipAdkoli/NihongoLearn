@@ -128,4 +128,51 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    title: "A morning routine",
+    passage: {
+      japanese:
+        "まいあさ、しちじに おきます。\nパンを たべて、それから おちゃを のみます。\nはちじに がっこうに いきます。",
+      english:
+        "Every morning, I get up at seven.\nI eat bread and then drink tea.\nI go to school at eight.",
+    },
+    lessons: [
+      {
+        id: "routine-wake-time",
+        title: "Getting up",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "When does the narrator get up?",
+        stem: "",
+        choices: ["At six", "At seven", "At eight"],
+        answer: "At seven",
+        feedback: "しちじに おきます means I get up at seven.",
+      },
+      {
+        id: "routine-after-bread",
+        title: "After eating",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What does the narrator do right after eating bread?",
+        stem: "",
+        choices: ["Drinks water", "Goes to school", "Drinks tea"],
+        answer: "Drinks tea",
+        feedback: "それから means then. おちゃを のみます means I drink tea.",
+      },
+      {
+        id: "routine-go-time",
+        title: "At eight o’clock",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What does the narrator do at eight?",
+        stem: "",
+        choices: ["Goes to school", "Gets up", "Eats bread"],
+        answer: "Goes to school",
+        feedback: "はちじに がっこうに いきます means I go to school at eight.",
+      },
+    ],
+  },
 ];
