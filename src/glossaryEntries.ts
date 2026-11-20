@@ -1,5 +1,5 @@
 import { glossaryKey, type GlossaryEntry } from "./glossary";
-import { weekdayWords } from "./kanji";
+import { kanjiWords } from "./kanji";
 import { kana } from "./learning";
 import { wordGroups } from "./vocabulary";
 
@@ -24,7 +24,7 @@ for (const group of wordGroups) {
       audio: word.audio,
     });
 }
-for (const word of weekdayWords) addEntry(word);
+for (const word of kanjiWords) addEntry(word);
 for (const item of kana) {
   if (item.example)
     addEntry({

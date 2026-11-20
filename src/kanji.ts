@@ -75,15 +75,61 @@ const weekdays = [
   },
 ];
 
-export const weekdayWords: readonly GlossaryEntry[] = weekdays.map(
-  ({ spelling, kana, romaji, meaning, audio }) => ({
-    spelling,
-    kana,
-    romaji,
-    meaning,
-    audio,
-  }),
-);
+const componentWords = [
+  {
+    id: "rest",
+    glyph: "休",
+    spelling: "休み",
+    kana: "やすみ",
+    romaji: "yasumi",
+    meaning: "a break or day off",
+    explanation:
+      "休 contains 亻, a form of 人 (person), beside 木 (tree). In 休み, the word can mean a break or a day off.",
+    audio: require("../assets/audio/kanji-rest.mp3"),
+  },
+  {
+    id: "grove",
+    glyph: "林",
+    spelling: "林",
+    kana: "はやし",
+    romaji: "hayashi",
+    meaning: "a grove",
+    explanation: "林 is written with two 木 (tree) characters side by side.",
+    audio: require("../assets/audio/kanji-grove.mp3"),
+  },
+  {
+    id: "forest",
+    glyph: "森",
+    spelling: "森",
+    kana: "もり",
+    romaji: "mori",
+    meaning: "a forest",
+    explanation: "森 contains three 木 (tree) characters.",
+    audio: require("../assets/audio/kanji-forest.mp3"),
+  },
+  {
+    id: "bright",
+    glyph: "明",
+    spelling: "明るい",
+    kana: "あかるい",
+    romaji: "akarui",
+    meaning: "bright",
+    explanation:
+      "You can spot 日 and 月 side by side in 明. The whole word 明るい means bright.",
+    audio: require("../assets/audio/kanji-bright.mp3"),
+  },
+];
+
+export const kanjiWords: readonly GlossaryEntry[] = [
+  ...weekdays,
+  ...componentWords,
+].map(({ spelling, kana, romaji, meaning, audio }) => ({
+  spelling,
+  kana,
+  romaji,
+  meaning,
+  audio,
+}));
 
 const signKanji = new Map([
   ["station", { glyph: "駅", explanation: "駅 is the kanji for a station." }],
@@ -164,6 +210,22 @@ export const kanjiCourse: readonly CourseGroup[] = [
       choices: [0, 1, 3, 5]
         .map((offset) => signWords[(index + offset) % signWords.length].meaning)
         .sort(),
+      answer: word.meaning,
+      feedback: `${word.spelling} is read ${word.kana} and means ${word.meaning}.`,
+      audio: word.audio,
+    })),
+  },
+  {
+    title: "Parts of common kanji",
+    lessons: componentWords.map((word) => ({
+      id: `component-${word.id}`,
+      title: word.glyph,
+      explanation: word.explanation,
+      japanese: word.spelling,
+      english: `${word.kana} · ${word.meaning}`,
+      prompt: "What does this word mean?",
+      stem: word.spelling,
+      choices: componentWords.map((option) => option.meaning),
       answer: word.meaning,
       feedback: `${word.spelling} is read ${word.kana} and means ${word.meaning}.`,
       audio: word.audio,
