@@ -1,0 +1,51 @@
+name: Android test APK
+
+on:
+  push:
+    branches: [main, "codex/**"]
+    paths:
+      - .github/workflows/android-apk.yml
+      - app.json
+      - package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: npm ci
+      - name: Install the Android toolchain
+        shell: bash
+        run: |
+          sdkmanager --licenses < <(yes)
+          sdkmanager --install "platforms;android-37.0" "build-tools;37.0.0" "ndk;27.1.12297006" "cmake;3.22.1"
+      - name: Generate the Android project
+        run: npx --no-install expo prebuild --platform android --no-install
+      - name: Build the bundled test app
+        working-directory: android
+        run: ./gradlew --no-daemon :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
+      - name: Verify the APK signature
+        run: ${ANDROID_HOME}/build-tools/37.0.0/apksigner verify android/app/build/outputs/apk/release/app-release.apk
+      - uses: actions/upload-artifact@v6
+        with:
+          name: NihongoLearn-test-arm64
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
