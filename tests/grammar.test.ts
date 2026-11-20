@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { existence } from "../src/existence.ts";
 import {
   adjectives,
   demonstratives,
@@ -13,6 +14,7 @@ test("grammar lessons have stable IDs and a single selectable answer each", () =
   const lessons = [
     ...grammar,
     ...demonstratives,
+    ...existence,
     ...particles,
     ...verbs,
     ...adjectives,
@@ -57,5 +59,12 @@ test("demonstrative questions distinguish standalone words, noun modifiers, and 
   assert.deepEqual(
     demonstratives.map((lesson) => lesson.answer),
     ["これ", "その", "どの", "あそこ", "どこ"],
+  );
+});
+
+test("existence practice distinguishes objects and animals and teaches location particles", () => {
+  assert.deepEqual(
+    existence.map((lesson) => lesson.answer),
+    ["あります", "います", "に", "が", "の"],
   );
 });

@@ -1,4 +1,5 @@
 import { ChoiceCourse } from "../src/ChoiceCourse";
+import { existence } from "../src/existence";
 import {
   adjectives,
   demonstratives,
@@ -16,6 +17,7 @@ export default function Grammar() {
       groups={[
         { title: "Statements and questions", lessons: grammar },
         { title: "Pointing to things and places", lessons: demonstratives },
+        { title: "Say what’s present and where", lessons: existence },
         { title: "Objects, places, and destinations", lessons: particles },
         { title: "Polite verb forms", lessons: verbs },
         { title: "Describing things", lessons: adjectives },
