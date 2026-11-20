@@ -1,3 +1,4 @@
+import { ability } from "./ability.ts";
 import { actionPatterns } from "./actionPatterns.ts";
 import type { CourseGroup } from "./ChoiceCourse";
 import { comparisons } from "./comparisons.ts";
@@ -29,4 +30,5 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Actions, permission, and wants", lessons: actionPatterns },
   { title: "Plain verb forms", lessons: plainVerbs },
   { title: "Reasons and connections", lessons: connectors },
+  { title: "Ability and potential verbs", lessons: ability },
 ];
