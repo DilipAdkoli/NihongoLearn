@@ -134,6 +134,57 @@ function KanaChart({
   );
 }
 
+const lessonLinks = [
+  {
+    href: "/vocabulary",
+    title: "Everyday vocabulary",
+    detail: "Food, drinks, and familiar objects",
+    icon: BookOpen,
+  },
+  {
+    href: "/grammar",
+    title: "First Japanese sentences",
+    detail: "Polite statements, particles, and verbs",
+    icon: BookOpen,
+  },
+  {
+    href: "/writing",
+    title: "Build a sentence",
+    detail: "Arrange words and particles",
+    icon: BookOpen,
+  },
+  {
+    href: "/kanji",
+    title: "First kanji in context",
+    detail: "The seven days of the week",
+    icon: BookOpen,
+  },
+  {
+    href: "/reading",
+    title: "Beginner reading",
+    detail: "Two short passages with questions",
+    icon: BookOpen,
+  },
+  {
+    href: "/passage-listening",
+    title: "Listen to short passages",
+    detail: "Two speeds and an optional transcript",
+    icon: AudioLines,
+  },
+  {
+    href: "/sound-rules",
+    title: "Sound and spelling rules",
+    detail: "Small っ and ッ, long vowels, and ー",
+    icon: AudioLines,
+  },
+  {
+    href: "/dictionary",
+    title: "Lesson glossary",
+    detail: "Search Japanese, romaji, or English",
+    icon: BookOpen,
+  },
+] as const;
+
 export function Learn() {
   const { data } = useStudy();
   const [script, setScript] = useState<Script>("hiragana");
@@ -141,8 +192,34 @@ export function Learn() {
     <View style={s.page}>
       <Heading
         title="Learn"
-        detail="Build your kana reading skills, one sound at a time."
+        detail="Choose a kana lesson or practice everyday Japanese."
       />
+      <View style={s.section}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Beginner Japanese
+        </Text>
+        <View style={s.courseGrid}>
+          {lessonLinks.map(({ href, title, detail, icon: Icon }) => (
+            <Link key={href} href={href} asChild>
+              <Pressable
+                accessibilityRole="link"
+                style={({ pressed }) => [
+                  s.list,
+                  s.courseLink,
+                  pressed && s.pressed,
+                ]}
+              >
+                <Icon size={18} color={green} />
+                <Text style={s.rowTitle}>{title}</Text>
+                <Text style={s.detail}>{detail}</Text>
+              </Pressable>
+            </Link>
+          ))}
+        </View>
+      </View>
+      <Text accessibilityRole="header" style={s.sectionTitle}>
+        Kana lessons
+      </Text>
       <View accessibilityRole="tablist" style={s.chartRow}>
         {(["hiragana", "katakana"] as const).map((option) => (
           <Pressable
@@ -164,120 +241,6 @@ export function Learn() {
         script={script}
         romaji={data.romaji}
       />
-      <Link href="/sound-rules" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Sound and spelling rules</Text>
-            <Text style={s.detail}>
-              Hear small っ and ッ, long vowels, and the katakana long-vowel
-              mark.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/grammar" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>First Japanese sentences</Text>
-            <Text style={s.detail}>
-              Practice polite sentences, particles, and verb forms.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/vocabulary" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Everyday vocabulary</Text>
-            <Text style={s.detail}>
-              Learn and hear words for food, drinks, and familiar objects.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/reading" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Beginner reading</Text>
-            <Text style={s.detail}>
-              Read two short passages and check what you understood.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/passage-listening" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Listen to short passages</Text>
-            <Text style={s.detail}>
-              Hear two short passages at normal or slower speed and answer
-              questions.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/dictionary" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Lesson glossary</Text>
-            <Text style={s.detail}>
-              Look up words in Japanese, romaji, or English.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/writing" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>Build a sentence</Text>
-            <Text style={s.detail}>
-              Put words and particles in order to express a meaning.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
-      <Link href="/kanji" asChild>
-        <Pressable
-          accessibilityRole="link"
-          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
-        >
-          <View style={s.grow}>
-            <Text style={s.rowTitle}>First kanji in context</Text>
-            <Text style={s.detail}>
-              Learn the kanji used in the seven days of the week.
-            </Text>
-          </View>
-          <ChevronRight size={18} color={muted} />
-        </Pressable>
-      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
@@ -910,6 +873,14 @@ const s = StyleSheet.create({
     flexDirection: "row",
     gap: 5,
     marginVertical: 3,
+  },
+  courseGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  courseLink: {
+    flexBasis: "46%",
+    flexGrow: 1,
+    minHeight: 96,
+    padding: 12,
+    gap: 5,
   },
   chart: { padding: 14, gap: 12 },
   chartRow: { flexDirection: "row", gap: 6, marginTop: 4 },
