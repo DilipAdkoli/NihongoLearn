@@ -11,7 +11,6 @@ import {
   ArrowRight,
   AudioLines,
   BookOpen,
-  Check,
   ChevronRight,
   CircleHelp,
   ExternalLink,
@@ -53,6 +52,64 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
+function KanaChart({ seen }: { seen: readonly string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <View style={s.list}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded(!expanded)}
+        style={({ pressed }) => [s.row, pressed && s.pressed]}
+      >
+        <View style={s.grow}>
+          <Text style={s.rowTitle}>Hiragana chart</Text>
+          <Text style={s.detail}>
+            {seen.length} of {kana.length} studied
+          </Text>
+        </View>
+        <ChevronRight
+          size={18}
+          color={muted}
+          style={{ transform: [{ rotate: expanded ? "90deg" : "0deg" }] }}
+        />
+      </Pressable>
+      {expanded && (
+        <View style={s.chart}>
+          {lessons.map((lesson) => (
+            <View key={lesson.title}>
+              <Text style={s.rowTitle}>{lesson.notebook}</Text>
+              <View style={s.chartRow}>
+                {kana
+                  .filter((item) => lesson.ids.includes(item.id))
+                  .map((item) => {
+                    const studied = seen.includes(item.id);
+                    return (
+                      <Pressable
+                        key={item.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Study ${item.glyph}, ${item.reading}${studied ? ", already studied" : ""}`}
+                        onPress={() => startLesson([item.id])}
+                        style={({ pressed }) => [
+                          s.chartTile,
+                          studied && s.chartStudied,
+                          pressed && s.pressed,
+                        ]}
+                      >
+                        <Text style={s.glyph}>{item.glyph}</Text>
+                        <Text style={s.detail}>{item.reading}</Text>
+                      </Pressable>
+                    );
+                  })}
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 export function Learn() {
   const { data } = useStudy();
   return (
@@ -61,6 +118,7 @@ export function Learn() {
         title="Learn"
         detail="Build your hiragana reading skills, one sound at a time."
       />
+      <KanaChart seen={data.seen} />
       {lessons.map((lesson, index) => {
         const studied = lesson.ids.filter((id) =>
           data.seen.includes(id),
@@ -91,40 +149,6 @@ export function Learn() {
           </View>
         );
       })}
-      <View style={s.section}>
-        <Text accessibilityRole="header" style={s.sectionTitle}>
-          Explore a character
-        </Text>
-        <View style={s.list}>
-          {kana.map((item, index) => (
-            <Pressable
-              key={item.id}
-              accessibilityRole="button"
-              accessibilityLabel={`Study ${item.glyph}, ${item.reading}`}
-              onPress={() => startLesson([item.id])}
-              style={({ pressed }) => [
-                s.row,
-                index > 0 && s.rule,
-                pressed && s.pressed,
-              ]}
-            >
-              <View style={s.glyphTile}>
-                <Text style={s.glyph}>{item.glyph}</Text>
-              </View>
-              <View style={s.grow}>
-                <Text style={s.rowTitle}>{item.reading}</Text>
-                <Text style={s.detail}>
-                  {item.example} · {item.meaning}
-                </Text>
-              </View>
-              {data.seen.includes(item.id) && (
-                <Check accessibilityLabel="Studied" size={17} color={green} />
-              )}
-              <ChevronRight size={18} color={muted} />
-            </Pressable>
-          ))}
-        </View>
-      </View>
     </View>
   );
 }
@@ -247,15 +271,12 @@ export function Progress() {
           style={s.track}
           accessibilityLabel={`${studied} of ${kana.length} characters studied`}
         >
-          {kana.map((item) => (
-            <View
-              key={item.id}
-              style={[
-                s.segment,
-                data.seen.includes(item.id) && s.segmentFilled,
-              ]}
-            />
-          ))}
+          <View
+            style={[
+              s.progressFill,
+              { width: `${(100 * studied) / kana.length}%` },
+            ]}
+          />
         </View>
         {!studied && (
           <View style={s.featureFooter}>
@@ -515,14 +536,28 @@ const s = StyleSheet.create({
   },
   statValue: { fontFamily: "DMSerifText", fontSize: 34, color: green },
   track: {
+    backgroundColor: "#ccd9c5",
+    borderRadius: 5,
     alignSelf: "stretch",
     maxWidth: 480,
     flexDirection: "row",
     gap: 5,
     marginVertical: 3,
   },
-  segment: { flex: 1, height: 7, borderRadius: 5, backgroundColor: "#ccd9c5" },
-  segmentFilled: { backgroundColor: green },
+  chart: { padding: 14, gap: 12 },
+  chartRow: { flexDirection: "row", gap: 6, marginTop: 4 },
+  chartTile: {
+    flex: 1,
+    maxWidth: 110,
+    minHeight: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    backgroundColor: "#f5f4eb",
+  },
+  chartStudied: { backgroundColor: "#dfe8d9" },
+  progressFill: { height: 7, borderRadius: 5, backgroundColor: green },
+
   error: {
     fontFamily: "DMSans",
     color: coral,
