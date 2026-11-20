@@ -6,6 +6,8 @@
 
 Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
+For a web build that can reopen offline, run `npm run export:web` and serve `dist/` from the root of an HTTPS origin or from localhost. Open it once with a connection so the service worker can cache the app and audio.
+
 ## Current build
 
 - **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. The sound guide compares small っ and ッ and long vowels.
