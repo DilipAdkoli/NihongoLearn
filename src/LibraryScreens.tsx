@@ -174,7 +174,7 @@ export function Learn() {
           <View style={s.grow}>
             <Text style={s.rowTitle}>First Japanese sentences</Text>
             <Text style={s.detail}>
-              Build polite statements and questions with です, は, and か.
+              Practice polite sentences, particles, and verb forms.
             </Text>
           </View>
           <ChevronRight size={18} color={muted} />
