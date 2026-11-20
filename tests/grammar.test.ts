@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { actionPatterns } from "../src/actionPatterns.ts";
 import { comparisons } from "../src/comparisons.ts";
 import { existence } from "../src/existence.ts";
 import {
@@ -23,6 +24,7 @@ test("grammar lessons have stable IDs and a single selectable answer each", () =
     ...adjectives,
     ...comparisons,
     ...teForm,
+    ...actionPatterns,
   ];
   assert.equal(
     new Set(lessons.map((lesson) => lesson.id)).size,

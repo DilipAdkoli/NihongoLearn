@@ -1,3 +1,4 @@
+import { actionPatterns } from "../src/actionPatterns";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { comparisons } from "../src/comparisons";
 import { existence } from "../src/existence";
@@ -27,6 +28,7 @@ export default function Grammar() {
         { title: "Describing things", lessons: adjectives },
         { title: "Comparing things", lessons: comparisons },
         { title: "Requests with the て-form", lessons: teForm },
+        { title: "Actions, permission, and wants", lessons: actionPatterns },
       ]}
     />
   );
