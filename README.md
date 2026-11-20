@@ -6,7 +6,14 @@
 
 Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
-**Resume here.** TypeScript and twenty-four automated tests passed, including SQLite close/reopen. The vowel lesson passed in phone-width and desktop browsers, including a simulated save failure and retry, progress after reload, and review of a missed character. The K-row lesson passed in a phone-width browser with existing vowel progress. The 46-character chart, を audio request, and progress after reload also passed. A basic kana check samples all ten rows in the selected script and recommends a lesson. Review uses typed recall history to schedule characters with FSRS. A browser test confirmed the next review time survives reload. Review also offers focused practice for kana pairs the learner has mixed up. The expanded kana curriculum exported successfully as an Android JavaScript bundle. Listening drills use the same audio assets and keep their scores separate from recognition and recall. Learn also includes sound comparisons ten beginner grammar exercises, and eight everyday words with audio, four scripted dialogue exercises,, plus two short reading passages with optional translations. Grammar, vocabulary, reading, sentence building, kanji, dialogue, and passage listening each have their own score. Progress shows activity across the last seven local dates. Settings can hide kana reading hints independently of pronunciation audio and export a JSON copy of study history or merge a backup into local progress. The offline lesson glossary supports Japanese, romaji, and English searches. Weekday kanji lessons teach seven readings in context. Listening passages offer normal and slower audio, optional transcripts, and translations. Review the draft lesson and synthesized pronunciations, then run `npm run android` with an Android SDK and device. Native prebuild succeeded. APK assembly needs network access to `repo.reactnative.dev` for the React Native and Hermes libraries. Confirm progress and bundled audio on an Android device in airplane mode before marking Phase 1 complete.
+## Current build
+
+- **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. The sound guide compares small っ and ッ and long vowels.
+- **Beginner lessons.** Practice polite grammar, everyday words, sentence building, weekday kanji, and scripted dialogue. Reading and listening passages offer optional translations. Listening includes two playback speeds and transcripts. The glossary searches lesson words by Japanese, romaji, or English.
+- **Review and progress.** Overview shows due kana and opens the next review batch. FSRS schedules recall from saved answers. A kana check suggests a lesson, and Review offers targeted drills for pairs learners have mixed up. Progress shows separate skill scores and seven days of activity.
+- **Local settings.** Pronunciation audio and kana reading hints can be toggled independently. Settings exports study data as JSON and merges imported progress without changing local preferences.
+
+TypeScript, formatting, and 24 automated tests passed. Browser checks covered lesson and review flows, backup export and import, and persistence across reloads. The Android JavaScript bundle exported successfully. APK assembly still needs access to `repo.reactnative.dev` for React Native and Hermes. Confirm playback and persistence on a physical Android device in airplane mode before marking Phase 1 complete. Draft lesson content and synthesized pronunciation still need human review.
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 
@@ -30,7 +37,7 @@ This README records the full feature vision developed in the project's planning 
 - **C / Core** — initial product and learning foundations.
 - **N / Next** — later versions once foundations work.
 - **A / Advanced** — complex, expensive, experimental, or optional.
-- All feature checkboxes start unchecked: this README is a backlog, not a claim that code exists.
+- The checklist describes the full backlog. The current build is summarized above.
 
 ## Learner journeys
 

@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Linking,
   Pressable,
@@ -27,7 +27,7 @@ import { saveBackup } from "./saveBackup";
 import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { placementSample } from "./placement";
-import { reviewQueue } from "./review";
+import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
 import type { Attempt, StudyPreference } from "./storage.types";
 
@@ -314,18 +314,8 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
 
 export function Review() {
   const { data } = useStudy();
-  const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(timer);
-  }, []);
+  const { queue, due } = useReviewQueue(data);
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
-  const queue = reviewQueue(
-    data,
-    kana.map((item) => item.id),
-    now,
-  );
-  const due = queue.filter((card) => card.dueAt <= now);
   const missed = queue.filter(
     ({ id }) =>
       latestResult(data.attempts, id, "recognition") === false ||
@@ -333,7 +323,7 @@ export function Review() {
   );
   const focus = (due.length ? due : missed.length ? missed : queue).slice(
     0,
-    10,
+    REVIEW_BATCH_SIZE,
   );
   const title = due.length
     ? `${due.length} ready for review`

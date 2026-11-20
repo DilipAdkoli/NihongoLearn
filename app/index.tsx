@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { kana, lessons } from "../src/learning";
+import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
 
 function Metric({
@@ -78,6 +79,7 @@ function SectionTitle({
 
 export default function Home() {
   const { data } = useStudy();
+  const { due } = useReviewQueue(data);
   const { width } = useWindowDimensions();
   const narrow = width < 700;
   const phone = width < 520;
@@ -163,6 +165,31 @@ export default function Home() {
           />
         </View>
       </View>
+      {!!due.length && (
+        <View style={s.reviewCard}>
+          <View style={s.reviewCopy}>
+            <Text accessibilityRole="header" style={s.reviewTitle}>
+              {due.length} kana ready for review
+            </Text>
+            <Text style={s.metricLabel}>
+              Refresh them before your next lesson.
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() =>
+              startLesson(
+                due.slice(0, REVIEW_BATCH_SIZE).map((card) => card.id),
+                "review",
+              )
+            }
+            style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+          >
+            <Text style={s.linkText}>Start review</Text>
+            <ArrowRight size={16} color="#345b45" />
+          </Pressable>
+        </View>
+      )}
       <SectionTitle
         title="Study snapshot"
         link="View progress"
@@ -307,6 +334,31 @@ const s = StyleSheet.create({
   time: { flexDirection: "row", alignItems: "center", gap: 6 },
   timeText: { fontFamily: "DMSans", fontSize: 12, color: "#e1e8da" },
   fill: { width: "100%", height: "100%", position: "absolute" },
+  reviewCard: {
+    backgroundColor: "#e9eee2",
+    borderColor: "#cddbc7",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    flexDirection: "row",
+    gap: 10,
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  reviewCopy: { flexGrow: 1, flexShrink: 1, gap: 3 },
+  reviewTitle: { color: "#253e32", fontSize: 18, fontFamily: "DMSansBold" },
+  reviewButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    minHeight: 44,
+    borderRadius: 7,
+    paddingHorizontal: 12,
+    backgroundColor: "#fffef8",
+  },
   sectionTitle: {
     flexDirection: "row",
     alignItems: "center",
