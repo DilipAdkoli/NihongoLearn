@@ -1,3 +1,4 @@
+import type { parseBackup } from "./backup";
 import type { SessionMode } from "./learning";
 import {
   createContext,
@@ -15,6 +16,7 @@ type StudyContext = {
   data: StudyData;
   see: (id: string) => Promise<void>;
   answer: (attempt: Attempt) => Promise<void>;
+  mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -86,6 +88,34 @@ export function StudyProvider({ children }: PropsWithChildren) {
           ? { ...old, attempts: [...old.attempts, attempt] }
           : old,
       );
+    },
+    async mergeProgress(backup) {
+      const seen = new Set(data.seen);
+      const answers = new Set(data.attempts.map((attempt) => attempt.id));
+      try {
+        for (const id of backup.seen) {
+          if (!seen.has(id)) await storage.markSeen(id);
+        }
+        for (const attempt of backup.attempts) {
+          if (!answers.has(attempt.id)) await storage.recordAttempt(attempt);
+        }
+      } finally {
+        const persisted = await storage.loadStudy();
+        setData((old) => {
+          if (!old) return persisted;
+          const attempts = new Map(
+            persisted.attempts.map((attempt) => [attempt.id, attempt]),
+          );
+          for (const attempt of old.attempts) {
+            if (!attempts.has(attempt.id)) attempts.set(attempt.id, attempt);
+          }
+          return {
+            ...old,
+            seen: [...new Set([...old.seen, ...persisted.seen])],
+            attempts: [...attempts.values()],
+          };
+        });
+      }
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);
