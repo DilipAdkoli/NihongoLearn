@@ -233,6 +233,80 @@ export const wordGroups: readonly { title: string; words: readonly Word[] }[] =
         },
       ],
     },
+    {
+      title: "Daily routines",
+      words: [
+        {
+          id: "get-up",
+          kana: "おきる",
+          spelling: "起きる",
+          romaji: "okiru",
+          meaning: "to get up",
+          audio: require("../assets/audio/word-get-up.mp3"),
+        },
+        {
+          id: "eat",
+          kana: "たべる",
+          spelling: "食べる",
+          romaji: "taberu",
+          meaning: "to eat",
+          audio: require("../assets/audio/word-eat.mp3"),
+        },
+        {
+          id: "drink",
+          kana: "のむ",
+          spelling: "飲む",
+          romaji: "nomu",
+          meaning: "to drink",
+          audio: require("../assets/audio/word-drink.mp3"),
+        },
+        {
+          id: "go",
+          kana: "いく",
+          spelling: "行く",
+          romaji: "iku",
+          meaning: "to go",
+          audio: require("../assets/audio/word-go.mp3"),
+        },
+      ],
+    },
+    {
+      title: "From school or work to bedtime",
+      words: [
+        {
+          id: "study",
+          kana: "べんきょうする",
+          spelling: "勉強する",
+          romaji: "benkyou suru",
+          meaning: "to study",
+          audio: require("../assets/audio/word-study.mp3"),
+        },
+        {
+          id: "work",
+          kana: "はたらく",
+          spelling: "働く",
+          romaji: "hataraku",
+          meaning: "to work",
+          audio: require("../assets/audio/word-work.mp3"),
+        },
+        {
+          id: "go-home",
+          kana: "かえる",
+          spelling: "帰る",
+          romaji: "kaeru",
+          meaning: "to go home",
+          audio: require("../assets/audio/word-go-home.mp3"),
+        },
+        {
+          id: "go-to-bed",
+          kana: "ねる",
+          spelling: "寝る",
+          romaji: "neru",
+          meaning: "to go to bed",
+          audio: require("../assets/audio/word-go-to-bed.mp3"),
+        },
+      ],
+    },
   ];
 
 export const vocabulary = wordGroups.map(({ title, words }) => ({
