@@ -10,7 +10,7 @@ For a web build that can reopen offline, run `npm run export:web` and serve `dis
 
 To try the latest pushed web build with Python, download `NihongoLearn-web` from **Artifacts** on the latest successful [App checks run](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml). Unzip it, open the folder containing `index.html` in VS Code, and run `python -m http.server 8000 --bind 127.0.0.1`. Open `http://localhost:8000` in your browser.
 
-The [Android test APK workflow](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/android-apk.yml) builds an ARM64 APK with the JavaScript and audio bundled. A successful run’s **Artifacts** section contains `NihongoLearn-test-arm64`. This APK uses the test signing key and is for sideloading on an Android phone.
+The Android test APK workflow builds an ARM64 APK with the JavaScript and audio bundled. Sign in to GitHub and download `NihongoLearn-test-arm64` from **Artifacts** on a successful run. Unzip it, transfer `app-release.apk` to the phone, and open it on the phone. The APK uses the test signing key. New builds also include `SHA256SUMS.txt` with the APK’s SHA-256 checksum. [Android test APK runs](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/android-apk.yml)
 
 ## Current build
 
@@ -20,7 +20,7 @@ The [Android test APK workflow](https://github.com/DilipAdkoli/NihongoLearn/acti
 - **Starter path.** Open Learn and select Start learning Japanese for six guided steps from hiragana vowels through a café exchange. Existing study progress counts toward the path.
 - **Local settings.** Pronunciation audio and kana reading hints can be toggled independently. Settings exports study data as JSON and merges imported progress without changing local preferences.
 
-TypeScript, formatting, and 48 automated tests passed. Browser checks covered lesson and review flows, backup export and import, and persistence across reloads. The Android JavaScript bundle exported successfully. APK assembly still needs access to `repo.reactnative.dev` for React Native and Hermes. Confirm playback and persistence on a physical Android device in airplane mode before marking Phase 1 complete. Draft lesson content and synthesized pronunciation still need human review.
+TypeScript, formatting, and 48 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. GitHub Actions built, verified, and uploaded the first signed Android test APK. A physical Android airplane-mode check of playback and progress persistence is pending. Draft lesson content and synthesized pronunciation still need human review. [First successful APK build](https://github.com/DilipAdkoli/NihongoLearn/actions/runs/44771830477)
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 
