@@ -111,7 +111,7 @@ test("ぢ and づ accept their standard readings and keyboard spellings", () => 
 
 test("listening never offers an alternative spelling of the same sound", () => {
   const ids = ["o", "wo", "ji", "di", "zu", "du", "kata-wo"];
-  const questions = makeExercises(ids, true);
+  const questions = makeExercises(ids, "listening");
   assert.equal(questions.length, ids.length);
   for (const question of questions) {
     assert.equal(question.mode, "listening");
@@ -126,5 +126,17 @@ test("listening never offers an alternative spelling of the same sound", () => {
         evaluateAnswer(question, glyph),
       );
     }
+  }
+});
+
+test("contrast practice includes the other kana even across rows", () => {
+  const questions = makeExercises(["kata-shi", "kata-tsu"], "contrast").filter(
+    (q) => q.mode === "recognition",
+  );
+  assert.equal(questions.length, 2);
+  for (const question of questions) {
+    assert.ok(question.choices.includes("シ"));
+    assert.ok(question.choices.includes("ツ"));
+    assert.equal(new Set(question.choices).size, 4);
   }
 });

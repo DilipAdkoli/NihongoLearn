@@ -1,6 +1,8 @@
 import type { Attempt } from "./storage.types";
 import { yoon } from "./yoon.ts";
 
+export type SessionMode = "study" | "review" | "contrast" | "listening";
+
 export type Script = "hiragana" | "katakana";
 
 export type Kana = {
@@ -970,7 +972,11 @@ function soundReading(item: Kana) {
   return item.reading === "wo" ? "o" : item.reading;
 }
 
-export function makeExercises(ids: string[], listening = false): Exercise[] {
+export function makeExercises(
+  ids: string[],
+  mode: SessionMode = "study",
+): Exercise[] {
+  const listening = mode === "listening";
   const selected = shuffled(kana.filter((item) => ids.includes(item.id)));
   const recognition = selected.map((item): Exercise => {
     const row = lessons.find((lesson) => lesson.ids.includes(item.id));
@@ -984,11 +990,16 @@ export function makeExercises(ids: string[], listening = false): Exercise[] {
           : other.reading !== item.reading),
     );
     const neighbors = eligible.filter((other) => row?.ids.includes(other.id));
-    const nearby = shuffled(neighbors).slice(0, 3);
-    const fill = shuffled(
-      eligible.filter((other) => !row?.ids.includes(other.id)),
-    ).slice(0, 3 - nearby.length);
-    const distractors = [...nearby, ...fill].map((other) => other.glyph);
+    const otherPool = eligible.filter((other) => !row?.ids.includes(other.id));
+    const contrast =
+      mode === "contrast"
+        ? eligible.filter((entry) => ids.includes(entry.id))
+        : [];
+    const distractors = [
+      ...new Set([...contrast, ...shuffled(neighbors), ...shuffled(otherPool)]),
+    ]
+      .slice(0, 3)
+      .map((other) => other.glyph);
     return {
       kanaId: item.id,
       mode: listening ? "listening" : "recognition",

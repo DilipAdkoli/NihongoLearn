@@ -6,18 +6,26 @@ import { useStudy } from "../src/study";
 export default function SessionRoute() {
   const params = useLocalSearchParams<{
     ids?: string;
+    mode?: string;
     review?: string;
     listening?: string;
   }>();
   const ids =
     typeof params.ids === "string" ? params.ids.split(",") : lessons[0].ids;
+  const mode =
+    params.mode === "contrast"
+      ? "contrast"
+      : params.mode === "listening" || params.listening === "1"
+        ? "listening"
+        : params.mode === "review" || params.review === "1"
+          ? "review"
+          : "study";
   const { data, see, answer } = useStudy();
   return (
     <Session
-      key={JSON.stringify([ids, params.review, params.listening])}
+      key={JSON.stringify([ids, mode])}
       ids={ids}
-      review={params.review === "1"}
-      listening={params.listening === "1"}
+      mode={mode}
       sound={data.sound}
       onSeen={see}
       onAttempt={answer}

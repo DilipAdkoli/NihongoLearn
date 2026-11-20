@@ -1,3 +1,4 @@
+import type { SessionMode } from "./learning";
 import {
   createContext,
   useContext,
@@ -100,13 +101,6 @@ export function useStudy() {
   return context;
 }
 
-export function startLesson(ids: string[], review = false, listening = false) {
-  router.push({
-    pathname: "/session",
-    params: {
-      ids: ids.join(","),
-      review: review ? "1" : "0",
-      listening: listening ? "1" : "0",
-    },
-  });
+export function startLesson(ids: string[], mode: SessionMode = "study") {
+  router.push({ pathname: "/session", params: { ids: ids.join(","), mode } });
 }

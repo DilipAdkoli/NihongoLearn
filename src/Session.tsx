@@ -15,13 +15,13 @@ import {
   lessons,
   makeExercises,
   type Kana,
+  type SessionMode,
 } from "./learning";
 import type { Attempt } from "./storage.types";
 
 type SessionProps = {
   ids: string[];
-  review: boolean;
-  listening: boolean;
+  mode: SessionMode;
   sound: boolean;
   onSeen: (id: string) => Promise<void>;
   onAttempt: (attempt: Attempt) => Promise<void>;
@@ -116,21 +116,21 @@ function LessonCard({ item, sound }: { item: Kana; sound: boolean }) {
 
 export default function Session({
   ids,
-  review,
-  listening,
+  mode,
   sound,
   onSeen,
   onAttempt,
   onClose,
   onFinish,
 }: SessionProps) {
+  const listening = mode === "listening";
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
-  const [exercises] = useState(() => makeExercises(ids, listening));
+  const [exercises] = useState(() => makeExercises(ids, mode));
   const [sessionId] = useState(
     () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
   );
   const [stage, setStage] = useState<"lesson" | "quiz" | "results">(
-    review || listening ? "quiz" : "lesson",
+    mode === "study" ? "lesson" : "quiz",
   );
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -215,9 +215,11 @@ export default function Session({
           : "Type the reading";
   const heading = listening
     ? "Listening practice"
-    : review
-      ? "Review"
-      : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
+    : mode === "contrast"
+      ? "Compare kana"
+      : mode === "review"
+        ? "Review"
+        : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
   return (

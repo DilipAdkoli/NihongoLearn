@@ -20,6 +20,7 @@ import {
   Sprout,
 } from "lucide-react-native";
 
+import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
@@ -251,6 +252,7 @@ export function Review() {
     const timer = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, []);
+  const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const queue = reviewQueue(
     data,
     kana.map((item) => item.id),
@@ -313,7 +315,7 @@ export function Review() {
               focus.length
                 ? startLesson(
                     focus.map((item) => item.id),
-                    true,
+                    "review",
                   )
                 : startLesson(firstLessonIds)
             }
@@ -324,14 +326,48 @@ export function Review() {
               onPress={() =>
                 startLesson(
                   focus.map((card) => card.id),
-                  true,
-                  true,
+                  "listening",
                 )
               }
             />
           )}
         </View>
       </View>
+      {!!pairs.length && (
+        <View style={s.section}>
+          <Text accessibilityRole="header" style={s.sectionTitle}>
+            Kana you mixed up
+          </Text>
+          {pairs.map(({ items, count }) => (
+            <View
+              style={s.feature}
+              key={items.map((item) => item.id).join(":")}
+            >
+              <View style={s.chips}>
+                {items.map((item) => (
+                  <View key={item.id} style={s.chartTile}>
+                    <Text style={s.glyph}>{item.glyph}</Text>
+                    <Text style={s.detail}>{item.reading}</Text>
+                  </View>
+                ))}
+              </View>
+              <Text style={s.detail}>
+                Mixed up {count} {count === 1 ? "time" : "times"} in recognition
+                practice.
+              </Text>
+              <Action
+                label={`Practice ${items.map((item) => item.glyph).join(" and ")}`}
+                onPress={() =>
+                  startLesson(
+                    items.map((item) => item.id),
+                    "contrast",
+                  )
+                }
+              />
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
