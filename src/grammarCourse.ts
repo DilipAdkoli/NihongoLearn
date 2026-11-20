@@ -10,6 +10,7 @@ import {
   teForm,
   verbs,
 } from "./grammar.ts";
+import { plainVerbs } from "./plainVerbs.ts";
 import { questionWords } from "./questions.ts";
 
 export const grammarTopics: readonly CourseGroup[] = [
@@ -23,4 +24,5 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Comparing things", lessons: comparisons },
   { title: "Requests with the て-form", lessons: teForm },
   { title: "Actions, permission, and wants", lessons: actionPatterns },
+  { title: "Plain verb forms", lessons: plainVerbs },
 ];
