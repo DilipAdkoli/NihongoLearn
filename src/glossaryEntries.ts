@@ -37,6 +37,12 @@ addEntry({
   meaning: "opening hours",
   romaji: "eigyou jikan",
 });
+addEntry({
+  spelling: "明後日",
+  kana: "あさって",
+  meaning: "the day after tomorrow",
+  romaji: "asatte",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

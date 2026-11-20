@@ -160,4 +160,47 @@ export const passageListening: readonly CourseGroup[] = [
       },
     ),
   },
+  {
+    id: "forecast",
+    title: "A short weather forecast",
+    passage: {
+      japanese:
+        "きょうは くもりです。\nあしたは あめです。\nあさっては はれです。",
+      standardJapanese: "今日は曇りです。\n明日は雨です。\n明後日は晴れです。",
+      english:
+        "It’s cloudy today.\nIt will rain tomorrow.\nIt will be sunny the day after tomorrow.",
+      lookupWords: ["曇り", "雨", "晴れ", "明後日"],
+      audio: [
+        require("../assets/audio/passage-forecast-normal.mp3"),
+        require("../assets/audio/passage-forecast-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "forecast-today",
+        title: "Today’s weather",
+        prompt: "What’s the weather like today?",
+        choices: ["Rainy", "Cloudy", "Sunny"],
+        answer: "Cloudy",
+        feedback: "きょう means today, and くもり describes cloudy weather.",
+      },
+      {
+        id: "forecast-tomorrow",
+        title: "Tomorrow’s weather",
+        prompt: "What kind of weather is forecast for tomorrow?",
+        choices: ["Sunny", "Snowy", "Rainy"],
+        answer: "Rainy",
+        feedback: "あした means tomorrow, and あめ means rain.",
+      },
+      {
+        id: "forecast-sun",
+        title: "The sunny day",
+        prompt: "When will it be sunny?",
+        choices: ["The day after tomorrow", "Tomorrow", "Today"],
+        answer: "The day after tomorrow",
+        feedback:
+          "あさって is the day after tomorrow. はれ means sunny weather.",
+      },
+    ),
+  },
 ];
