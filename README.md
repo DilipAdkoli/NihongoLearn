@@ -1,6 +1,6 @@
 # NihongoLearn 🇯🇵
 
-> **Development checkpoint — kana curriculum.** The Expo app teaches all 46 basic hiragana and 25 kana with dakuten or handakuten across 15 lessons, 33 contracted hiragana sounds across 11 lessons, plus matching basic, voiced, and contracted katakana across 26 lessons, with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
+> **Development preview.** Learn kana and everyday Japanese, hear bundled pronunciations, and review your progress locally on Android or in a browser.
 
 ## Run the app
 
@@ -21,6 +21,8 @@ npm.cmd run export:web
 npm.cmd run preview:web
 ```
 
+In Chrome or Edge, use the browser’s **Install NihongoLearn** action to open the exported build as a standalone app.
+
 Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 
 To try the latest pushed web build with Python, download `NihongoLearn-web` from **Artifacts** on the latest successful [App checks run](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml). Unzip it, open the folder containing `index.html` in VS Code, and run `python -m http.server 8000 --bind 127.0.0.1`. Open `http://localhost:8000` in your browser.
@@ -37,7 +39,7 @@ Search Learn by lesson title, topic, or kana.
 - **Starter path.** Open the starter path from Overview or choose Start learning Japanese in Learn for six guided steps from hiragana vowels through a café exchange. Existing study progress counts toward the path. The beginner skill check covers vocabulary, grammar, reading, and listening and links back to skills to revisit. Japanese for travel offers five steps from reading signs to asking for a train ticket.
 - **Local settings.** Settings offers pronunciation audio, kana reading hints, and Japanese text size. Settings exports study data as JSON and merges imported progress without changing local preferences.
 
-TypeScript, formatting, and 52 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. GitHub Actions built, verified, and uploaded the first signed Android test APK. A physical Android airplane-mode check of playback and progress persistence is pending. Draft lesson content and synthesized pronunciation still need human review. [First successful APK build](https://github.com/DilipAdkoli/NihongoLearn/actions/runs/44771830477)
+TypeScript, formatting, and 52 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. GitHub Actions built and verified the signed APK at revision `4528352`. A physical Android airplane-mode check of playback and progress persistence is pending. Draft lesson content and synthesized pronunciation still need human review. [Signed Android test build](https://github.com/DilipAdkoli/NihongoLearn/actions/runs/44827099580)
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 

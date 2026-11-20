@@ -18,12 +18,17 @@ async function filesUnder(directory) {
 }
 
 const html = await readFile(join(output, "index.html"), "utf8");
-const registration = '<script src="/register-offline.js" defer></script>';
+const offlineHead = [
+  '<link rel="manifest" href="/manifest.webmanifest" />',
+  '<link rel="apple-touch-icon" href="/icon-192.png" />',
+  '<meta name="theme-color" content="#244f41" />',
+  '<script src="/register-offline.js" defer></script>',
+].join("\n");
 if (!html.includes("</head>"))
   throw new Error("Web export is missing its HTML head.");
 await writeFile(
   join(output, "index.html"),
-  html.replace("</head>", registration + "</head>"),
+  html.replace("</head>", offlineHead + "\n</head>"),
 );
 
 const files = (await filesUnder(""))
