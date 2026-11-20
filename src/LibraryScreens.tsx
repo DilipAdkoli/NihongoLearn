@@ -137,6 +137,13 @@ function KanaChart({
 
 const lessonLinks = [
   {
+    href: "/numbers",
+    title: "Count from 1 to 99",
+    detail: "Read Japanese numbers and practice the tens",
+    icon: BookOpen,
+  },
+
+  {
     href: "/conversation",
     title: "Everyday dialogue",
     detail: "Introductions and ordering tea",
@@ -484,6 +491,9 @@ export function Progress() {
   const loanwordAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("loanwords:"),
   );
+  const countingAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("numbers:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -560,6 +570,9 @@ export function Progress() {
       )}
       {!!loanwordAttempts.length && (
         <Score label="Loanword sounds" attempts={loanwordAttempts} />
+      )}
+      {!!countingAttempts.length && (
+        <Score label="Counting" attempts={countingAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
