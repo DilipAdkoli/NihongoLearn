@@ -802,28 +802,65 @@ const katakanaExamples: readonly [string, string, string, string][] = [
   ["wa", "ワイン", "wain", "wine"],
   ["wo", "", "", ""],
   ["n", "インク", "inku", "ink"],
+  ["ga", "ガラス", "garasu", "glass"],
+  ["gi", "ギネス", "ginesu", "Guinness"],
+  ["gu", "グミ", "gumi", "gummy candy"],
+  ["ge", "ゲノム", "genomu", "genome"],
+  ["go", "ゴム", "gomu", "rubber"],
+  ["za", "ザクロ", "zakuro", "pomegranate"],
+  ["ji", "ジム", "jimu", "gym"],
+  ["zu", "レンズ", "renzu", "lens"],
+  ["ze", "ゼロ", "zero", "zero"],
+  ["zo", "ゾウ", "zou", "elephant"],
+  ["da", "ダイヤ", "daiya", "diamond"],
+  ["di", "", "", ""],
+  ["du", "", "", ""],
+  ["de", "デマ", "dema", "false rumor"],
+  ["do", "ドラム", "doramu", "drums"],
+  ["ba", "バナナ", "banana", "banana"],
+  ["bi", "ビル", "biru", "building"],
+  ["bu", "ブラシ", "burashi", "brush"],
+  ["be", "ベニス", "benisu", "Venice"],
+  ["bo", "ボルト", "boruto", "bolt"],
+  ["pa", "パンダ", "panda", "panda"],
+  ["pi", "ピアノ", "piano", "piano"],
+  ["pu", "プラス", "purasu", "plus"],
+  ["pe", "ペン", "pen", "pen"],
+  ["po", "ポスト", "posuto", "mailbox"],
+  ["kya", "キャンプ", "kyanpu", "camping"],
+  ["kyu", "キュウリ", "kyuuri", "cucumber"],
+  ["kyo", "キョウト", "kyouto", "Kyoto"],
+  ["sha", "シャツ", "shatsu", "shirt"],
+  ["shu", "シュウマイ", "shuumai", "steamed dumpling"],
+  ["sho", "ショパン", "shopan", "Chopin"],
+  ["cha", "チャイ", "chai", "chai"],
+  ["chu", "チュニス", "chunisu", "Tunis"],
+  ["cho", "チョコ", "choko", "chocolate"],
+  ["nya", "", "", ""],
+  ["nyu", "ニュアンス", "nyuansu", "nuance"],
+  ["nyo", "", "", ""],
+  ["hya", "", "", ""],
+  ["hyu", "", "", ""],
+  ["hyo", "ヒョウ", "hyou", "leopard"],
+  ["mya", "", "", ""],
+  ["myu", "ミュンヘン", "myunhen", "Munich"],
+  ["myo", "", "", ""],
+  ["rya", "", "", ""],
+  ["ryu", "リュウグウノツカイ", "ryuuguunotsukai", "oarfish"],
+  ["ryo", "", "", ""],
+  ["gya", "ギャグ", "gyagu", "gag"],
+  ["gyu", "ギュウギュウ", "gyuugyuu", "crammed together"],
+  ["gyo", "ギョウザ", "gyouza", "dumplings"],
+  ["ja", "ジャム", "jamu", "jam"],
+  ["ju", "ジュニア", "junia", "junior"],
+  ["jo", "ジョン", "jon", "John"],
+  ["bya", "ビャクシン", "byakushin", "Chinese juniper"],
+  ["byu", "", "", ""],
+  ["byo", "", "", ""],
+  ["pya", "", "", ""],
+  ["pyu", "ピュア", "pyua", "pure"],
+  ["pyo", "ピョンピョン", "pyonpyon", "hopping"],
 ];
-
-const katakana: Kana[] = katakanaExamples.map(
-  ([id, example, exampleReading, meaning]) => {
-    const source = hiragana.find((item) => item.id === id);
-    if (!source) throw new Error(`Missing hiragana counterpart for ${id}`);
-    const glyph = String.fromCharCode(source.glyph.charCodeAt(0) + 0x60);
-    return {
-      ...source,
-      id: `kata-${id}`,
-      glyph,
-      script: "katakana",
-      cue:
-        id === "wo"
-          ? "ヲ is rare in modern writing. It corresponds to を and is usually pronounced o."
-          : `This is the katakana counterpart of ${source.glyph}. ${source.cue}`,
-      example,
-      exampleReading,
-      meaning,
-    };
-  },
-);
 
 const contracted: Kana[] = yoon.map(
   ([glyph, reading, example, exampleReading, meaning]) => ({
@@ -853,6 +890,37 @@ const contractedLessons = Array.from(
   },
 );
 
+function toKatakana(text: string) {
+  return text.replace(/[ぁ-ゖ]/g, (glyph) =>
+    String.fromCharCode(glyph.charCodeAt(0) + 0x60),
+  );
+}
+
+const sourceKana = new Map(
+  [...hiragana, ...contracted].map((item) => [item.id, item]),
+);
+
+const katakana: Kana[] = katakanaExamples.map(
+  ([id, example, exampleReading, meaning]) => {
+    const source = sourceKana.get(id);
+    if (!source) throw new Error(`Missing hiragana counterpart for ${id}`);
+    const glyph = toKatakana(source.glyph);
+    return {
+      ...source,
+      id: `kata-${id}`,
+      glyph,
+      script: "katakana",
+      cue:
+        id === "wo"
+          ? "ヲ is rare in modern writing. It corresponds to を and is usually pronounced o."
+          : `This is the katakana counterpart of ${source.glyph}. ${toKatakana(source.cue)}`,
+      example,
+      exampleReading,
+      meaning,
+    };
+  },
+);
+
 export const kana: readonly Kana[] = [
   ...hiragana.map((item): Kana => ({ ...item, script: "hiragana" })),
   ...contracted,
@@ -865,16 +933,18 @@ export const lessons = [
     script: "hiragana" as const,
   })),
   ...contractedLessons,
-  ...hiraganaLessons.slice(0, 10).map((lesson) => {
+  ...[...hiraganaLessons, ...contractedLessons].map((lesson) => {
     const ids = lesson.ids.map((id) => `kata-${id}`);
     const glyphs = katakana
       .filter((item) => ids.includes(item.id))
       .map((item) => item.glyph);
     return {
       script: "katakana" as const,
-      title: lesson.title.replace("ん", "ン"),
-      notebook: lesson.notebook.replace("ん", "ン"),
-      detail: `Study ${glyphs.join("・")} and practice recalling each reading.`,
+      title: toKatakana(lesson.title),
+      notebook: toKatakana(lesson.notebook),
+      detail: lesson.ids.some((id) => sourceKana.get(id)?.glyph.length === 2)
+        ? toKatakana(lesson.detail)
+        : `Study ${glyphs.join("・")} and practice recalling each reading.`,
       ids,
     };
   }),

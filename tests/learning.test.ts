@@ -25,7 +25,7 @@ test("kana lessons have unique glyphs and examples readable with taught characte
     kana.map((item) => item.id),
   );
   assert.equal(kana.filter((item) => item.script === "hiragana").length, 104);
-  assert.equal(kana.filter((item) => item.script === "katakana").length, 46);
+  assert.equal(kana.filter((item) => item.script === "katakana").length, 104);
   assert.equal(new Set(kana.map((item) => item.glyph)).size, kana.length);
   const readings = [...kana].sort((a, b) => b.glyph.length - a.glyph.length);
   for (const item of kana) {
