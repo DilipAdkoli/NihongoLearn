@@ -7,6 +7,7 @@ export default function Kanji() {
       title="First kanji in context"
       course="kanji"
       groups={kanjiCourse}
+      browseTopics
     />
   );
 }

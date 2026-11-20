@@ -1,5 +1,6 @@
 import type { CourseGroup } from "./ChoiceCourse";
 import type { GlossaryEntry } from "./glossary";
+import { wordGroups } from "./vocabulary";
 
 const weekdays = [
   {
@@ -84,6 +85,46 @@ export const weekdayWords: readonly GlossaryEntry[] = weekdays.map(
   }),
 );
 
+const signKanji = new Map([
+  ["station", { glyph: "駅", explanation: "駅 is the kanji for a station." }],
+  ["right", { glyph: "右", explanation: "右 means right, as in turn right." }],
+  ["left", { glyph: "左", explanation: "左 means left, as in turn left." }],
+  [
+    "in-front",
+    { glyph: "前", explanation: "前 can mean the front of a place." },
+  ],
+  [
+    "exit",
+    {
+      glyph: "出",
+      explanation:
+        "出 is the character for going out. Look for it in 出口 on exit signs.",
+    },
+  ],
+  [
+    "entrance",
+    {
+      glyph: "入",
+      explanation:
+        "入 is the character for going in. Look for it in 入口 on entrance signs.",
+    },
+  ],
+  [
+    "park",
+    {
+      glyph: "園",
+      explanation: "園 appears in words for gardens and parks, including 公園.",
+    },
+  ],
+]);
+
+const signWords = wordGroups
+  .flatMap((group) => group.words)
+  .flatMap((word) => {
+    const character = signKanji.get(word.id);
+    return character ? [{ ...word, ...character }] : [];
+  });
+
 export const kanjiCourse: readonly CourseGroup[] = [
   {
     title: "Days of the week",
@@ -108,6 +149,24 @@ export const kanjiCourse: readonly CourseGroup[] = [
       answer: day.meaning,
       feedback: `${day.spelling} is read ${day.kana} and means ${day.meaning}.`,
       audio: day.audio,
+    })),
+  },
+  {
+    title: "Places and directions",
+    lessons: signWords.map((word, index) => ({
+      id: `sign-${word.id}`,
+      title: word.glyph,
+      explanation: word.explanation,
+      japanese: word.spelling,
+      english: `${word.kana} · ${word.meaning}`,
+      prompt: "What does this word mean?",
+      stem: word.spelling,
+      choices: [0, 1, 3, 5]
+        .map((offset) => signWords[(index + offset) % signWords.length].meaning)
+        .sort(),
+      answer: word.meaning,
+      feedback: `${word.spelling} is read ${word.kana} and means ${word.meaning}.`,
+      audio: word.audio,
     })),
   },
 ];

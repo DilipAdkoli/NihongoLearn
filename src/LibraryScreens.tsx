@@ -202,7 +202,7 @@ const lessonLinks = [
   {
     href: "/kanji",
     title: "First kanji in context",
-    detail: "The seven days of the week",
+    detail: "Weekdays, places, and directions",
     icon: BookOpen,
   },
   {
