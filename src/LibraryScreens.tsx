@@ -150,6 +150,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/calendar",
+    title: "Read calendar dates",
+    detail: "Learn months and irregular day readings",
+    icon: BookOpen,
+  },
+  {
     href: "/conversation",
     title: "Everyday dialogue",
     detail: "Introductions and ordering tea",
@@ -503,6 +509,9 @@ export function Progress() {
   const timeAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("time:"),
   );
+  const dateAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("calendar:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -585,6 +594,9 @@ export function Progress() {
       )}
       {!!timeAttempts.length && (
         <Score label="Telling time" attempts={timeAttempts} />
+      )}
+      {!!dateAttempts.length && (
+        <Score label="Calendar dates" attempts={dateAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
