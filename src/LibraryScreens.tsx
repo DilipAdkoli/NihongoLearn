@@ -26,6 +26,7 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
+import { missedGrammar } from "./grammarCourse";
 import { kana, lessons, type Script } from "./learning";
 import { placementSample } from "./placement";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
@@ -365,6 +366,7 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
 export function Review() {
   const { data } = useStudy();
   const { queue, due } = useReviewQueue(data);
+  const grammarCount = missedGrammar(data.attempts).length;
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
@@ -389,7 +391,7 @@ export function Review() {
     <View style={s.page}>
       <Heading
         title="Review"
-        detail="Return to the sounds you’ve been learning."
+        detail="Revisit kana and grammar from past lessons."
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
@@ -440,6 +442,26 @@ export function Review() {
           )}
         </View>
       </View>
+      {grammarCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Grammar to try again
+          </Text>
+          <Text style={s.body}>
+            Your latest answer was incorrect on {grammarCount}{" "}
+            {grammarCount === 1 ? "question" : "questions"}.
+          </Text>
+          <Link href="/grammar-review" asChild>
+            <Pressable
+              accessibilityRole="link"
+              style={({ pressed }) => [s.action, pressed && s.pressed]}
+            >
+              <Text style={s.actionLabel}>Review grammar</Text>
+              <ArrowRight size={18} color="white" />
+            </Pressable>
+          </Link>
+        </View>
+      )}
       {!!pairs.length && (
         <View style={s.section}>
           <Text accessibilityRole="header" style={s.sectionTitle}>

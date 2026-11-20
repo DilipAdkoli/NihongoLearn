@@ -56,10 +56,12 @@ function PracticeCard({
   course,
   lesson,
   onAnswer,
+  reviewQuestions,
 }: {
   course: Course;
   lesson: ChoiceLesson;
   onAnswer: (attempt: Attempt) => Promise<void>;
+  reviewQuestions: boolean;
 }) {
   const studyFirst = course === "vocabulary" || course === "kanji";
   const [practice, setPractice] = useState(!studyFirst);
@@ -110,9 +112,11 @@ function PracticeCard({
   return (
     <View style={s.card}>
       <Text accessibilityRole="header" style={s.heading}>
-        {lesson.title}
+        {reviewQuestions ? lesson.prompt : lesson.title}
       </Text>
-      {(!practice || course === "grammar" || course === "conversation") && (
+      {(!practice ||
+        (course === "grammar" && !reviewQuestions) ||
+        course === "conversation") && (
         <>
           {!!lesson.explanation && (
             <Text style={s.body}>{lesson.explanation}</Text>
@@ -159,7 +163,7 @@ function PracticeCard({
         </Pressable>
       ) : (
         <>
-          <Text style={s.body}>{lesson.prompt}</Text>
+          {!reviewQuestions && <Text style={s.body}>{lesson.prompt}</Text>}
           {!!lesson.stem && lesson.stem !== lesson.title && (
             <Text style={s.japanese}>{lesson.stem}</Text>
           )}
@@ -295,20 +299,25 @@ function Passage({ japanese, english, audio }: PassageData) {
 
 export function ChoiceCourse({
   title,
+  description,
   course,
   groups,
   backHref = "/learn",
   backLabel = "‹ Back to Learn",
   showBack = true,
   browseTopics = false,
+  reviewQuestions = false,
 }: {
   title: string;
+  description?: string;
   course: Course;
   groups: readonly CourseGroup[];
-  backHref?: "/learn" | "/dictionary" | "/loanwords" | "/vocabulary";
+  backHref?:
+    "/learn" | "/review" | "/dictionary" | "/loanwords" | "/vocabulary";
   backLabel?: string;
   showBack?: boolean;
   browseTopics?: boolean;
+  reviewQuestions?: boolean;
 }) {
   const { data, answer } = useStudy();
   const [topic, setTopic] = useState(0);
@@ -327,6 +336,7 @@ export function ChoiceCourse({
       <Text accessibilityRole="header" style={s.title}>
         {title}
       </Text>
+      {description && <Text style={s.body}>{description}</Text>}
       {showTopics && (
         <View
           accessibilityRole="tablist"
@@ -374,6 +384,7 @@ export function ChoiceCourse({
               course={course}
               lesson={lesson}
               onAnswer={answer}
+              reviewQuestions={reviewQuestions}
             />
           ))}
         </View>

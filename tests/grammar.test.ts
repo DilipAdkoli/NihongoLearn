@@ -1,31 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { actionPatterns } from "../src/actionPatterns.ts";
 import { comparisons } from "../src/comparisons.ts";
 import { existence } from "../src/existence.ts";
-import {
-  adjectives,
-  demonstratives,
-  grammar,
-  particles,
-  teForm,
-  verbs,
-} from "../src/grammar.ts";
+import { adjectives, demonstratives, teForm, verbs } from "../src/grammar.ts";
+import { grammarTopics, missedGrammar } from "../src/grammarCourse.ts";
 import { questionWords } from "../src/questions.ts";
+import type { Attempt } from "../src/storage.types.ts";
 
 test("grammar lessons have stable IDs and a single selectable answer each", () => {
-  const lessons = [
-    ...grammar,
-    ...demonstratives,
-    ...questionWords,
-    ...existence,
-    ...particles,
-    ...verbs,
-    ...adjectives,
-    ...comparisons,
-    ...teForm,
-    ...actionPatterns,
-  ];
+  const lessons = grammarTopics.flatMap((topic) => topic.lessons);
   assert.equal(
     new Set(lessons.map((lesson) => lesson.id)).size,
     lessons.length,
@@ -86,5 +69,29 @@ test("comparison questions cover より, ほうが, どちら, and いちばん"
   assert.deepEqual(
     comparisons.map((lesson) => lesson.answer),
     ["より", "ほうが", "どちら", "いちばん"],
+  );
+});
+
+test("grammar review selects only known questions with an incorrect latest answer", () => {
+  const attempt = (kanaId: string, at: number, correct: boolean): Attempt => ({
+    id: String(at),
+    kanaId,
+    at,
+    correct,
+    mode: "recognition",
+    answer: "は",
+  });
+  const history = [
+    attempt("grammar:question-ka", 6, false),
+    attempt("grammar:desu", 5, true),
+    attempt("grammar:topic-wa", 4, false),
+    attempt("grammar:desu", 3, false),
+    attempt("grammar:question-ka", 2, false),
+    attempt("vocabulary:water", 7, false),
+    attempt("grammar:removed-lesson", 8, false),
+  ];
+  assert.deepEqual(
+    missedGrammar(history).map((lesson) => lesson.id),
+    ["question-ka", "topic-wa"],
   );
 });
