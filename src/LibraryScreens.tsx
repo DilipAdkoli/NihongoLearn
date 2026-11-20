@@ -20,6 +20,7 @@ import {
   Sprout,
 } from "lucide-react-native";
 
+import { ActivityChart } from "./ActivityChart";
 import { confusedPairs } from "./confusions";
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
@@ -497,6 +498,7 @@ export function Progress() {
       {!!passageAttempts.length && (
         <Score label="Passage listening" attempts={passageAttempts} />
       )}
+      <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           By character
