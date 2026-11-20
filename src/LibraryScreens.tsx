@@ -145,7 +145,7 @@ const lessonLinks = [
   {
     href: "/vocabulary",
     title: "Everyday vocabulary",
-    detail: "Food, drinks, and familiar objects",
+    detail: "Food, travel, and everyday words",
     icon: BookOpen,
   },
   {

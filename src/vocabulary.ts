@@ -85,6 +85,80 @@ export const wordGroups: readonly { title: string; words: readonly Word[] }[] =
         },
       ],
     },
+    {
+      title: "At the station",
+      words: [
+        {
+          id: "station",
+          kana: "えき",
+          spelling: "駅",
+          romaji: "eki",
+          meaning: "station",
+          audio: require("../assets/audio/word-station.mp3"),
+        },
+        {
+          id: "train",
+          kana: "でんしゃ",
+          spelling: "電車",
+          romaji: "densha",
+          meaning: "train",
+          audio: require("../assets/audio/word-train.mp3"),
+        },
+        {
+          id: "bus",
+          kana: "バス",
+          spelling: "バス",
+          romaji: "basu",
+          meaning: "bus",
+          audio: require("../assets/audio/word-bus.mp3"),
+        },
+        {
+          id: "ticket",
+          kana: "きっぷ",
+          spelling: "切符",
+          romaji: "kippu",
+          meaning: "ticket",
+          audio: require("../assets/audio/word-ticket.mp3"),
+        },
+      ],
+    },
+    {
+      title: "People and time",
+      words: [
+        {
+          id: "today",
+          kana: "きょう",
+          spelling: "今日",
+          romaji: "kyou",
+          meaning: "today",
+          audio: require("../assets/audio/word-today.mp3"),
+        },
+        {
+          id: "tomorrow",
+          kana: "あした",
+          spelling: "明日",
+          romaji: "ashita",
+          meaning: "tomorrow",
+          audio: require("../assets/audio/word-tomorrow.mp3"),
+        },
+        {
+          id: "friend",
+          kana: "ともだち",
+          spelling: "友だち",
+          romaji: "tomodachi",
+          meaning: "friend",
+          audio: require("../assets/audio/word-friend.mp3"),
+        },
+        {
+          id: "student",
+          kana: "がくせい",
+          spelling: "学生",
+          romaji: "gakusei",
+          meaning: "student",
+          audio: require("../assets/audio/word-student.mp3"),
+        },
+      ],
+    },
   ];
 
 export const vocabulary = wordGroups.map(({ title, words }) => ({
