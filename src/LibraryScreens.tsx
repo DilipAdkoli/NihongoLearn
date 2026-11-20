@@ -194,6 +194,20 @@ export function Learn() {
           <ChevronRight size={18} color={muted} />
         </Pressable>
       </Link>
+      <Link href="/reading" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Beginner reading</Text>
+            <Text style={s.detail}>
+              Read two short passages and check what you understood.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
@@ -400,6 +414,9 @@ export function Progress() {
   const vocabularyAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("vocabulary:"),
   );
+  const readingAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("reading:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -455,6 +472,9 @@ export function Progress() {
       )}
       {!!vocabularyAttempts.length && (
         <Score label="Vocabulary" attempts={vocabularyAttempts} />
+      )}
+      {!!readingAttempts.length && (
+        <Score label="Reading" attempts={readingAttempts} />
       )}
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>

@@ -19,7 +19,9 @@ export type ChoiceLesson = {
   audio?: number;
 };
 
-export function lessonKey(course: "grammar" | "vocabulary", id: string) {
+type Course = "grammar" | "vocabulary" | "reading";
+
+export function lessonKey(course: Course, id: string) {
   return `${course}:${id}`;
 }
 
@@ -28,11 +30,11 @@ function PracticeCard({
   lesson,
   onAnswer,
 }: {
-  course: "grammar" | "vocabulary";
+  course: Course;
   lesson: ChoiceLesson;
   onAnswer: (attempt: Attempt) => Promise<void>;
 }) {
-  const [practice, setPractice] = useState(course === "grammar");
+  const [practice, setPractice] = useState(course !== "vocabulary");
   const [audioError, setAudioError] = useState(false);
   const [choice, setChoice] = useState("");
   const [result, setResult] = useState<Attempt>();
@@ -68,7 +70,7 @@ function PracticeCard({
   }
 
   function retry() {
-    setPractice(course === "grammar");
+    setPractice(course !== "vocabulary");
     setResult(undefined);
     setChoice("");
   }
@@ -124,7 +126,7 @@ function PracticeCard({
       ) : (
         <>
           <Text style={s.body}>{lesson.prompt}</Text>
-          {lesson.stem !== lesson.title && (
+          {!!lesson.stem && lesson.stem !== lesson.title && (
             <Text style={s.japanese}>{lesson.stem}</Text>
           )}
           <View style={s.choices}>
@@ -174,14 +176,38 @@ function PracticeCard({
   );
 }
 
+function Passage({ japanese, english }: { japanese: string; english: string }) {
+  const [translated, setTranslated] = useState(false);
+  return (
+    <View style={s.card}>
+      <Text style={s.japanese}>{japanese}</Text>
+      {translated && <Text style={s.body}>{english}</Text>}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: translated }}
+        onPress={() => setTranslated(!translated)}
+        style={s.action}
+      >
+        <Text style={s.actionLabel}>
+          {translated ? "Hide translation" : "Show translation"}
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
 export function ChoiceCourse({
   title,
   course,
   groups,
 }: {
   title: string;
-  course: "grammar" | "vocabulary";
-  groups: readonly { title?: string; lessons: readonly ChoiceLesson[] }[];
+  course: Course;
+  groups: readonly {
+    title?: string;
+    passage?: { japanese: string; english: string };
+    lessons: readonly ChoiceLesson[];
+  }[];
 }) {
   const { answer } = useStudy();
   return (
@@ -199,6 +225,7 @@ export function ChoiceCourse({
               {group.title}
             </Text>
           )}
+          {group.passage && <Passage {...group.passage} />}
           {group.lessons.map((lesson) => (
             <PracticeCard
               key={lesson.id}
