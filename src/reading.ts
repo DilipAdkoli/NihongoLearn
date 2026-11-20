@@ -175,4 +175,51 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    title: "A message from a friend",
+    passage: {
+      japanese:
+        "きのう、ほんやに いった。\nでも、ほんは かわなかった。\nあした、ともだちと もういちど いく。",
+      english:
+        "Yesterday I went to a bookstore.\nBut I didn’t buy a book.\nTomorrow I’ll go back with a friend.",
+    },
+    lessons: [
+      {
+        id: "message-yesterday",
+        title: "Yesterday’s trip",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Where did the writer go yesterday?",
+        stem: "",
+        choices: ["To a library", "To a bookstore", "To the station"],
+        answer: "To a bookstore",
+        feedback: "ほんや means bookstore. いった is the plain past of いく.",
+      },
+      {
+        id: "message-no-purchase",
+        title: "At the bookstore",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Did the writer buy a book yesterday?",
+        stem: "",
+        choices: ["Yes", "No", "The message doesn’t say"],
+        answer: "No",
+        feedback: "かわなかった is the plain past negative of かう (to buy).",
+      },
+      {
+        id: "message-tomorrow",
+        title: "Tomorrow’s plans",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Who will go with the writer tomorrow?",
+        stem: "",
+        choices: ["A teacher", "A sibling", "A friend"],
+        answer: "A friend",
+        feedback: "ともだちと means with a friend. もういちど means once more.",
+      },
+    ],
+  },
 ];
