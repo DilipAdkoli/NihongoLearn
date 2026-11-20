@@ -19,6 +19,7 @@ import {
   RotateCcw,
   Sprout,
 } from "lucide-react-native";
+import { grammar, grammarKey } from "./grammar";
 import { kana, lessons, type Script } from "./learning";
 import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
@@ -159,6 +160,20 @@ export function Learn() {
             <Text style={s.detail}>
               Hear small っ and ッ, long vowels, and the katakana long-vowel
               mark.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
+      <Link href="/grammar" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>First Japanese sentences</Text>
+            <Text style={s.detail}>
+              Build polite statements and questions with です, は, and か.
             </Text>
           </View>
           <ChevronRight size={18} color={muted} />
@@ -329,6 +344,9 @@ function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
 export function Progress() {
   const { data } = useStudy();
   const studied = kana.filter((item) => data.seen.includes(item.id)).length;
+  const grammarIds = new Set(grammar.map((lesson) => grammarKey(lesson.id)));
+  const grammarAttempts = data.attempts.filter((a) => grammarIds.has(a.kanaId));
+  const kanaAttempts = data.attempts.filter((a) => !grammarIds.has(a.kanaId));
   return (
     <View style={s.page}>
       <Heading
@@ -366,17 +384,20 @@ export function Progress() {
       <View style={s.stats}>
         <Score
           label="Recognition"
-          attempts={data.attempts.filter((a) => a.mode === "recognition")}
+          attempts={kanaAttempts.filter((a) => a.mode === "recognition")}
         />
         <Score
           label="Typed recall"
-          attempts={data.attempts.filter((a) => a.mode === "recall")}
+          attempts={kanaAttempts.filter((a) => a.mode === "recall")}
         />
         <Score
           label="Listening"
-          attempts={data.attempts.filter((a) => a.mode === "listening")}
+          attempts={kanaAttempts.filter((a) => a.mode === "listening")}
         />
       </View>
+      {!!grammarAttempts.length && (
+        <Score label="Grammar" attempts={grammarAttempts} />
+      )}
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           By character
