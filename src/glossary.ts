@@ -23,8 +23,8 @@ function normalizeQuery(value: string) {
     .trim();
 }
 
-export function searchGlossary(
-  entries: readonly GlossaryEntry[],
+export function searchGlossary<T extends GlossaryEntry>(
+  entries: readonly T[],
   query: string,
 ) {
   const terms = normalizeQuery(query).split(" ").filter(Boolean);

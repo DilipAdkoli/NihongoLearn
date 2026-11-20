@@ -185,6 +185,12 @@ const lessonLinks = [
     icon: AudioLines,
   },
   {
+    href: "/loanwords",
+    title: "Katakana loanword sounds",
+    detail: "Look up ファ, ティ, and other combinations",
+    icon: BookOpen,
+  },
+  {
     href: "/dictionary",
     title: "Lesson glossary",
     detail: "Search Japanese, romaji, or English",
