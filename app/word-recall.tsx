@@ -7,6 +7,7 @@ export default function WordRecall() {
       title="Recall Japanese words"
       course="vocabulary-recall"
       groups={vocabularyRecall}
+      browseTopics
       backHref="/vocabulary"
       backLabel="‹ Review everyday vocabulary"
     />

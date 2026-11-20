@@ -7,6 +7,7 @@ export default function Vocabulary() {
       title="Everyday vocabulary"
       course="vocabulary"
       groups={vocabulary}
+      browseTopics
     />
   );
 }

@@ -7,6 +7,7 @@ export default function PassageListening() {
       title="Listen to short passages"
       course="passage-listening"
       groups={passageListening}
+      browseTopics
     />
   );
 }
