@@ -1,5 +1,12 @@
 import { ChoiceCourse } from "../src/ChoiceCourse";
-import { adjectives, grammar, particles, teForm, verbs } from "../src/grammar";
+import {
+  adjectives,
+  demonstratives,
+  grammar,
+  particles,
+  teForm,
+  verbs,
+} from "../src/grammar";
 
 export default function Grammar() {
   return (
@@ -8,6 +15,7 @@ export default function Grammar() {
       course="grammar"
       groups={[
         { title: "Statements and questions", lessons: grammar },
+        { title: "Pointing to things and places", lessons: demonstratives },
         { title: "Objects, places, and destinations", lessons: particles },
         { title: "Polite verb forms", lessons: verbs },
         { title: "Describing things", lessons: adjectives },

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   adjectives,
+  demonstratives,
   grammar,
   particles,
   teForm,
@@ -11,6 +12,7 @@ import {
 test("grammar lessons have stable IDs and a single selectable answer each", () => {
   const lessons = [
     ...grammar,
+    ...demonstratives,
     ...particles,
     ...verbs,
     ...adjectives,
@@ -48,5 +50,12 @@ test("て-form practice includes ichidan, godan, and irregular responses", () =>
   assert.deepEqual(
     teForm.map((lesson) => lesson.answer),
     ["みて", "かって", "のんで", "いって", "して"],
+  );
+});
+
+test("demonstrative questions distinguish standalone words, noun modifiers, and places", () => {
+  assert.deepEqual(
+    demonstratives.map((lesson) => lesson.answer),
+    ["これ", "その", "どの", "あそこ", "どこ"],
   );
 });

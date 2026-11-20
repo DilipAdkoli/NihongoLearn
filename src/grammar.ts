@@ -263,3 +263,75 @@ export const teForm = [
     feedback: "する becomes して, so して ください means “please do it.”",
   },
 ] as const;
+
+export const demonstratives = [
+  {
+    id: "demonstrative-standalone",
+    title: "Point to a thing with これ, それ, or あれ",
+    explanation:
+      "Use これ for something near you, それ for something near the person you’re speaking to, and あれ for something away from both of you. These words stand on their own.",
+    japanese: "それは なんですか。",
+    english: "What is that near you?",
+    prompt: "The key is in your own hand. Say “This is a key.”",
+    stem: "＿＿は かぎです。",
+    choices: ["あれ", "これ", "それ"],
+    answer: "これ",
+    feedback: "The key is near you, the speaker, so use これ.",
+  },
+  {
+    id: "demonstrative-before-noun",
+    title: "Put この, その, or あの before a noun",
+    explanation:
+      "Use この, その, and あの with a following noun. They follow the same distance pattern as これ, それ, and あれ.",
+    japanese: "この ほんは おもしろいです。",
+    english: "This book is interesting.",
+    prompt:
+      "The umbrella is beside the person you’re talking to. Choose “that umbrella near you.”",
+    stem: "＿＿ かさです。",
+    choices: ["それ", "あの", "その"],
+    answer: "その",
+    feedback: "その goes before the noun かさ when it is near the listener.",
+  },
+  {
+    id: "demonstrative-which",
+    title: "Ask which one with どれ or どの",
+    explanation:
+      "どれ means “which one” by itself. Use どの when it is followed by a noun, as in どの でんしゃ (which train).",
+    japanese: "ミカさんの かさは どれですか。",
+    english: "Which one is Mika’s umbrella?",
+    prompt: "Complete the question “Which train goes to Kyoto?”",
+    stem: "＿＿ でんしゃが きょうとに いきますか。",
+    choices: ["どの", "どれ", "どこ"],
+    answer: "どの",
+    feedback:
+      "Use どの before でんしゃ to ask which train. が marks the train that goes there.",
+  },
+  {
+    id: "demonstrative-places",
+    title: "Point to a place with ここ, そこ, or あそこ",
+    explanation:
+      "ここ means here near the speaker. そこ points to a place near the listener, and あそこ points to a place away from both.",
+    japanese: "ここは きっさてんです。",
+    english: "This place is a café.",
+    prompt:
+      "The station is over there, away from both of you. Say “The station is over there.”",
+    stem: "えきは ＿＿です。",
+    choices: ["ここ", "そこ", "あそこ"],
+    answer: "あそこ",
+    feedback:
+      "あそこ refers to a place away from both the speaker and the listener.",
+  },
+  {
+    id: "demonstrative-where",
+    title: "Ask where with どこ",
+    explanation:
+      "Use どこ to ask where a place or thing is. A common pattern is [thing or place] は どこですか.",
+    japanese: "トイレは どこですか。",
+    english: "Where is the restroom?",
+    prompt: "Complete “Where is the station?”",
+    stem: "えきは ＿＿ですか。",
+    choices: ["どれ", "どこ", "そこ"],
+    answer: "どこ",
+    feedback: "どこ asks for a location. どれ asks which one.",
+  },
+] as const;
