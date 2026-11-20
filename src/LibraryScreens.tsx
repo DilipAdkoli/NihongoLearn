@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Linking,
   Pressable,
@@ -19,6 +19,7 @@ import {
   Sprout,
 } from "lucide-react-native";
 import { kana, lessons } from "./learning";
+import { reviewQueue } from "./review";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
 
@@ -168,23 +169,36 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
 
 export function Review() {
   const { data } = useStudy();
-  const studied = kana.filter(
-    (item) =>
-      data.seen.includes(item.id) ||
-      data.attempts.some((a) => a.kanaId === item.id),
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+  const queue = reviewQueue(
+    data,
+    kana.map((item) => item.id),
+    now,
   );
-  const needsPractice = studied.filter(
-    (item) =>
-      latestResult(data.attempts, item.id, "recognition") === false ||
-      latestResult(data.attempts, item.id, "recall") === false,
+  const due = queue.filter((card) => card.dueAt <= now);
+  const missed = queue.filter(
+    ({ id }) =>
+      latestResult(data.attempts, id, "recognition") === false ||
+      latestResult(data.attempts, id, "recall") === false,
   );
-  const focus = needsPractice.length ? needsPractice : studied;
-  let detail = "Study your first vowel lesson to begin a personal review list.";
-  if (studied.length) {
-    detail = needsPractice.length
-      ? "Practice the characters you missed on your latest recognition or recall attempt."
-      : "Practice the characters you have already studied, with recognition and typed recall.";
-  }
+  const focus = (due.length ? due : missed.length ? missed : queue).slice(
+    0,
+    10,
+  );
+  const title = due.length
+    ? `${due.length} ready for review`
+    : queue.length
+      ? "You’re caught up"
+      : "Your first review";
+  const detail = due.length
+    ? `Practice ${focus.length} ${focus.length === 1 ? "character" : "characters"} in this round. Typed recall schedules the next review.`
+    : queue.length
+      ? `Next review ${new Date(queue[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}. You can also practice early.`
+      : "Study your first vowel lesson to begin a personal review list.";
   return (
     <View style={s.page}>
       <Heading
@@ -196,26 +210,28 @@ export function Review() {
           <RotateCcw size={18} color={green} />
           <Text style={s.kicker}>PERSONAL PRACTICE</Text>
         </View>
-        <Text style={s.featureTitle}>
-          {needsPractice.length
-            ? "Another look"
-            : studied.length
-              ? "Keep it fresh"
-              : "Your first review"}
-        </Text>
+        <Text style={s.featureTitle}>{title}</Text>
         <Text style={s.body}>{detail}</Text>
         {focus.length > 0 && (
           <View style={s.chips}>
-            {focus.map((item) => (
-              <View style={s.chip} key={item.id}>
-                <Text style={s.glyph}>{item.glyph}</Text>
+            {focus.map(({ id }) => (
+              <View style={s.chip} key={id}>
+                <Text style={s.glyph}>
+                  {kana.find((item) => item.id === id)?.glyph}
+                </Text>
               </View>
             ))}
           </View>
         )}
         <View style={s.featureFooter}>
           <Action
-            label={focus.length ? "Start review" : "Learn the five vowels"}
+            label={
+              due.length
+                ? "Start review"
+                : focus.length
+                  ? "Practice early"
+                  : "Learn the five vowels"
+            }
             onPress={() =>
               focus.length
                 ? startLesson(
