@@ -112,6 +112,10 @@ let stopCurrent: (() => void) | undefined;
 export async function playKana(id: string): Promise<void> {
   const clip = clips.get(id.replace(/^kata-/, ""));
   if (clip === undefined) throw new Error("Pronunciation unavailable.");
+  await playClip(clip);
+}
+
+export async function playClip(clip: number): Promise<void> {
   stopCurrent?.();
 
   const player = createAudioPlayer(clip, { updateInterval: 100 });

@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Linking,
@@ -148,6 +149,21 @@ export function Learn() {
         ))}
       </View>
       <KanaChart key={script} seen={data.seen} script={script} />
+      <Link href="/sound-rules" asChild>
+        <Pressable
+          accessibilityRole="link"
+          style={({ pressed }) => [s.list, s.row, pressed && s.pressed]}
+        >
+          <View style={s.grow}>
+            <Text style={s.rowTitle}>Sound and spelling rules</Text>
+            <Text style={s.detail}>
+              Hear small っ and ッ, long vowels, and the katakana long-vowel
+              mark.
+            </Text>
+          </View>
+          <ChevronRight size={18} color={muted} />
+        </Pressable>
+      </Link>
       {lessons
         .filter((lesson) => lesson.script === script)
         .map((lesson, index) => {
