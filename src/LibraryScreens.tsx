@@ -217,6 +217,12 @@ const lessonLinks = [
     icon: AudioLines,
   },
   {
+    href: "/compare-kana",
+    title: "Compare similar kana",
+    detail: "See and practice the differences between lookalikes",
+    icon: BookOpen,
+  },
+  {
     href: "/loanwords",
     title: "Katakana loanword sounds",
     detail: "Look up ファ, ティ, and other combinations",
