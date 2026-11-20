@@ -14,6 +14,7 @@ export default function Grammar() {
     <ChoiceCourse
       title="First Japanese sentences"
       course="grammar"
+      browseTopics
       groups={[
         { title: "Statements and questions", lessons: grammar },
         { title: "Pointing to things and places", lessons: demonstratives },

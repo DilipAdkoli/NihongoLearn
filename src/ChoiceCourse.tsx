@@ -300,6 +300,7 @@ export function ChoiceCourse({
   backHref = "/learn",
   backLabel = "‹ Back to Learn",
   showBack = true,
+  browseTopics = false,
 }: {
   title: string;
   course: Course;
@@ -307,8 +308,15 @@ export function ChoiceCourse({
   backHref?: "/learn" | "/dictionary" | "/loanwords" | "/vocabulary";
   backLabel?: string;
   showBack?: boolean;
+  browseTopics?: boolean;
 }) {
-  const { answer } = useStudy();
+  const { data, answer } = useStudy();
+  const [topic, setTopic] = useState(0);
+  const showTopics = browseTopics && groups.length > 1;
+  const visibleGroups = showTopics ? groups.slice(topic, topic + 1) : groups;
+  const attempted = showTopics
+    ? new Set(data.attempts.map((attempt) => attempt.kanaId))
+    : undefined;
   return (
     <View style={s.page}>
       {showBack && (
@@ -319,7 +327,40 @@ export function ChoiceCourse({
       <Text accessibilityRole="header" style={s.title}>
         {title}
       </Text>
-      {groups.map((group) => (
+      {showTopics && (
+        <View
+          accessibilityRole="tablist"
+          accessibilityLabel="Topics"
+          style={s.topicGrid}
+        >
+          {groups.map((group, index) => {
+            const tried = group.lessons.filter((lesson) =>
+              attempted?.has(lessonKey(course, lesson.id)),
+            ).length;
+            const label = group.title ?? `Topic ${index + 1}`;
+            return (
+              <Pressable
+                key={label}
+                accessibilityRole="tab"
+                accessibilityLabel={`${label}, ${tried} of ${group.lessons.length} tried`}
+                aria-selected={topic === index}
+                onPress={() => setTopic(index)}
+                style={({ pressed }) => [
+                  s.topic,
+                  topic === index && s.selected,
+                  pressed && s.disabled,
+                ]}
+              >
+                <Text style={s.topicLabel}>{label}</Text>
+                <Text style={s.topicCount}>
+                  {tried} / {group.lessons.length} tried
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
+      {visibleGroups.map((group) => (
         <View key={group.title ?? course} style={{ gap: 14 }}>
           {group.title && (
             <Text accessibilityRole="header" style={s.heading}>
@@ -356,6 +397,21 @@ const s = StyleSheet.create({
     lineHeight: 45,
   },
   heading: { color: "#203730", fontFamily: "DMSerifText", fontSize: 25 },
+  topicGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  topic: {
+    flexBasis: 145,
+    flexGrow: 1,
+    padding: 10,
+    gap: 4,
+    minHeight: 54,
+    justifyContent: "center",
+    backgroundColor: "#fffef8",
+    borderColor: "#dadfd3",
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  topicLabel: { color: "#203730", fontFamily: "DMSansBold", fontSize: 14 },
+  topicCount: { color: "#566860", fontFamily: "DMSans", fontSize: 12 },
   card: {
     padding: 17,
     gap: 10,
