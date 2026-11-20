@@ -33,7 +33,8 @@ type Course =
   | "numbers"
   | "time"
   | "calendar"
-  | "vocabulary-recall";
+  | "vocabulary-recall"
+  | "counters";
 
 type PassageData = {
   japanese: string;

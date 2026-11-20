@@ -145,6 +145,12 @@ const lessonLinks = [
   },
 
   {
+    href: "/counters",
+    title: "Count things and people",
+    detail: "Practice つ, 枚, and 人",
+    icon: BookOpen,
+  },
+  {
     href: "/time",
     title: "Tell the time",
     detail: "Read hours, minutes, and half past",
@@ -522,6 +528,9 @@ export function Progress() {
   const wordRecallAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("vocabulary-recall:"),
   );
+  const counterAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("counters:"),
+  );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
   return (
@@ -610,6 +619,9 @@ export function Progress() {
       )}
       {!!wordRecallAttempts.length && (
         <Score label="Vocabulary recall" attempts={wordRecallAttempts} />
+      )}
+      {!!counterAttempts.length && (
+        <Score label="Counters" attempts={counterAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
       <View style={s.section}>
