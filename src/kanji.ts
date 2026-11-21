@@ -120,9 +120,64 @@ const componentWords = [
   },
 ];
 
+const weekdaysById = Object.fromEntries(weekdays.map((day) => [day.id, day]));
+
+const readingExamples = [
+  {
+    weekday: weekdaysById.sun,
+    kana: "ひ",
+    romaji: "hi",
+    meaning: "sun or day",
+    audio: require("../assets/audio/kanji-alone-sun.mp3"),
+    quizWord: "日",
+    quizReading: "ひ",
+    choices: ["にち", "ひ", "び"],
+    explanation:
+      "日 can be ひ on its own. In 日曜日, the first 日 is にち and the final 日 is び.",
+  },
+  {
+    weekday: weekdaysById.mon,
+    kana: "つき",
+    romaji: "tsuki",
+    meaning: "moon",
+    audio: require("../assets/audio/kanji-alone-moon.mp3"),
+    quizWord: "月曜日",
+    quizReading: "げつようび",
+    choices: ["つきようび", "がつようび", "げつようび"],
+    explanation:
+      "月 is つき when it means the moon. It is げつ in 月曜日 and がつ in dates such as 四月.",
+  },
+  {
+    weekday: weekdaysById.thu,
+    kana: "き",
+    romaji: "ki",
+    meaning: "tree",
+    audio: require("../assets/audio/kanji-alone-tree.mp3"),
+    quizWord: "木",
+    quizReading: "き",
+    choices: ["もく", "き", "こう"],
+    explanation: "木 is き when it means a tree. It is もく in 木曜日.",
+  },
+  {
+    weekday: weekdaysById.wed,
+    kana: "みず",
+    romaji: "mizu",
+    meaning: "water",
+    audio: require("../assets/audio/word-water.mp3"),
+    quizWord: "水曜日",
+    quizReading: "すいようび",
+    choices: ["すいようび", "みずようび", "ずいようび"],
+    explanation: "水 is みず when it means water. It is すい in 水曜日.",
+  },
+];
+
 export const kanjiWords: readonly GlossaryEntry[] = [
   ...weekdays,
   ...componentWords,
+  ...readingExamples.map(({ weekday, ...word }) => ({
+    ...word,
+    spelling: weekday.glyph,
+  })),
 ].map(({ spelling, kana, romaji, meaning, audio }) => ({
   spelling,
   kana,
@@ -229,6 +284,26 @@ export const kanjiCourse: readonly CourseGroup[] = [
       answer: word.meaning,
       feedback: `${word.spelling} is read ${word.kana} and means ${word.meaning}.`,
       audio: word.audio,
+    })),
+  },
+  {
+    title: "One kanji, several readings",
+    lessons: readingExamples.map((example) => ({
+      id: `readings-${example.weekday.id}`,
+      title: example.weekday.glyph,
+      explanation: example.explanation,
+      japanese: `${example.weekday.glyph}　${example.kana}\n${example.weekday.spelling}　${example.weekday.kana}`,
+      english: `${example.meaning} · ${example.weekday.meaning}`,
+      prompt: `How do you read ${example.quizWord} here?`,
+      stem: example.quizWord,
+      choices: example.choices,
+      answer: example.quizReading,
+      feedback: example.explanation,
+      audio: example.audio,
+      answerAudio:
+        example.quizWord === example.weekday.spelling
+          ? example.weekday.audio
+          : example.audio,
     })),
   },
 ];
