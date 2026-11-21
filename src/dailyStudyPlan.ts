@@ -57,14 +57,20 @@ export type PlanQueues = {
   saved: Queue;
 };
 
-function nextReview(
+function dueReviews(
   queues: PlanQueues,
   now: number,
   kanaBatchSize: number,
-): PlanItem | undefined {
-  const kana = queues.kana.filter((card) => card.dueAt <= now);
-  const words = queues.vocabulary.filter((card) => card.dueAt <= now);
-  const saved = queues.saved.filter((card) => card.dueAt <= now);
+): PlanItem[] {
+  const kana = queues.kana
+    .filter((card) => card.dueAt <= now)
+    .sort((a, b) => a.dueAt - b.dueAt);
+  const words = queues.vocabulary
+    .filter((card) => card.dueAt <= now)
+    .sort((a, b) => a.dueAt - b.dueAt);
+  const saved = queues.saved
+    .filter((card) => card.dueAt <= now)
+    .sort((a, b) => a.dueAt - b.dueAt);
   const candidates: { firstDue: number; item: PlanItem }[] = [];
   if (kana.length)
     candidates.push({
@@ -98,7 +104,22 @@ function nextReview(
         },
       },
     });
-  return candidates.sort((a, b) => a.firstDue - b.firstDue)[0]?.item;
+  return candidates
+    .sort((a, b) => a.firstDue - b.firstDue)
+    .map(({ item }) => item);
+}
+
+export function reviewForecast(queues: PlanQueues, now: number) {
+  const nextDay = now + 24 * 60 * 60 * 1000;
+  let dueNow = 0;
+  let dueNext24Hours = 0;
+  for (const queue of [queues.kana, queues.vocabulary, queues.saved]) {
+    for (const card of queue) {
+      if (card.dueAt <= now) dueNow++;
+      else if (card.dueAt <= nextDay) dueNext24Hours++;
+    }
+  }
+  return { dueNow, dueNext24Hours };
 }
 
 function practiceFocus(
@@ -149,11 +170,10 @@ export function dailyStudyPlan(
   now: number,
   kanaBatchSize: number,
 ): PlanItem[] {
-  const review = nextReview(queues, now, kanaBatchSize);
+  const reviews = dueReviews(queues, now, kanaBatchSize);
   const focus = practiceFocus(data.attempts, index, now);
   const nextStep = selectedPathSteps(data).find((step) => !step.complete);
-  const items: PlanItem[] = [];
-  if (review) items.push(review);
+  const items: PlanItem[] = [...reviews];
   if (focus) items.push(focus);
   if (nextStep) {
     items.push({
