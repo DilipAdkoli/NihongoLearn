@@ -4,6 +4,7 @@ import {
   evaluateAnswer,
   kana,
   lessons,
+  latestAttemptResult,
   makeExercises,
   missedKanaIds,
   mixedKanaSample,
@@ -78,6 +79,38 @@ test("session summaries return unique kana IDs for incorrect answers", () => {
     ["a", "u"],
   );
   assert.deepEqual(missedKanaIds([attempt("1", "a", true)]), []);
+});
+
+test("latest kana result is separate for recognition, recall, and listening", () => {
+  const attempts: Attempt[] = [
+    {
+      id: "1",
+      kanaId: "a",
+      mode: "recognition",
+      answer: "あ",
+      correct: true,
+      at: 1,
+    },
+    {
+      id: "2",
+      kanaId: "a",
+      mode: "recognition",
+      answer: "い",
+      correct: false,
+      at: 2,
+    },
+    {
+      id: "3",
+      kanaId: "a",
+      mode: "recall",
+      answer: "a",
+      correct: true,
+      at: 3,
+    },
+  ];
+  assert.equal(latestAttemptResult(attempts, "a", "recognition"), false);
+  assert.equal(latestAttemptResult(attempts, "a", "recall"), true);
+  assert.equal(latestAttemptResult(attempts, "a", "listening"), undefined);
 });
 
 test("recognition includes exactly one correct glyph among four distinct choices", () => {

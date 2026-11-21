@@ -1073,6 +1073,24 @@ export function missedKanaIds(attempts: readonly Attempt[]): string[] {
   ];
 }
 
+export function latestAttemptResult(
+  attempts: readonly Attempt[],
+  kanaId: string,
+  mode: Attempt["mode"],
+) {
+  let latest: Attempt | undefined;
+  for (const attempt of attempts) {
+    if (
+      attempt.kanaId === kanaId &&
+      attempt.mode === mode &&
+      (!latest || attempt.at >= latest.at)
+    ) {
+      latest = attempt;
+    }
+  }
+  return latest?.correct;
+}
+
 export function evaluateAnswer(exercise: Exercise, answer: string): boolean {
   const item = kana.find((entry) => entry.id === exercise.kanaId);
   if (!item) return false;

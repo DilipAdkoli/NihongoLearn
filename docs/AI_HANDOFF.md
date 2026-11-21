@@ -69,6 +69,13 @@
 - Verification after missed-answer retry: `npm run typecheck` succeeded,
   `npm test` passed **82/82 tests**, changed files pass Prettier, and
   `npm run export:web` succeeded.
+- Added separate recognition, recall, and listening status to the Progress
+  by-character list, with each skill using the latest attempt for that mode.
+- Exposed the Complete beginner journey and katakana loanword practice directly
+  in the Learn catalog, and added discoverability coverage for both routes.
+- Verification after catalog and progress updates: `npm run typecheck` succeeded,
+  `npm test` passed **84/84 tests**, changed files pass Prettier, and
+  `npm run export:web` succeeded.
 
 ## Recently completed in prior sprints
 

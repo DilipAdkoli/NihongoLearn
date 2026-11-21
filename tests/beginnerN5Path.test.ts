@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { existsSync, readFileSync } from "node:fs";
 import { beginnerN5Path } from "../src/beginnerN5Path.ts";
 import { reading } from "../src/reading.ts";
 import type { Attempt, StudyData } from "../src/storage.types.ts";
@@ -106,4 +107,12 @@ test("beginner journey reading routes use real lesson topics", () => {
       "params" in listeningStep.href &&
       listeningStep.href.params?.topic === "yesterday",
   );
+});
+
+test("beginner journey and loanword practice are visible in the Learn catalog", () => {
+  const catalog = readFileSync("src/LibraryScreens.tsx", "utf8");
+  assert.match(catalog, /href: "\/beginner-n5-path"/);
+  assert.match(catalog, /href: "\/loanword-practice"/);
+  assert.ok(existsSync("app/beginner-n5-path.tsx"));
+  assert.ok(existsSync("app/loanword-practice.tsx"));
 });

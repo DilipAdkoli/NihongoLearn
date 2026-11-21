@@ -34,7 +34,13 @@ import { grammarTopics } from "./grammarCourse";
 import { JapaneseText } from "./JapaneseText";
 import { japaneseTextSizes } from "./japaneseTextSize";
 import { listeningReviewCourses, missedLessons } from "./MissedChoiceCourse";
-import { kana, lessons, mixedKanaSample, type Script } from "./learning";
+import {
+  kana,
+  latestAttemptResult,
+  lessons,
+  mixedKanaSample,
+  type Script,
+} from "./learning";
 import { overviewPaths } from "./overviewPath";
 import { mistakeJournal } from "./mistakeJournal";
 import { passageListening } from "./passageListening";
@@ -204,6 +210,13 @@ const lessonLinks = [
     icon: Sprout,
   },
   {
+    href: "/beginner-n5-path",
+    title: "Complete beginner journey",
+    detail:
+      "Follow kana, grammar, reading, listening, travel, and planning lessons in sequence",
+    icon: Sprout,
+  },
+  {
     href: "/numbers",
     title: "Count from 1 to 99",
     detail: "Read Japanese numbers and practice the tens",
@@ -343,6 +356,12 @@ const lessonLinks = [
     title: "Katakana loanword sounds",
     detail: "Look up ファ, ティ, and other combinations",
     icon: BookOpen,
+  },
+  {
+    href: "/loanword-practice",
+    title: "Practice katakana loanwords",
+    detail: "Quiz the combination sounds and meanings you’ve learned",
+    icon: AudioLines,
   },
   {
     href: "/dictionary",
@@ -627,19 +646,6 @@ export function Learn() {
   );
 }
 
-function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
-  let latest: Attempt | undefined;
-  for (const attempt of attempts) {
-    if (
-      attempt.kanaId === id &&
-      attempt.mode === mode &&
-      (!latest || attempt.at >= latest.at)
-    )
-      latest = attempt;
-  }
-  return latest?.correct;
-}
-
 function ReviewLink({ href, label }: { href: Href; label: string }) {
   const s = useStyles();
   const themeColor = useThemeColor();
@@ -692,8 +698,8 @@ export function Review() {
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
-      latestResult(data.attempts, id, "recognition") === false ||
-      latestResult(data.attempts, id, "recall") === false,
+      latestAttemptResult(data.attempts, id, "recognition") === false ||
+      latestAttemptResult(data.attempts, id, "recall") === false,
   );
   const focus = (due.length ? due : missed.length ? missed : queue).slice(
     0,
@@ -1172,6 +1178,27 @@ export function Progress() {
             const attempts = data.attempts.filter(
               (attempt) => attempt.kanaId === item.id,
             );
+            const recognition = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "recognition",
+            );
+            const recall = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "recall",
+            );
+            const listening = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "listening",
+            );
+            const status = (value: boolean | undefined) =>
+              value === undefined
+                ? "Not tried"
+                : value
+                  ? "Good"
+                  : "Needs retry";
             return (
               <View key={item.id} style={[s.row, index > 0 && s.rule]}>
                 <View style={s.glyphTile}>
@@ -1181,7 +1208,7 @@ export function Progress() {
                   <Text style={s.rowTitle}>{item.reading}</Text>
                   <Text style={s.detail}>
                     {attempts.length
-                      ? `${attempts.filter((attempt) => attempt.correct).length} of ${attempts.length} correct`
+                      ? `Recognition: ${status(recognition)} · Recall: ${status(recall)} · Listening: ${status(listening)}`
                       : data.seen.includes(item.id)
                         ? "Studied · awaiting practice"
                         : "Ready to learn"}

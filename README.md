@@ -45,7 +45,7 @@ Search Learn by lesson title, topic, or kana. Search by grammar pattern, vocabul
 - **Beginner journey.** The Complete beginner journey overview path links kana, basic sentences, everyday words, reading, listening, dates, travel, and planning activities into one continued sequence. It uses existing lesson answer keys and local progress; it is a curated beginner route, not an official JLPT certification.
 - **Local settings.** Settings offers a dark theme, pronunciation audio, kana reading hints, and Japanese text size. Settings exports study data as JSON and merges imported progress without changing local preferences.
 
-TypeScript, formatting, and 82 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. Android build and physical-device validation are paused at the user's request. Draft lesson content and synthesized pronunciation still need human review.
+TypeScript, formatting, and 84 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. The Learn catalog exposes the beginner journey, kana, guided paths, vocabulary, grammar, reading, listening, writing, kanji, dialogue, counters, calendar, and loanword practice. Android build and physical-device validation are paused at the user's request. Draft lesson content and synthesized pronunciation still need human review.
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 
