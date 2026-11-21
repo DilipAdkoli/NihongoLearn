@@ -4,6 +4,8 @@
 
 ## Run the app
 
+**Windows 10 or 11, x64.** Sign in to GitHub, open a successful App checks run that lists the Windows preview, and download **NihongoLearn-Windows-x64** under **Artifacts**. Right-click the ZIP, choose **Extract All**, and double-click **Start NihongoLearn.cmd** in the extracted folder. It opens the app in your browser and includes its own Node runtime. Keep the terminal window open while you study. [Download a preview](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml?query=branch%3Acodex%2Fnihongolearn)
+
 Use Node.js 24 LTS (24.3 or newer). In VS Code, open the cloned `NihongoLearn` folder and run these commands in its terminal to try the development branch.
 
 ```powershell

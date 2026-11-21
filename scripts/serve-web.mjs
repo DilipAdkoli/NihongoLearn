@@ -2,16 +2,24 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
+import { spawn } from "node:child_process";
 
-const args = process.argv.slice(2);
-const port =
-  args.length === 0
-    ? 8081
-    : args.length === 2 && args[0] === "--port"
-      ? Number(args[1])
-      : NaN;
+let options;
+try {
+  options = parseArgs({
+    options: {
+      port: { type: "string", default: "8081" },
+      open: { type: "boolean", default: false },
+    },
+  }).values;
+} catch {
+  console.error("Usage: node serve.mjs [--port 8081] [--open]");
+  process.exit(1);
+}
+const port = Number(options.port);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  console.error("Usage: node serve.mjs [--port 8081]");
+  console.error("Choose a port between 1 and 65535.");
   process.exit(1);
 }
 
@@ -82,4 +90,18 @@ server.on("error", (error) => {
 });
 server.listen(port, "127.0.0.1", () => {
   console.log(`NihongoLearn is running at ${origin}`);
+  if (options.open) {
+    const command =
+      process.platform === "win32"
+        ? "explorer.exe"
+        : process.platform === "darwin"
+          ? "open"
+          : "xdg-open";
+    const browser = spawn(command, [origin], {
+      stdio: "ignore",
+      detached: true,
+    });
+    browser.on("error", () => console.log(`Open ${origin} in your browser.`));
+    browser.unref();
+  }
 });

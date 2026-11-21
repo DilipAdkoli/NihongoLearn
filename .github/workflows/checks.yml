@@ -36,3 +36,65 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 7
+
+  windows-preview:
+    if: github.event_name == 'push'
+    needs: checks
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          architecture: x64
+      - uses: actions/download-artifact@v6
+        with:
+          name: NihongoLearn-web
+          path: windows-preview/app
+      - name: Package the Windows preview
+        shell: pwsh
+        run: |
+          $runtime = New-Item -ItemType Directory windows-preview/runtime
+          $nodePath = (Get-Command node.exe).Source
+          Copy-Item $nodePath $runtime
+          $license = Join-Path (Split-Path $nodePath) LICENSE
+          if (Test-Path $license) {
+            Copy-Item $license $runtime
+          } else {
+            $version = & $nodePath --version
+            Invoke-WebRequest "https://raw.githubusercontent.com/nodejs/node/$version/LICENSE" -OutFile "$runtime/LICENSE"
+          }
+          Copy-Item 'scripts/Start NihongoLearn.cmd' windows-preview
+      - name: Start the packaged copy and request a lesson
+        shell: pwsh
+        working-directory: windows-preview
+        run: |
+          $launcher = Start-Process cmd.exe -ArgumentList '/d /c call ".\Start NihongoLearn.cmd"' -PassThru
+          try {
+            $base = 'http://localhost:8081'
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              try {
+                $page = Invoke-WebRequest "$base/reading" -Headers @{ Accept = 'text/html' } -TimeoutSec 2
+                if ($page.Content -match 'register-offline.js') { $ready = $true; break }
+              } catch { Start-Sleep -Milliseconds 300 }
+              if ($launcher.HasExited) { break }
+            }
+            if (!$ready) { throw 'The packaged Windows launcher did not serve a lesson.' }
+            $catalog = Invoke-RestMethod "$base/offline-assets.json"
+            $audio = $catalog.assets | Where-Object { $_ -like '*.mp3' } | Select-Object -First 1
+            if (!$audio) { throw 'The offline catalog contains no audio.' }
+            $clip = Invoke-WebRequest "$base/$audio" -Method Head
+            if ([int64]$clip.Headers['Content-Length'][0] -le 0) { throw 'The bundled audio is empty.' }
+          } finally {
+            if (!$launcher.HasExited) { taskkill /PID $launcher.Id /T /F }
+          }
+      - uses: actions/upload-artifact@v6
+        with:
+          name: NihongoLearn-Windows-x64
+          path: windows-preview/
+          if-no-files-found: error
+          retention-days: 7
