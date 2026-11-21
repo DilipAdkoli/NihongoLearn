@@ -1,3 +1,4 @@
+import { beginnerCheck, beginnerCheckCourse } from "./beginnerCheck";
 import { datePractice } from "./calendar";
 import { counterPractice } from "./counters";
 import { dialogueGroups } from "./dialogueAudio";
@@ -14,6 +15,20 @@ import { writingTasks } from "./writing";
 // Add the other everyday lessons so their mistakes can be explained as well.
 export const journalCourses = {
   ...reviewCourses,
+  [beginnerCheckCourse]: {
+    skill: "Placement",
+    href: "/beginner-check",
+    groups: beginnerCheck.map((group) => ({
+      title: group.title,
+      lessons: group.lessons.map((lesson) => ({
+        ...lesson,
+        explanation: "",
+        japanese: "",
+        english: "",
+        stem: "stem" in lesson ? lesson.stem : "",
+      })),
+    })),
+  },
   kanji: {
     skill: "Kanji",
     href: "/kanji",
