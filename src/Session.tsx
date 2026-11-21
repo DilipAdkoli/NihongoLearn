@@ -246,9 +246,11 @@ export default function Session({
         ? "Listening practice"
         : mode === "contrast"
           ? "Compare kana"
-          : mode === "review"
-            ? "Review"
-            : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
+          : mode === "mixed"
+            ? "Mixed kana practice"
+            : mode === "review"
+              ? "Review"
+              : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
 
   const suggestion =

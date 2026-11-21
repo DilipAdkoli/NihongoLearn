@@ -31,7 +31,7 @@ import { glossaryEntries } from "./glossaryEntries";
 import { JapaneseText } from "./JapaneseText";
 import { japaneseTextSizes } from "./japaneseTextSize";
 import { missedLessons } from "./MissedChoiceCourse";
-import { kana, lessons, type Script } from "./learning";
+import { kana, lessons, mixedKanaSample, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
 import { passageListening } from "./passageListening";
 import { placementSample } from "./placement";
@@ -370,6 +370,9 @@ export function Learn() {
       ? terms.every((term) => searchable.includes(term))
       : lesson.script === script,
   );
+  const studiedScripts = new Set(
+    kana.filter(({ id }) => data.seen.includes(id)).map(({ script }) => script),
+  );
   return (
     <View style={s.page}>
       <Heading
@@ -420,6 +423,21 @@ export function Learn() {
       )}
       {!searching && (
         <>
+          {studiedScripts.size === 2 && (
+            <View style={s.feature}>
+              <Text accessibilityRole="header" style={s.featureTitle}>
+                Mixed kana practice
+              </Text>
+              <Text style={s.body}>
+                Switch between hiragana and katakana you’ve studied in a short
+                round of recognition and typed recall.
+              </Text>
+              <Action
+                label="Practice both scripts"
+                onPress={() => startLesson(mixedKanaSample(data.seen), "mixed")}
+              />
+            </View>
+          )}
           <View accessibilityRole="tablist" style={s.chartRow}>
             {(["hiragana", "katakana"] as const).map((option) => (
               <Pressable

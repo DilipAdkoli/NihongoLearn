@@ -5,6 +5,7 @@ import {
   kana,
   lessons,
   makeExercises,
+  mixedKanaSample,
 } from "../src/learning.ts";
 
 test("kana lessons have unique glyphs and examples readable with taught characters", () => {
@@ -138,5 +139,31 @@ test("contrast practice includes the other kana even across rows", () => {
     assert.ok(question.choices.includes("シ"));
     assert.ok(question.choices.includes("ツ"));
     assert.equal(new Set(question.choices).size, 4);
+  }
+});
+
+test("mixed practice balances studied scripts and distinguishes matching sounds", () => {
+  assert.deepEqual(mixedKanaSample(["a", "i", "unknown"]), []);
+  const seen = ["a", "i", "u", "e", "kata-a", "kata-i", "kata-u", "kata-e"];
+  const ids = mixedKanaSample(seen);
+  assert.equal(ids.length, 6);
+  assert.equal(new Set(ids).size, 6);
+  assert.equal(ids.filter((id) => id.startsWith("kata-")).length, 3);
+  assert.ok(ids.every((id) => seen.includes(id)));
+  const questions = makeExercises(ids, "mixed");
+  assert.equal(questions.length, 12);
+  for (const question of questions.slice(0, 6)) {
+    const item = kana.find(({ id }) => id === question.kanaId)!;
+    const counterpart = kana.find(
+      ({ id }) =>
+        id ===
+        (item.script === "hiragana" ? `kata-${item.id}` : item.id.slice(5)),
+    )!;
+    assert.ok(question.choices.includes(counterpart.glyph));
+    assert.equal(new Set(question.choices).size, 4);
+    assert.deepEqual(
+      question.choices.filter((choice) => evaluateAnswer(question, choice)),
+      [item.glyph],
+    );
   }
 });

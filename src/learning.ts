@@ -2,7 +2,7 @@ import type { Attempt } from "./storage.types";
 import { yoon } from "./yoon.ts";
 
 export type SessionMode =
-  "study" | "review" | "contrast" | "listening" | "placement";
+  "study" | "review" | "contrast" | "listening" | "placement" | "mixed";
 
 export type Script = "hiragana" | "katakana";
 
@@ -969,6 +969,21 @@ export function shuffled<T>(items: readonly T[]): T[] {
   return result;
 }
 
+export function mixedKanaSample(seen: readonly string[]) {
+  const learned = new Set(seen);
+  const hiragana = kana.filter(
+    ({ id, script }) => script === "hiragana" && learned.has(id),
+  );
+  const katakana = kana.filter(
+    ({ id, script }) => script === "katakana" && learned.has(id),
+  );
+  const perScript = Math.min(3, hiragana.length, katakana.length);
+  return [
+    ...shuffled(hiragana).slice(0, perScript),
+    ...shuffled(katakana).slice(0, perScript),
+  ].map(({ id }) => id);
+}
+
 function soundReading(item: Kana) {
   return item.reading === "wo" ? "o" : item.reading;
 }
@@ -996,8 +1011,19 @@ export function makeExercises(
       mode === "contrast"
         ? eligible.filter((entry) => ids.includes(entry.id))
         : [];
+    const counterpartId =
+      item.script === "hiragana" ? `kata-${item.id}` : item.id.slice(5);
+    const counterpart =
+      mode === "mixed"
+        ? kana.find(({ id }) => id === counterpartId)
+        : undefined;
     const distractors = [
-      ...new Set([...contrast, ...shuffled(neighbors), ...shuffled(otherPool)]),
+      ...new Set([
+        ...(counterpart ? [counterpart] : []),
+        ...contrast,
+        ...shuffled(neighbors),
+        ...shuffled(otherPool),
+      ]),
     ]
       .slice(0, 3)
       .map((other) => other.glyph);
