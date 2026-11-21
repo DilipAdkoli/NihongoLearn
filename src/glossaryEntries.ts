@@ -88,6 +88,24 @@ addEntry({
   meaning: "to turn",
   romaji: "magaru",
 });
+addEntry({
+  spelling: "コーヒー",
+  kana: "コーヒー",
+  meaning: "coffee",
+  romaji: "koohii",
+});
+addEntry({
+  spelling: "サンドイッチ",
+  kana: "サンドイッチ",
+  meaning: "sandwich",
+  romaji: "sandoicchi",
+});
+addEntry({
+  spelling: "セット",
+  kana: "セット",
+  meaning: "set meal",
+  romaji: "setto",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

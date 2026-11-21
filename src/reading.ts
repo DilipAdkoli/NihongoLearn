@@ -503,4 +503,69 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    id: "cafe-menu",
+    title: "Read a café menu",
+    passage: {
+      japanese:
+        "きょうの メニュー\nおちゃ　200えん\nコーヒー　350えん\nパン　250えん\nサンドイッチ　500えん\nおちゃと パンの セット　400えん\n※ セットは ごぜん じゅういちじまでです。",
+      standardJapanese:
+        "今日のメニュー\nお茶　200円\nコーヒー　350円\nパン　250円\nサンドイッチ　500円\nお茶とパンのセット　400円\n※ セットは午前11時までです。",
+      english:
+        "Today’s menu\nTea ¥200\nCoffee ¥350\nBread ¥250\nSandwich ¥500\nTea and bread set ¥400\nThe set is available until 11 a.m.",
+      lookupWords: ["お茶", "コーヒー", "サンドイッチ", "セット", "午前"],
+    },
+    lessons: [
+      {
+        id: "menu-price",
+        title: "Read an item’s price",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What costs ¥350?",
+        stem: "",
+        choices: ["Tea", "Coffee", "A sandwich"],
+        answer: "Coffee",
+        feedback: "コーヒー is coffee. It is listed at 350円.",
+      },
+      {
+        id: "menu-set-savings",
+        title: "Compare the set price",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "How much do you save by buying the tea and bread set?",
+        stem: "",
+        choices: ["¥25", "¥50", "¥100"],
+        answer: "¥50",
+        feedback:
+          "Tea and bread cost ¥450 together at their individual prices. The set costs ¥400, so you save ¥50.",
+      },
+      {
+        id: "menu-set-time",
+        title: "Check when the set is available",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Until what time is the set available?",
+        stem: "",
+        choices: ["10 a.m.", "11 p.m.", "11 a.m."],
+        answer: "11 a.m.",
+        feedback:
+          "ごぜん means a.m. じゅういちじまで means until eleven o’clock.",
+      },
+      {
+        id: "menu-budget",
+        title: "Order with a fixed amount",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which item costs exactly ¥250?",
+        stem: "",
+        choices: ["Bread", "Tea", "A sandwich"],
+        answer: "Bread",
+        feedback: "パン is bread. The menu lists it at 250円.",
+      },
+    ],
+  },
 ];
