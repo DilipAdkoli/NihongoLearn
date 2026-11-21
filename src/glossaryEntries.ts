@@ -52,6 +52,12 @@ addEntry({
 addEntry({ spelling: "角", kana: "かど", meaning: "corner", romaji: "kado" });
 addEntry({ spelling: "部屋", kana: "へや", meaning: "room", romaji: "heya" });
 addEntry({
+  spelling: "四人",
+  kana: "よにん",
+  meaning: "four people",
+  romaji: "yonin",
+});
+addEntry({
   spelling: "歯医者",
   kana: "はいしゃ",
   meaning: "dentist",

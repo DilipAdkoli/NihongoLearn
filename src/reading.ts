@@ -438,4 +438,69 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    id: "family-introduction",
+    title: "A family introduction",
+    passage: {
+      japanese:
+        "わたしの かぞくは よにんです。\nちちと ははと あねと わたしです。\nあねは がくせいです。\nどようびに あねと こうえんへ いきます。",
+      standardJapanese:
+        "私の家族は四人です。\n父と母と姉と私です。\n姉は学生です。\n土曜日に姉と公園へ行きます。",
+      english:
+        "There are four people in my family.\nMy father, my mother, my older sister, and me.\nMy older sister is a student.\nOn Saturday I’ll go to the park with my sister.",
+      lookupWords: ["家族", "四人", "父", "母", "姉", "学生"],
+    },
+    lessons: [
+      {
+        id: "family-size",
+        title: "The size of the family",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "How many people are in the narrator’s family?",
+        stem: "",
+        choices: ["Three", "Four", "Five"],
+        answer: "Four",
+        feedback: "よにん (四人) means four people.",
+      },
+      {
+        id: "family-student",
+        title: "A student in the family",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which family member is a student?",
+        stem: "",
+        choices: ["Their mother", "Their younger sister", "Their older sister"],
+        answer: "Their older sister",
+        feedback:
+          "あね is the narrator’s older sister. あねは がくせいです says that she is a student.",
+      },
+      {
+        id: "family-outing-day",
+        title: "The day of the outing",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "When will the narrator go out with their sister?",
+        stem: "",
+        choices: ["Saturday", "Sunday", "Monday"],
+        answer: "Saturday",
+        feedback: "どようび means Saturday. に marks when they’ll go.",
+      },
+      {
+        id: "family-outing-place",
+        title: "The place they’ll visit",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Where will they go together?",
+        stem: "",
+        choices: ["The station", "The park", "A bookstore"],
+        answer: "The park",
+        feedback:
+          "こうえん means park. へ marks the destination and is pronounced え here.",
+      },
+    ],
+  },
 ];
