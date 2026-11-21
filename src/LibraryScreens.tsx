@@ -22,6 +22,7 @@ import {
 } from "lucide-react-native";
 
 import { ActivityChart } from "./ActivityChart";
+import { DelayedRecallCard } from "./DelayedRecallCard";
 import { createBackup, parseBackup } from "./backup";
 import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
@@ -1131,6 +1132,7 @@ export function Progress() {
         <Score label="Counters" attempts={counterAttempts} />
       )}
       <ActivityChart attempts={data.attempts} />
+      <DelayedRecallCard attempts={data.attempts} />
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           By character
