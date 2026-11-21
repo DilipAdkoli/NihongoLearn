@@ -106,6 +106,30 @@ addEntry({
   meaning: "set meal",
   romaji: "setto",
 });
+addEntry({
+  spelling: "一つずつ",
+  kana: "ひとつずつ",
+  meaning: "one of each",
+  romaji: "hitotsu zutsu",
+});
+addEntry({
+  spelling: "ホット",
+  kana: "ホット",
+  meaning: "hot (of a drink)",
+  romaji: "hotto",
+});
+addEntry({
+  spelling: "アイス",
+  kana: "アイス",
+  meaning: "iced (of a drink)",
+  romaji: "aisu",
+});
+addEntry({
+  spelling: "全部で",
+  kana: "ぜんぶで",
+  meaning: "in total",
+  romaji: "zenbu de",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

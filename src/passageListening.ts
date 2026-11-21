@@ -310,4 +310,63 @@ export const passageListening: readonly (CourseGroup & {
       },
     ),
   },
+  {
+    id: "cafe-order",
+    title: "Listen to a café order",
+    passage: {
+      japanese:
+        "A: いらっしゃいませ。なにに しますか。\nB: コーヒーと サンドイッチを ひとつずつ ください。\nA: コーヒーは ホットですか、アイスですか。\nB: ホットで おねがいします。\nA: はい、ぜんぶで はっぴゃくごじゅうえんです。",
+      standardJapanese:
+        "A: いらっしゃいませ。何にしますか。\nB: コーヒーとサンドイッチを一つずつください。\nA: コーヒーはホットですか、アイスですか。\nB: ホットでお願いします。\nA: はい、全部で八百五十円です。",
+      english:
+        "A: Welcome. What would you like?\nB: One coffee and one sandwich, please.\nA: Would you like the coffee hot or iced?\nB: Hot, please.\nA: Sure. That’s ¥850 in total.",
+      lookupWords: [
+        "コーヒー",
+        "サンドイッチ",
+        "一つずつ",
+        "ホット",
+        "アイス",
+        "全部で",
+      ],
+      audio: [
+        require("../assets/audio/passage-cafe-order-normal.mp3"),
+        require("../assets/audio/passage-cafe-order-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "cafe-order-items",
+        title: "The order",
+        prompt: "What does the customer order?",
+        choices: ["Tea and bread", "Coffee and a sandwich", "Coffee and bread"],
+        answer: "Coffee and a sandwich",
+        feedback: "と links コーヒー and サンドイッチ.",
+      },
+      {
+        id: "cafe-order-quantity",
+        title: "How many of each",
+        prompt: "How many of each item does the customer ask for?",
+        choices: ["One of each", "Two of each", "Three of each"],
+        answer: "One of each",
+        feedback: "ひとつずつ means one of each item.",
+      },
+      {
+        id: "cafe-order-temperature",
+        title: "The coffee temperature",
+        prompt: "How does the customer want the coffee?",
+        choices: ["Iced", "Hot", "With milk"],
+        answer: "Hot",
+        feedback:
+          "The customer says ホットで おねがいします to ask for hot coffee.",
+      },
+      {
+        id: "cafe-order-total",
+        title: "The total price",
+        prompt: "How much does the order cost altogether?",
+        choices: ["¥580", "¥800", "¥850"],
+        answer: "¥850",
+        feedback: "ぜんぶで means in total. はっぴゃくごじゅうえん is ¥850.",
+      },
+    ),
+  },
 ];
