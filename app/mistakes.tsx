@@ -3,10 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { JapaneseText } from "../src/JapaneseText";
 import { kana } from "../src/learning";
-import {
-  mistakeJournal,
-  mistakeSkillCounts,
-} from "../src/mistakeJournal";
+import { mistakeJournal, mistakeSkillCounts } from "../src/mistakeJournal";
 import { journalCourses } from "../src/journalCourses";
 import { useStudy } from "../src/study";
 import { createThemedStyles } from "../src/theme";
@@ -126,7 +123,12 @@ const useStyles = createThemedStyles({
     lineHeight: 29,
     color: "#203730",
   },
-  detail: { fontFamily: "DMSans", fontSize: 15, lineHeight: 22, color: "#566860" },
+  detail: {
+    fontFamily: "DMSans",
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#566860",
+  },
   filters: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   filter: {
     borderWidth: 1,

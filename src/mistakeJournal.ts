@@ -68,10 +68,7 @@ export function mistakeJournal(
 
   return [...latest]
     .filter(([, attempt]) => !attempt.correct)
-    .sort(
-      ([keyA, a], [keyB, b]) =>
-        b.at - a.at || keyA.localeCompare(keyB),
-    )
+    .sort(([keyA, a], [keyB, b]) => b.at - a.at || keyA.localeCompare(keyB))
     .map(([key, attempt]) => {
       const entry = catalog.get(attempt.kanaId)!;
       if (entry.kind === "kana") {

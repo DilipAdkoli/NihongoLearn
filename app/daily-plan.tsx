@@ -1,7 +1,11 @@
 import { Link } from "expo-router";
 import { Text, View, Pressable } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
-import { dailyStudyPlan, reviewForecast, studySkillIndex } from "../src/dailyStudyPlan";
+import {
+  dailyStudyPlan,
+  reviewForecast,
+  studySkillIndex,
+} from "../src/dailyStudyPlan";
 import { glossaryEntries } from "../src/glossaryEntries";
 import { reviewCourses } from "../src/reviewCourses";
 import { savedWordRecallQueue } from "../src/savedWordReview";
@@ -34,7 +38,8 @@ export default function DailyPlan() {
         Today’s study plan
       </Text>
       <Text style={s.detail} accessibilityRole="summary">
-        {forecast.dueNow} due now · {forecast.dueNext24Hours} due in the next 24 hours
+        {forecast.dueNow} due now · {forecast.dueNext24Hours} due in the next 24
+        hours
       </Text>
       <Link href="/mistakes" style={s.back}>
         See explanations for mistakes ›

@@ -106,10 +106,10 @@ test("unknown removed questions are ignored and valid mistakes appear newest fir
     ],
     courses,
   );
-  assert.deepEqual(entries.map((entry) => entry.key), [
-    "writing:greeting",
-    "grammar:particle",
-  ]);
+  assert.deepEqual(
+    entries.map((entry) => entry.key),
+    ["writing:greeting", "grammar:particle"],
+  );
   assert.equal(entries[0].correctAnswer, "こんにちは");
   assert.deepEqual(mistakeSkillCounts(entries), [
     { skill: "Grammar", count: 1 },
@@ -175,7 +175,10 @@ test("kana listening errors show the glyph and are independent of recall", () =>
     },
   ];
   const entries = mistakeJournal(history, courses, kanaItems);
-  assert.deepEqual(entries.map((entry) => entry.key), ["a:listening"]);
+  assert.deepEqual(
+    entries.map((entry) => entry.key),
+    ["a:listening"],
+  );
   assert.equal(entries[0].correctAnswer, "あ");
   assert.match(entries[0].feedback, /Short ah/);
 });

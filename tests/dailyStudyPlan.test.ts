@@ -108,17 +108,23 @@ test("the earliest due queue precedes targeted practice and the guided activity,
 
 test("daily plan includes every due category in deadline order", () => {
   const queues: PlanQueues = {
-    kana: [{ id: "a", dueAt: 20 }, { id: "i", dueAt: 10 }],
+    kana: [
+      { id: "a", dueAt: 20 },
+      { id: "i", dueAt: 10 },
+    ],
     vocabulary: [{ dueAt: 5 }],
     saved: [{ dueAt: 15 }],
   };
   const items = plan({}, queues);
-  assert.deepEqual(items.map((item) => item.title), [
-    "Recall everyday vocabulary",
-    "Review due kana",
-    "Recall saved words",
-    "Study the five vowels",
-  ]);
+  assert.deepEqual(
+    items.map((item) => item.title),
+    [
+      "Recall everyday vocabulary",
+      "Review due kana",
+      "Recall saved words",
+      "Study the five vowels",
+    ],
+  );
   assert.deepEqual(items[1].action, {
     kana: ["i", "a"],
     mode: "review",
@@ -130,7 +136,10 @@ test("review forecast separates ready reviews from those arriving in the next da
   assert.deepEqual(
     reviewForecast(
       {
-        kana: [{ id: "a", dueAt: now }, { id: "i", dueAt: now + day }],
+        kana: [
+          { id: "a", dueAt: now },
+          { id: "i", dueAt: now + day },
+        ],
         vocabulary: [{ dueAt: now + day + 1 }, { dueAt: now - 1 }],
         saved: [{ dueAt: now + 1 }],
       },
