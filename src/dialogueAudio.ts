@@ -19,6 +19,9 @@ const responseAudio: Record<ResponseId, number> = {
   "invite-to-movie": require("../assets/audio/dialogue-invite-to-movie.mp3"),
   "suggest-meeting-time": require("../assets/audio/dialogue-suggest-meeting-time.mp3"),
   "suggest-another-day": require("../assets/audio/dialogue-suggest-another-day.mp3"),
+  "family-size": require("../assets/audio/dialogue-family-size.mp3"),
+  "family-older-sister": require("../assets/audio/dialogue-family-older-sister.mp3"),
+  "family-younger-sister": require("../assets/audio/dialogue-family-younger-sister.mp3"),
 };
 
 export const dialogueGroups = conversation.map((group) => ({

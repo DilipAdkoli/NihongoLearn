@@ -327,4 +327,66 @@ export const conversation = [
       },
     ],
   },
+  {
+    id: "family",
+    title: "Talking about family",
+    lessons: [
+      {
+        id: "family-size",
+        title: "Say how big your family is",
+        explanation:
+          "Someone asks about your family. There are four people in it.",
+        japanese: "なんにん かぞくですか。",
+        english: "How many people are in your family?",
+        prompt: "Which response says you’re a family of four?",
+        stem: "",
+        choices: [
+          "さんにん かぞくです。",
+          "よにん かぞくです。",
+          "ごにん かぞくです。",
+        ],
+        answer: "よにん かぞくです。",
+        answerEnglish: "We’re a family of four.",
+        feedback: "なんにん asks how many people. 四人 has the reading よにん.",
+      },
+      {
+        id: "family-older-sister",
+        title: "Talk about your older sister",
+        explanation:
+          "You’re talking with someone outside your family. Your older sister is a student.",
+        japanese: "おねえさんは がくせいですか。",
+        english: "Is your older sister a student?",
+        prompt: "Which response says she is a student?",
+        stem: "",
+        choices: [
+          "いいえ、あねは がくせいでは ありません。",
+          "はい、あには がくせいです。",
+          "はい、あねは がくせいです。",
+        ],
+        answer: "はい、あねは がくせいです。",
+        answerEnglish: "Yes, my older sister is a student.",
+        feedback:
+          "Use あね (姉) for your own older sister when speaking to someone outside your family.",
+      },
+      {
+        id: "family-younger-sister",
+        title: "Say which sibling you have",
+        explanation: "You have a younger sister. You have no younger brother.",
+        japanese: "おとうとさんは いますか。",
+        english: "Do you have a younger brother?",
+        prompt: "Which response describes your family?",
+        stem: "",
+        choices: [
+          "いいえ、おとうとは いません。いもうとが います。",
+          "はい、おとうとが います。いもうとは いません。",
+          "いいえ、おとうとも いもうとも いません。",
+        ],
+        answer: "いいえ、おとうとは いません。いもうとが います。",
+        answerEnglish:
+          "No, I don’t have a younger brother. I have a younger sister.",
+        feedback:
+          "いません is the polite negative of います. いもうとがいます means you have a younger sister.",
+      },
+    ],
+  },
 ] as const satisfies readonly DialogueGroup[];
