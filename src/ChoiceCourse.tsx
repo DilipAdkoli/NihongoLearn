@@ -512,6 +512,7 @@ export function ChoiceCourse({
   showBack = true,
   browseTopics = false,
   initialTopic,
+  onTopicChange,
   reviewQuestions = false,
 }: {
   title: string;
@@ -524,6 +525,7 @@ export function ChoiceCourse({
   showBack?: boolean;
   browseTopics?: boolean;
   initialTopic?: string;
+  onTopicChange?: (id: string | undefined) => void;
   reviewQuestions?: boolean;
 }) {
   const s = useStyles();
@@ -570,7 +572,10 @@ export function ChoiceCourse({
                 accessibilityRole="tab"
                 accessibilityLabel={`${label}, ${tried} of ${group.lessons.length} tried`}
                 aria-selected={topic === index}
-                onPress={() => setTopic(index)}
+                onPress={() => {
+                  setTopic(index);
+                  onTopicChange?.(group.id);
+                }}
                 style={({ pressed }) => [
                   s.topic,
                   topic === index && s.selected,

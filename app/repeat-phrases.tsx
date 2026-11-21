@@ -1,5 +1,5 @@
 import { createThemedStyles } from "../src/theme";
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { dialogueGroups } from "../src/dialogueAudio";
@@ -10,17 +10,18 @@ import {
   voiceRecordingLimit,
 } from "../src/useVoiceRecording";
 
-const phrases = dialogueGroups.flatMap((group) =>
-  group.lessons.map((lesson) => ({
-    japanese: lesson.answer,
-    english: lesson.answerEnglish,
-    clip: lesson.answerAudio,
-    topic: group.title,
-  })),
-);
-
 export default function RepeatPhrases() {
+  const { topic } = useLocalSearchParams<{ topic?: string }>();
+  const initialTopic = Math.max(
+    0,
+    dialogueGroups.findIndex((group) => group.id === topic),
+  );
+  return <PhrasePractice key={initialTopic} initialTopic={initialTopic} />;
+}
+
+function PhrasePractice({ initialTopic }: { initialTopic: number }) {
   const s = useStyles();
+  const [topic, setTopic] = useState(initialTopic);
   const [index, setIndex] = useState(0);
   const [translation, setTranslation] = useState(false);
   const { play, stop, playing, audioError } = useClipPlayback();
@@ -28,35 +29,60 @@ export default function RepeatPhrases() {
   const recordingUri = voice.uri;
   const recording = voice.phase === "recording";
   const audioBusy = voice.phase !== "idle";
-  const phrase = phrases[index];
+  const group = dialogueGroups[topic];
+  const phrase = group.lessons[index];
+  const last = index + 1 === group.lessons.length;
 
-  function goTo(next: number) {
+  function goTo(next: number, nextTopic = topic) {
     stop();
     voice.reset();
     setIndex(next);
+    setTopic(nextTopic);
     setTranslation(false);
   }
 
   return (
     <View style={s.page}>
-      <Link href="/conversation" style={s.link}>
+      <Link
+        href={{ pathname: "/conversation", params: { topic: group.id } }}
+        style={s.link}
+      >
         ‹ Back to Everyday dialogue
       </Link>
       <Text accessibilityRole="header" style={s.title}>
         Listen and repeat
       </Text>
       <Text style={s.body}>Listen, then say the phrase aloud.</Text>
+      <View
+        accessibilityRole="tablist"
+        accessibilityLabel="Phrase topics"
+        style={s.controls}
+      >
+        {dialogueGroups.map(({ id, title }, next) => (
+          <Pressable
+            key={id}
+            accessibilityRole="tab"
+            aria-selected={next === topic}
+            onPress={() => {
+              if (next !== topic) goTo(0, next);
+            }}
+            style={[s.button, next === topic && s.selected]}
+          >
+            <Text style={s.buttonText}>{title}</Text>
+          </Pressable>
+        ))}
+      </View>
       <View style={s.card}>
         <Text accessibilityLiveRegion="polite" style={s.body}>
-          {phrase.topic} · {index + 1} of {phrases.length}
+          {group.title} · {index + 1} of {group.lessons.length}
         </Text>
-        <JapaneseText style={s.phrase}>{phrase.japanese}</JapaneseText>
-        {translation && <Text style={s.body}>{phrase.english}</Text>}
+        <JapaneseText style={s.phrase}>{phrase.answer}</JapaneseText>
+        {translation && <Text style={s.body}>{phrase.answerEnglish}</Text>}
         <View style={s.controls}>
           <Pressable
             accessibilityRole="button"
             disabled={audioBusy}
-            onPress={() => play(phrase.clip)}
+            onPress={() => play(phrase.answerAudio)}
             style={[s.button, s.primary, audioBusy && s.disabled]}
           >
             <Text style={s.primaryText}>Listen</Text>
@@ -64,7 +90,7 @@ export default function RepeatPhrases() {
           <Pressable
             accessibilityRole="button"
             disabled={audioBusy}
-            onPress={() => play(phrase.clip, { rate: 0.8 })}
+            onPress={() => play(phrase.answerAudio, { rate: 0.8 })}
             style={[s.button, audioBusy && s.disabled]}
           >
             <Text style={s.buttonText}>Listen slowly</Text>
@@ -94,6 +120,25 @@ export default function RepeatPhrases() {
             Audio couldn’t play. Tap Listen to retry.
           </Text>
         )}
+        <View style={s.controls}>
+          <Pressable
+            accessibilityRole="button"
+            disabled={index === 0}
+            onPress={() => goTo(index - 1)}
+            style={[s.button, index === 0 && s.disabled]}
+          >
+            <Text style={s.buttonText}>Previous phrase</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => goTo(last ? 0 : index + 1)}
+            style={s.button}
+          >
+            <Text style={s.buttonText}>
+              {last ? "Start again" : "Next phrase"}
+            </Text>
+          </Pressable>
+        </View>
       </View>
       <View style={s.card}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
@@ -163,25 +208,6 @@ export default function RepeatPhrases() {
           </Text>
         )}
       </View>
-      <View style={s.controls}>
-        <Pressable
-          accessibilityRole="button"
-          disabled={index === 0}
-          onPress={() => goTo(index - 1)}
-          style={[s.button, index === 0 && s.disabled]}
-        >
-          <Text style={s.buttonText}>Previous phrase</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => goTo(index + 1 === phrases.length ? 0 : index + 1)}
-          style={s.button}
-        >
-          <Text style={s.buttonText}>
-            {index + 1 === phrases.length ? "Start again" : "Next phrase"}
-          </Text>
-        </Pressable>
-      </View>
     </View>
   );
 }
@@ -227,6 +253,7 @@ const useStyles = createThemedStyles({
     paddingHorizontal: 12,
   },
   primary: { backgroundColor: "#215848", borderColor: "#215848" },
+  selected: { backgroundColor: "#dfe8d9" },
   primaryText: { color: "#fffef8", fontFamily: "DMSansBold" },
   buttonText: { color: "#215848", fontFamily: "DMSansBold" },
   disabled: { opacity: 0.6 },
