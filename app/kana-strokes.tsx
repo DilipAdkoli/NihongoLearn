@@ -1,11 +1,12 @@
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View, type ViewStyle } from "react-native";
 import Svg, { Line, Path } from "react-native-svg";
 import { JapaneseText } from "../src/JapaneseText";
 import { kana, type Kana } from "../src/learning";
 import { kanaStrokePaths } from "../src/kanaStrokePaths";
 import { createThemedStyles, useThemeColor } from "../src/theme";
+import { kanaDiagramSize, useKanaTrace } from "../src/useKanaTrace";
 
 const groups = [
   {
@@ -27,6 +28,7 @@ const groups = [
 ];
 
 const strokeDuration = 650;
+const drawOnWeb: ViewStyle & { touchAction: "none" } = { touchAction: "none" };
 
 function StrokeButton({
   label,
@@ -59,6 +61,8 @@ export default function KanaStrokes() {
   const [item, setItem] = useState(groups[0].items[0]);
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [tracing, setTracing] = useState(false);
+  const trace = useKanaTrace();
   const strokes = kanaStrokePaths[item.glyph];
   const total = strokes.length;
   const completed = Math.floor(step);
@@ -85,11 +89,19 @@ export default function KanaStrokes() {
     setPlaying(false);
     setStep(0);
     setItem(next);
+    trace.clear();
   }
 
   function togglePlayback() {
     setStep(playing ? Math.ceil(step) : 0);
     setPlaying(!playing);
+  }
+
+  function toggleTracing() {
+    setPlaying(false);
+    setStep(0);
+    trace.clear();
+    setTracing(!tracing);
   }
 
   return (
@@ -101,7 +113,7 @@ export default function KanaStrokes() {
         Kana stroke order
       </Text>
       <Text style={s.body}>
-        Watch each vowel’s strokes in order, then copy it on paper.
+        Watch each vowel’s strokes in order or trace it on the screen.
       </Text>
       <View accessibilityRole="tablist" style={s.controls}>
         {groups.map(({ title, items }, index) => (
@@ -137,77 +149,132 @@ export default function KanaStrokes() {
         ))}
       </View>
       <View style={s.card}>
-        <Svg
-          width={216}
-          height={216}
-          viewBox="0 0 109 109"
-          accessibilityRole="image"
-          accessibilityLabel={`Stroke diagram for ${item.glyph}`}
-          style={s.diagram}
+        <StrokeButton
+          label={tracing ? "Back to stroke order" : "Try tracing"}
+          onPress={toggleTracing}
+        />
+        {tracing && (
+          <Text style={s.body}>
+            Draw over the guide. Lift your finger between strokes.
+          </Text>
+        )}
+        <View
+          accessibilityLabel={
+            tracing ? `Drawing area for ${item.glyph}` : undefined
+          }
+          style={[s.board, tracing && Platform.OS === "web" && drawOnWeb]}
+          {...(tracing ? trace.panHandlers : {})}
         >
-          <Line
-            x1={54.5}
-            x2={54.5}
-            y1={0}
-            y2={109}
-            stroke={guideColor}
-            strokeWidth={0.4}
-            strokeDasharray={[2, 2]}
-          />
-          <Line
-            y1={54.5}
-            y2={54.5}
-            x1={0}
-            x2={109}
-            stroke={guideColor}
-            strokeWidth={0.4}
-            strokeDasharray={[2, 2]}
-          />
-          {strokes.map(({ d, length }, index) => {
-            const amount = Math.min(Math.max(step - index, 0), 1);
-            return (
-              <Path
-                key={d}
-                d={d}
-                fill="none"
-                stroke={
-                  amount === 0
-                    ? guideColor
-                    : index + 1 >= step
-                      ? currentColor
-                      : inkColor
-                }
-                strokeWidth={3}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray={
-                  amount > 0 && amount < 1 ? [length, length] : undefined
-                }
-                strokeDashoffset={length * (1 - amount)}
-              />
-            );
-          })}
-        </Svg>
-        <Text accessibilityLiveRegion="polite" style={s.body}>
-          {completed} of {total} strokes shown
-        </Text>
-        <View style={s.controls}>
-          <StrokeButton
-            label={playing ? "Stop animation" : "Play stroke order"}
-            onPress={togglePlayback}
-            primary
-          />
-          <StrokeButton
-            label="Previous stroke"
-            disabled={playing || completed === 0}
-            onPress={() => setStep(completed - 1)}
-          />
-          <StrokeButton
-            label="Next stroke"
-            disabled={playing || completed === total}
-            onPress={() => setStep(completed + 1)}
-          />
+          <Svg
+            width={kanaDiagramSize}
+            height={kanaDiagramSize}
+            viewBox="0 0 109 109"
+            accessibilityRole="image"
+            accessibilityLabel={`Stroke diagram for ${item.glyph}`}
+            style={s.diagram}
+            pointerEvents="none"
+          >
+            <Line
+              x1={54.5}
+              x2={54.5}
+              y1={0}
+              y2={109}
+              stroke={guideColor}
+              strokeWidth={0.4}
+              strokeDasharray={[2, 2]}
+            />
+            <Line
+              y1={54.5}
+              y2={54.5}
+              x1={0}
+              x2={109}
+              stroke={guideColor}
+              strokeWidth={0.4}
+              strokeDasharray={[2, 2]}
+            />
+            {strokes.map(({ d, length }, index) => {
+              const amount = Math.min(Math.max(step - index, 0), 1);
+              return (
+                <Path
+                  key={d}
+                  d={d}
+                  fill="none"
+                  stroke={
+                    amount === 0
+                      ? guideColor
+                      : index + 1 >= step
+                        ? currentColor
+                        : inkColor
+                  }
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={
+                    amount > 0 && amount < 1 ? [length, length] : undefined
+                  }
+                  strokeDashoffset={length * (1 - amount)}
+                />
+              );
+            })}
+            {tracing &&
+              [...trace.strokes, ...(trace.draft ? [trace.draft] : [])].map(
+                (path, index) => (
+                  <Path
+                    key={index}
+                    d={path}
+                    fill="none"
+                    stroke={inkColor}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                ),
+              )}
+          </Svg>
         </View>
+        {tracing ? (
+          <>
+            <Text accessibilityLiveRegion="polite" style={s.body}>
+              {trace.strokes.length}{" "}
+              {trace.strokes.length === 1 ? "stroke" : "strokes"} drawn
+            </Text>
+            <View style={s.controls}>
+              <StrokeButton
+                label="Undo last stroke"
+                disabled={!trace.strokes.length}
+                onPress={trace.undo}
+              />
+              <StrokeButton
+                label="Clear drawing"
+                disabled={!trace.strokes.length}
+                onPress={trace.clear}
+              />
+            </View>
+          </>
+        ) : (
+          <>
+            <Text accessibilityLiveRegion="polite" style={s.body}>
+              {completed} of {total} strokes shown
+            </Text>
+            <View style={s.controls}>
+              <StrokeButton
+                label={playing ? "Stop animation" : "Play stroke order"}
+                onPress={togglePlayback}
+                primary
+              />
+              <StrokeButton
+                label="Previous stroke"
+                disabled={playing || completed === 0}
+                onPress={() => setStep(completed - 1)}
+              />
+              <StrokeButton
+                label="Next stroke"
+                disabled={playing || completed === total}
+                onPress={() => setStep(completed + 1)}
+              />
+            </View>
+          </>
+        )}
       </View>
       <Text style={s.body}>
         Stroke paths from{" "}
@@ -273,5 +340,10 @@ const useStyles = createThemedStyles({
     borderWidth: 1,
     borderColor: "#a8bea7",
     borderRadius: 6,
+  },
+  board: {
+    alignSelf: "center",
+    width: kanaDiagramSize,
+    height: kanaDiagramSize,
   },
 });
