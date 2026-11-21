@@ -50,6 +50,13 @@ addEntry({
   romaji: "massugu",
 });
 addEntry({ spelling: "角", kana: "かど", meaning: "corner", romaji: "kado" });
+addEntry({ spelling: "部屋", kana: "へや", meaning: "room", romaji: "heya" });
+addEntry({
+  spelling: "一泊",
+  kana: "いっぱく",
+  meaning: "one night’s stay",
+  romaji: "ippaku",
+});
 addEntry({
   spelling: "曲がる",
   kana: "まがる",

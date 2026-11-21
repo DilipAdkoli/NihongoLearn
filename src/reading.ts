@@ -369,4 +369,68 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    id: "room-options",
+    title: "Compare two places to stay",
+    passage: {
+      japanese:
+        "Aの へやは おおきいです。えきから あるいて じゅっぷんです。いっぱく いちまんにせんえんです。\nBの へやは ちいさいですが、しずかです。えきから あるいて ごふんです。いっぱく はっせんえんです。",
+      standardJapanese:
+        "Aの部屋は大きいです。駅から歩いて十分です。一泊一万二千円です。\nBの部屋は小さいですが、静かです。駅から歩いて五分です。一泊八千円です。",
+      english:
+        "Room A is large. It’s a ten-minute walk from the station and costs 12,000 yen per night.\nRoom B is small and quiet. It’s a five-minute walk from the station and costs 8,000 yen per night.",
+      lookupWords: ["部屋", "大きい", "小さい", "静か", "一泊"],
+    },
+    lessons: [
+      {
+        id: "rooms-size",
+        title: "Find the bigger room",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which room is described as large?",
+        stem: "",
+        choices: ["Room A", "Room B", "Both rooms"],
+        answer: "Room A",
+        feedback: "Aの へやは おおきいです means Room A is big.",
+      },
+      {
+        id: "rooms-walk",
+        title: "A shorter walk",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which room is closer on foot?",
+        stem: "",
+        choices: ["Room A", "Room B", "They are equally far"],
+        answer: "Room B",
+        feedback:
+          "Room A is じゅっぷん (ten minutes) away. Room B is ごふん (five minutes) away.",
+      },
+      {
+        id: "rooms-price",
+        title: "The nightly price",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "How much does Room B cost per night?",
+        stem: "",
+        choices: ["¥12,000", "¥5,000", "¥8,000"],
+        answer: "¥8,000",
+        feedback: "いっぱく is one night, and はっせんえん is 8,000 yen.",
+      },
+      {
+        id: "rooms-quiet",
+        title: "Find a quiet room",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Which room is described as quiet?",
+        stem: "",
+        choices: ["Room B", "Room A", "Both rooms"],
+        answer: "Room B",
+        feedback: "Room B is described as ちいさい (small) and しずか (quiet).",
+      },
+    ],
+  },
 ];
