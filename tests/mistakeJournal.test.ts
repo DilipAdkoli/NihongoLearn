@@ -124,3 +124,58 @@ test("the journal is empty for new learners and never changes stored attempts", 
   mistakeJournal(history, courses);
   assert.equal(JSON.stringify(history), snapshot);
 });
+
+const kanaItems = [
+  {
+    id: "a",
+    glyph: "あ",
+    script: "hiragana" as const,
+    reading: "a",
+    cue: "Short ah.",
+    example: "あい",
+    exampleReading: "ai",
+    meaning: "love",
+  },
+];
+
+test("kana recall mistakes remain until recall is corrected, even after correct recognition", () => {
+  const recalledWrong = {
+    ...attempt("a", false, 3, "e"),
+    mode: "recall" as const,
+  };
+  const recognized = attempt("a", true, 4, "あ");
+  const entries = mistakeJournal(
+    [recalledWrong, recognized],
+    courses,
+    kanaItems,
+  );
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].key, "a:recall");
+  assert.equal(entries[0].skill, "Hiragana");
+  assert.equal(entries[0].correctAnswer, "a");
+  assert.deepEqual(entries[0].href, {
+    pathname: "/session",
+    params: { ids: "a", mode: "review" },
+  });
+});
+
+test("kana listening errors show the glyph and are independent of recall", () => {
+  const history = [
+    {
+      ...attempt("a", false, 2, "い"),
+      mode: "listening" as const,
+    },
+    {
+      ...attempt("a", false, 3, "e"),
+      mode: "recall" as const,
+    },
+    {
+      ...attempt("a", true, 4, "a"),
+      mode: "recall" as const,
+    },
+  ];
+  const entries = mistakeJournal(history, courses, kanaItems);
+  assert.deepEqual(entries.map((entry) => entry.key), ["a:listening"]);
+  assert.equal(entries[0].correctAnswer, "あ");
+  assert.match(entries[0].feedback, /Short ah/);
+});
