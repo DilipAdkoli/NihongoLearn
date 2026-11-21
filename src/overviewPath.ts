@@ -23,6 +23,22 @@ export const overviewPaths = [
     href: "/planning-path",
     action: "Open planning path",
   },
+  {
+    id: 3,
+    title: "Hiragana step by step",
+    detail:
+      "Learn every hiragana study row in small sessions, including voiced and combined sounds.",
+    href: "/hiragana-path",
+    action: "Learn hiragana",
+  },
+  {
+    id: 4,
+    title: "Katakana step by step",
+    detail:
+      "Learn every katakana study row in small sessions, including voiced and combined sounds.",
+    href: "/katakana-path",
+    action: "Learn katakana",
+  },
 ] as const;
 
 export type OverviewPath = (typeof overviewPaths)[number]["id"];

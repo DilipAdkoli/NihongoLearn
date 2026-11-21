@@ -173,6 +173,18 @@ const lessonLinks = [
     icon: Sprout,
   },
   {
+    href: "/hiragana-path",
+    title: "Learn all hiragana",
+    detail: "Follow small sessions through the complete hiragana course",
+    icon: BookOpen,
+  },
+  {
+    href: "/katakana-path",
+    title: "Learn all katakana",
+    detail: "Follow small sessions through the complete katakana course",
+    icon: BookOpen,
+  },
+  {
     href: "/beginner-check",
     title: "Beginner skill check",
     detail: "Check your vocabulary, grammar, reading, listening, and writing",

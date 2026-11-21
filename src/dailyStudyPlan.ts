@@ -1,5 +1,6 @@
 import type { Href } from "expo-router";
 import { beginnerCheck, beginnerCheckCourse } from "./beginnerCheck.ts";
+import { hiraganaPath, katakanaPath } from "./kanaPaths.ts";
 import { latestQuestionAttempts } from "./missedQuestions.ts";
 import { overviewPaths } from "./overviewPath.ts";
 import { planningPath } from "./planningPath.ts";
@@ -11,6 +12,8 @@ const paths = {
   "/starter-path": starterPath,
   "/travel-path": travelPath,
   "/planning-path": planningPath,
+  "/hiragana-path": hiraganaPath,
+  "/katakana-path": katakanaPath,
 };
 
 export function selectedPathSteps(data: StudyData) {

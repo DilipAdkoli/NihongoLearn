@@ -1,5 +1,7 @@
 # NihongoLearn 🇯🇵
 
+> **Coding agents:** Read [AGENTS.md](AGENTS.md) and the current [AI development handoff](docs/AI_HANDOFF.md) before making changes. Update the handoff with each implemented feature.
+
 > **Development preview.** Learn kana and everyday Japanese, hear bundled pronunciations, and review your progress locally on Android or in a browser.
 
 ## Run the app
