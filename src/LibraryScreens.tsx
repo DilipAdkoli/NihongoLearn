@@ -157,6 +157,12 @@ function KanaChart({
 
 const lessonLinks = [
   {
+    href: "/getting-started",
+    title: "Choose a study path",
+    detail: "Set a daily goal and pick a starting point",
+    icon: Sprout,
+  },
+  {
     href: "/starter-path",
     title: "Start learning Japanese",
     detail: "Follow six steps from vowels to first conversations",

@@ -178,6 +178,11 @@ export default function Home() {
               <Text style={s.timeText}>~5 min</Text>
             </View>
           </View>
+          {data.seen.length === 0 && data.attempts.length === 0 && (
+            <Link href="/getting-started" style={s.heroPathLink}>
+              Choose a study path ›
+            </Link>
+          )}
         </View>
         <View
           style={
@@ -409,6 +414,12 @@ const useStyles = createThemedStyles({
     gap: 12,
   },
   startText: { color: "#fffdf6", fontFamily: "DMSansBold", fontSize: 14 },
+  heroPathLink: {
+    color: "#e1e8da",
+    fontFamily: "DMSansBold",
+    alignSelf: "flex-start",
+    paddingVertical: 8,
+  },
   time: { flexDirection: "row", alignItems: "center", gap: 6 },
   timeText: { fontFamily: "DMSans", fontSize: 12, color: "#e1e8da" },
   fill: { width: "100%", height: "100%", position: "absolute" },
