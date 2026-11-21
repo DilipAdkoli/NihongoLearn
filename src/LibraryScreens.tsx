@@ -40,7 +40,7 @@ import { mistakeJournal } from "./mistakeJournal";
 import { passageListening } from "./passageListening";
 import { placementSample } from "./placement";
 import { reading } from "./reading";
-import { reviewCourses } from "./reviewCourses";
+import { journalCourses } from "./journalCourses";
 import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
@@ -649,7 +649,7 @@ export function Review() {
   const themeColor = useThemeColor();
   const { data } = useStudy();
   const { queue, due, now } = useReviewQueue(data);
-  const journalCount = mistakeJournal(data.attempts, reviewCourses, kana).length;
+  const journalCount = mistakeJournal(data.attempts, journalCourses, kana).length;
   const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
   const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
   const wordQueue = vocabularyReviewQueue(data, vocabularyWordIds, now);
