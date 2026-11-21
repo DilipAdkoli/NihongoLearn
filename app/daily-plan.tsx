@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Text, View, Pressable } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
-import { dailyStudyPlan, studySkillIndex } from "../src/dailyStudyPlan";
+import { dailyStudyPlan, reviewForecast, studySkillIndex } from "../src/dailyStudyPlan";
 import { glossaryEntries } from "../src/glossaryEntries";
 import { reviewCourses } from "../src/reviewCourses";
 import { savedWordRecallQueue } from "../src/savedWordReview";
@@ -17,17 +17,13 @@ export default function DailyPlan() {
   const s = useStyles();
   const { data } = useStudy();
   const { due, now } = useReviewQueue(data);
-  const items = dailyStudyPlan(
-    data,
-    {
-      kana: due,
-      vocabulary: vocabularyReviewQueue(data, vocabularyWordIds, now),
-      saved: savedWordRecallQueue(data, glossaryEntries, now),
-    },
-    questions,
-    now,
-    REVIEW_BATCH_SIZE,
-  );
+  const queues = {
+    kana: due,
+    vocabulary: vocabularyReviewQueue(data, vocabularyWordIds, now),
+    saved: savedWordRecallQueue(data, glossaryEntries, now),
+  };
+  const items = dailyStudyPlan(data, queues, questions, now, REVIEW_BATCH_SIZE);
+  const forecast = reviewForecast(queues, now);
   const goal = dailyGoalProgress(data.attempts, data.dailyGoal, new Date(now));
   return (
     <View style={s.page}>
@@ -36,6 +32,9 @@ export default function DailyPlan() {
       </Link>
       <Text accessibilityRole="header" style={s.title}>
         Today’s study plan
+      </Text>
+      <Text style={s.detail} accessibilityRole="summary">
+        {forecast.dueNow} due now · {forecast.dueNext24Hours} due in the next 24 hours
       </Text>
       {data.dailyGoal > 0 && (
         <Text style={s.detail}>
