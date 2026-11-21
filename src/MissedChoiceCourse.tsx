@@ -5,9 +5,15 @@ import { kanjiRecall } from "./kanjiReading";
 import { missedQuestions } from "./missedQuestions";
 import { passageListening } from "./passageListening";
 import { reading } from "./reading";
+import { scheduleListening } from "./scheduleListening";
+import { soundQuestions } from "./soundRules";
 import type { Attempt } from "./storage.types";
 import { useStudy } from "./study";
-import { vocabulary, vocabularyRecall } from "./vocabulary";
+import {
+  vocabulary,
+  vocabularyListening,
+  vocabularyRecall,
+} from "./vocabulary";
 import { typedSentenceLessons } from "./writing";
 
 const choices = {
@@ -27,9 +33,27 @@ const choices = {
     title: "Review typed sentences",
     groups: [{ lessons: typedSentenceLessons }],
   },
+  "vocabulary-listening": {
+    title: "Review spoken words",
+    groups: vocabularyListening,
+  },
+  "schedule-listening": {
+    title: "Review spoken dates and times",
+    groups: scheduleListening,
+  },
+  "sound-listening": {
+    title: "Review sound differences",
+    groups: [{ lessons: soundQuestions }],
+  },
 };
 
 type ReviewCourse = keyof typeof choices;
+
+export const listeningReviewCourses = [
+  { course: "vocabulary-listening", label: "spoken word" },
+  { course: "schedule-listening", label: "date or time question" },
+  { course: "sound-listening", label: "sound question" },
+] as const;
 
 export function missedLessons(
   attempts: readonly Attempt[],
@@ -43,10 +67,11 @@ export function MissedChoiceCourse({ course }: { course: ReviewCourse }) {
   const [groups] = useState<readonly CourseGroup[]>(() => {
     const lessons = missedLessons(data.attempts, course).slice(0, 6);
     if (!lessons.length) return [];
-    if (course !== "reading" && course !== "passage-listening") {
+    if (course !== "reading" && !course.endsWith("-listening")) {
       return [{ lessons }];
     }
-    return choices[course].groups
+    const sources: readonly CourseGroup[] = choices[course].groups;
+    return sources
       .map((group) => ({
         ...group,
         lessons: lessons.filter((lesson) => group.lessons.includes(lesson)),

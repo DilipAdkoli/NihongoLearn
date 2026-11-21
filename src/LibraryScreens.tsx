@@ -31,7 +31,7 @@ import { glossaryEntries } from "./glossaryEntries";
 import { grammarTopics } from "./grammarCourse";
 import { JapaneseText } from "./JapaneseText";
 import { japaneseTextSizes } from "./japaneseTextSize";
-import { missedLessons } from "./MissedChoiceCourse";
+import { listeningReviewCourses, missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, mixedKanaSample, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
 import { passageListening } from "./passageListening";
@@ -616,6 +616,12 @@ export function Review() {
     data.attempts,
     "writing-type",
   ).length;
+  const missedListening = listeningReviewCourses
+    .map((option) => ({
+      ...option,
+      count: missedLessons(data.attempts, option.course).length,
+    }))
+    .filter(({ count }) => count > 0);
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
@@ -761,6 +767,25 @@ export function Review() {
                 label={`Review ${listeningCount} listening ${listeningCount === 1 ? "question" : "questions"}`}
               />
             )}
+          </View>
+        </View>
+      )}
+      {missedListening.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Listening to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {missedListening.map(({ course, label, count }) => (
+              <ReviewLink
+                key={course}
+                href={{
+                  pathname: "/listening-review",
+                  params: { skill: course },
+                }}
+                label={`Retry ${count} ${label}${count === 1 ? "" : "s"}`}
+              />
+            ))}
           </View>
         </View>
       )}
