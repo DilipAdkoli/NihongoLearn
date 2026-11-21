@@ -56,6 +56,9 @@
 - Updated Android APK workflow triggers so app, source, asset, public, script,
   package, lockfile, app configuration, and workflow changes all request a
   test-arm64 build.
+- Android work is paused until the user explicitly requests it to resume.
+  Do not add Android features, broaden APK triggers, or claim device validation
+  until that request.
 
 ## Recently completed in prior sprints
 
@@ -84,10 +87,10 @@
 ## Next concrete development tasks
 
 1. Verify this beginner-journey and latest-answer commit's preview deployment.
-2. Continue from the existing roadmap without claiming unreviewed language or
-   audio content is native-speaker validated.
-3. Validate the Android APK and offline audio on a real phone.
-4. Plan a reviewed development-to-production merge, checking divergence.
+2. Continue core app features and polish without claiming unreviewed language
+   or audio content is native-speaker validated.
+3. Plan a reviewed development-to-production merge, checking divergence.
+4. Android APK and physical-device work remain paused until the user asks.
 
 **Handoff rule:** Every coding agent should read this document first and
 append/update the sprint summary and next actions whenever code changes.

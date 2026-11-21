@@ -5,12 +5,6 @@ on:
     branches: [main, "codex/**"]
     paths:
       - .github/workflows/android-apk.yml
-      - app/**
-      - src/**
-      - assets/**
-      - public/**
-      - scripts/**
-      - package.json
       - app.json
       - package-lock.json
   workflow_dispatch:
