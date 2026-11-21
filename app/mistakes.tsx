@@ -7,7 +7,7 @@ import {
   mistakeJournal,
   mistakeSkillCounts,
 } from "../src/mistakeJournal";
-import { reviewCourses } from "../src/reviewCourses";
+import { journalCourses } from "../src/journalCourses";
 import { useStudy } from "../src/study";
 import { createThemedStyles } from "../src/theme";
 
@@ -15,7 +15,7 @@ export default function Mistakes() {
   const s = useStyles();
   const { data } = useStudy();
   const [skill, setSkill] = useState("All");
-  const entries = mistakeJournal(data.attempts, reviewCourses, kana);
+  const entries = mistakeJournal(data.attempts, journalCourses, kana);
   const skills = mistakeSkillCounts(entries);
   const shown =
     skill === "All"
