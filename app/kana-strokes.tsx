@@ -111,6 +111,7 @@ export default function KanaStrokes() {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [tracing, setTracing] = useState(false);
+  const [guideVisible, setGuideVisible] = useState(true);
   const trace = useKanaTrace();
   const activeGroup = groups[group];
   const activeSection = activeGroup.sections[section];
@@ -153,6 +154,7 @@ export default function KanaStrokes() {
     setPlaying(false);
     setStep(0);
     trace.clear();
+    setGuideVisible(true);
     setTracing(!tracing);
   }
 
@@ -168,64 +170,82 @@ export default function KanaStrokes() {
         Watch or trace hiragana and katakana, including combinations with small
         kana.
       </Text>
-      <StrokeTabs
-        label="Writing systems"
-        options={groups}
-        selected={group}
-        onSelect={(next) => {
-          setGroup(next);
-          setSection(0);
-          setRow(0);
-          show(groups[next].sections[0].rows[0].items[0]);
-        }}
-      />
-      <StrokeTabs
-        label="Kana type"
-        options={activeGroup.sections}
-        selected={section}
-        onSelect={(next) => {
-          setSection(next);
-          setRow(0);
-          show(activeGroup.sections[next].rows[0].items[0]);
-        }}
-      />
-      <StrokeTabs
-        label="Kana rows"
-        options={activeSection.rows}
-        selected={row}
-        onSelect={(next) => {
-          setRow(next);
-          show(activeSection.rows[next].items[0]);
-        }}
-      />
-      <View
-        style={s.controls}
-        accessibilityLabel={`${activeGroup.title} ${activeRow.title}`}
-      >
-        {activeRow.items.map((character) => (
-          <Pressable
-            key={character.id}
-            accessibilityRole="button"
-            accessibilityLabel={`Show ${character.glyph}`}
-            accessibilityState={{ selected: character.id === item.id }}
-            onPress={() => show(character)}
-            style={[s.button, character.id === item.id && s.selected]}
+      {guideVisible && (
+        <>
+          <StrokeTabs
+            label="Writing systems"
+            options={groups}
+            selected={group}
+            onSelect={(next) => {
+              setGroup(next);
+              setSection(0);
+              setRow(0);
+              show(groups[next].sections[0].rows[0].items[0]);
+            }}
+          />
+          <StrokeTabs
+            label="Kana type"
+            options={activeGroup.sections}
+            selected={section}
+            onSelect={(next) => {
+              setSection(next);
+              setRow(0);
+              show(activeGroup.sections[next].rows[0].items[0]);
+            }}
+          />
+          <StrokeTabs
+            label="Kana rows"
+            options={activeSection.rows}
+            selected={row}
+            onSelect={(next) => {
+              setRow(next);
+              show(activeSection.rows[next].items[0]);
+            }}
+          />
+          <View
+            style={s.controls}
+            accessibilityLabel={`${activeGroup.title} ${activeRow.title}`}
           >
-            <JapaneseText style={s.glyph}>{character.glyph}</JapaneseText>
-          </Pressable>
-        ))}
-      </View>
+            {activeRow.items.map((character) => (
+              <Pressable
+                key={character.id}
+                accessibilityRole="button"
+                accessibilityLabel={`Show ${character.glyph}`}
+                accessibilityState={{ selected: character.id === item.id }}
+                onPress={() => show(character)}
+                style={[s.button, character.id === item.id && s.selected]}
+              >
+                <JapaneseText style={s.glyph}>{character.glyph}</JapaneseText>
+              </Pressable>
+            ))}
+          </View>
+        </>
+      )}
       <View style={s.card}>
-        <StrokeButton
-          label={tracing ? "Back to stroke order" : "Try tracing"}
-          onPress={toggleTracing}
-        />
+        <View style={s.controls}>
+          <StrokeButton
+            label={tracing ? "Back to stroke order" : "Try tracing"}
+            onPress={toggleTracing}
+          />
+          {tracing && (
+            <StrokeButton
+              label={guideVisible ? "Hide guide" : "Show guide"}
+              onPress={() => setGuideVisible((shown) => !shown)}
+            />
+          )}
+        </View>
         {tracing && (
-          <Text style={s.body}>Draw over the guide, one stroke at a time.</Text>
+          <Text style={s.body}>
+            {guideVisible
+              ? "Draw over the guide, one stroke at a time."
+              : `Write the ${item.script} for “${item.reading}”. Then show the guide to compare.`}
+          </Text>
         )}
         <View
           accessibilityLabel={
-            tracing ? `Drawing area for ${item.glyph}` : undefined
+            tracing
+              ? `Drawing area for ${guideVisible ? item.glyph : item.reading}`
+              : undefined
           }
           style={[s.board, tracing && Platform.OS === "web" && drawOnWeb]}
           {...(tracing ? trace.panHandlers : {})}
@@ -235,7 +255,9 @@ export default function KanaStrokes() {
             height={kanaDiagramSize}
             viewBox="0 0 109 109"
             accessibilityRole="image"
-            accessibilityLabel={`Stroke diagram for ${item.glyph}`}
+            accessibilityLabel={
+              guideVisible ? `Stroke diagram for ${item.glyph}` : "Writing grid"
+            }
             style={s.diagram}
             pointerEvents="none"
           >
@@ -257,31 +279,32 @@ export default function KanaStrokes() {
               strokeWidth={0.4}
               strokeDasharray={[2, 2]}
             />
-            {strokes.map(({ d, length, transform }, index) => {
-              const amount = Math.min(Math.max(step - index, 0), 1);
-              return (
-                <Path
-                  key={index}
-                  d={d}
-                  transform={transform}
-                  fill="none"
-                  stroke={
-                    amount === 0
-                      ? guideColor
-                      : index + 1 >= step
-                        ? currentColor
-                        : inkColor
-                  }
-                  strokeWidth={3}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeDasharray={
-                    amount > 0 && amount < 1 ? [length, length] : undefined
-                  }
-                  strokeDashoffset={length * (1 - amount)}
-                />
-              );
-            })}
+            {guideVisible &&
+              strokes.map(({ d, length, transform }, index) => {
+                const amount = Math.min(Math.max(step - index, 0), 1);
+                return (
+                  <Path
+                    key={index}
+                    d={d}
+                    transform={transform}
+                    fill="none"
+                    stroke={
+                      amount === 0
+                        ? guideColor
+                        : index + 1 >= step
+                          ? currentColor
+                          : inkColor
+                    }
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={
+                      amount > 0 && amount < 1 ? [length, length] : undefined
+                    }
+                    strokeDashoffset={length * (1 - amount)}
+                  />
+                );
+              })}
             {tracing &&
               [...trace.strokes, ...(trace.draft ? [trace.draft] : [])].map(
                 (path, index) => (
