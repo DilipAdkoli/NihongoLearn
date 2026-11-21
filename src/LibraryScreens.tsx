@@ -232,7 +232,7 @@ const lessonLinks = [
   {
     href: "/vocabulary",
     title: "Everyday vocabulary",
-    detail: "Food, travel, routines, weather, and places in town",
+    detail: "Food, travel, routines, weather, places in town, and family",
     icon: BookOpen,
   },
   {

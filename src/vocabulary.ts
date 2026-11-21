@@ -7,6 +7,7 @@ type Word = {
   meaning: string;
   romaji: string;
   audio: number;
+  note?: string;
 };
 
 export const wordGroups: readonly {
@@ -501,6 +502,90 @@ export const wordGroups: readonly {
       },
     ],
   },
+  {
+    id: "family",
+    title: "Family and parents",
+    words: [
+      {
+        id: "family",
+        kana: "かぞく",
+        spelling: "家族",
+        romaji: "kazoku",
+        meaning: "family",
+        note: "私の家族 means my family.",
+        audio: require("../assets/audio/word-family-family.mp3"),
+      },
+      {
+        id: "parents",
+        kana: "りょうしん",
+        spelling: "両親",
+        romaji: "ryoushin",
+        meaning: "parents",
+        note: "両 means both. 両親 refers to both parents.",
+        audio: require("../assets/audio/word-family-parents.mp3"),
+      },
+      {
+        id: "father",
+        kana: "ちち",
+        spelling: "父",
+        romaji: "chichi",
+        meaning: "my father",
+        note: "Use 父 when speaking about your father to someone outside your family.",
+        audio: require("../assets/audio/word-family-father.mp3"),
+      },
+      {
+        id: "mother",
+        kana: "はは",
+        spelling: "母",
+        romaji: "haha",
+        meaning: "my mother",
+        note: "Use 母 when speaking about your mother to someone outside your family.",
+        audio: require("../assets/audio/word-family-mother.mp3"),
+      },
+    ],
+  },
+  {
+    id: "siblings",
+    title: "Brothers and sisters",
+    words: [
+      {
+        id: "older-brother",
+        kana: "あに",
+        spelling: "兄",
+        romaji: "ani",
+        meaning: "my older brother",
+        note: "Use 兄 when speaking about your own older brother to others.",
+        audio: require("../assets/audio/word-family-older-brother.mp3"),
+      },
+      {
+        id: "older-sister",
+        kana: "あね",
+        spelling: "姉",
+        romaji: "ane",
+        meaning: "my older sister",
+        note: "Use 姉 when speaking about your own older sister to others.",
+        audio: require("../assets/audio/word-family-older-sister.mp3"),
+      },
+      {
+        id: "younger-brother",
+        kana: "おとうと",
+        spelling: "弟",
+        romaji: "otouto",
+        meaning: "younger brother",
+        note: "To talk about someone else’s younger brother politely, use 弟さん (おとうとさん).",
+        audio: require("../assets/audio/word-family-younger-brother.mp3"),
+      },
+      {
+        id: "younger-sister",
+        kana: "いもうと",
+        spelling: "妹",
+        romaji: "imouto",
+        meaning: "younger sister",
+        note: "To talk about someone else’s younger sister politely, use 妹さん (いもうとさん).",
+        audio: require("../assets/audio/word-family-younger-sister.mp3"),
+      },
+    ],
+  },
 ];
 
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
@@ -511,7 +596,7 @@ export const vocabulary = wordGroups.map(({ id, title, words }) => ({
     title: word.kana,
     japanese: word.spelling,
     english: word.meaning,
-    explanation: "",
+    explanation: word.note ?? "",
     prompt: "What does this word mean?",
     stem: word.kana,
     choices: words.map((entry) => entry.meaning),
