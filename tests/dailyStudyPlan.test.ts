@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   dailyStudyPlan,
+  reviewForecast,
   selectedPathSteps,
   studySkillIndex,
   type PlanQueues,
@@ -81,7 +82,7 @@ test("the earliest due queue precedes targeted practice and the guided activity,
   const items = plan(data, queues);
   assert.deepEqual(
     items.map((item) => item.title),
-    ["Recall saved words", "Practice reading", "Study the five vowels"],
+    ["Recall saved words", "Review due kana", "Recall everyday vocabulary", "Practice reading", "Study the five vowels"],
   );
   assert.deepEqual(items[0].action, {
     href: { pathname: "/saved-practice", params: { mode: "recall" } },
@@ -96,6 +97,40 @@ test("the earliest due queue precedes targeted practice and the guided activity,
   assert.equal(
     plan({}, { ...noReviews, vocabulary: [{ dueAt: now + 1 }] }).length,
     1,
+  );
+});
+
+test("daily plan includes every due category in deadline order", () => {
+  const queues: PlanQueues = {
+    kana: [{ id: "a", dueAt: 20 }, { id: "i", dueAt: 10 }],
+    vocabulary: [{ dueAt: 5 }],
+    saved: [{ dueAt: 15 }],
+  };
+  const items = plan({}, queues);
+  assert.deepEqual(items.map((item) => item.title), [
+    "Recall everyday vocabulary",
+    "Review due kana",
+    "Recall saved words",
+    "Study the five vowels",
+  ]);
+  assert.deepEqual(items[1].action, {
+    kana: ["i", "a"],
+    mode: "review",
+  });
+});
+
+test("review forecast separates ready reviews from those arriving in the next day", () => {
+  const day = 24 * 60 * 60 * 1000;
+  assert.deepEqual(
+    reviewForecast(
+      {
+        kana: [{ id: "a", dueAt: now }, { id: "i", dueAt: now + day }],
+        vocabulary: [{ dueAt: now + day + 1 }, { dueAt: now - 1 }],
+        saved: [{ dueAt: now + 1 }],
+      },
+      now,
+    ),
+    { dueNow: 2, dueNext24Hours: 2 },
   );
 });
 
