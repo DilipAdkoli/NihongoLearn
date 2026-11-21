@@ -213,7 +213,8 @@ const lessonLinks = [
   {
     href: "/conversation",
     title: "Everyday dialogue",
-    detail: "Introductions, cafés, stations, shops, and asking for help",
+    detail:
+      "Introductions, cafés, stations, shops, asking for help, and invitations",
     icon: AudioLines,
   },
   {

@@ -13,6 +13,7 @@ import {
   verbs,
 } from "./grammar.ts";
 import { nounParticles } from "./nounParticles.ts";
+import { invitations } from "./invitations.ts";
 import { plainVerbs } from "./plainVerbs.ts";
 import { questionWords } from "./questions.ts";
 import { requests } from "./requests.ts";
@@ -54,6 +55,11 @@ export const grammarTopics: readonly (CourseGroup & {
   },
   { id: "plain-verbs", title: "Plain verb forms", lessons: plainVerbs },
   { id: "requests", title: "Requests and obligations", lessons: requests },
+  {
+    id: "invitations",
+    title: "Invitations and suggestions",
+    lessons: invitations,
+  },
   { id: "connectors", title: "Reasons and connections", lessons: connectors },
   { id: "ability", title: "Ability and potential verbs", lessons: ability },
 ];

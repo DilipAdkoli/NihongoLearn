@@ -266,4 +266,65 @@ export const conversation = [
       },
     ],
   },
+  {
+    id: "invitations",
+    title: "Making weekend plans",
+    lessons: [
+      {
+        id: "invite-to-movie",
+        title: "Invite a friend to a movie",
+        explanation: "You want to see a movie together on Sunday.",
+        japanese: "にちようびに えいがを",
+        english: "a movie on Sunday",
+        prompt: "Which question invites your friend to see it?",
+        stem: "",
+        choices: [
+          "にちようびに えいがを みましたか。",
+          "にちようびに えいがを みませんか。",
+          "にちようびに えいがを みません。",
+        ],
+        answer: "にちようびに えいがを みませんか。",
+        answerEnglish: "Would you like to see a movie on Sunday?",
+        feedback:
+          "みませんか invites the listener to watch the movie with you.",
+      },
+      {
+        id: "suggest-meeting-time",
+        title: "Suggest a place and time to meet",
+        explanation: "You want to meet at the station at 2 p.m.",
+        japanese: "いつ、どこで あいましょうか。",
+        english: "When and where shall we meet?",
+        prompt: "Which response suggests the right plan?",
+        stem: "",
+        choices: [
+          "ごぜん にじに えきで あいましょう。",
+          "ごご にじに こうえんで あいましょう。",
+          "ごご にじに えきで あいましょう。",
+        ],
+        answer: "ごご にじに えきで あいましょう。",
+        answerEnglish: "Let’s meet at the station at 2 p.m.",
+        feedback:
+          "ごご にじに gives the time. えきで marks the place where you’ll meet.",
+      },
+      {
+        id: "suggest-another-day",
+        title: "Suggest a different day",
+        explanation: "Saturday is difficult for you. Suggest Sunday instead.",
+        japanese: "どようびは どうですか。",
+        english: "How about Saturday?",
+        prompt: "Which response offers Sunday?",
+        stem: "",
+        choices: [
+          "すみません、どようびは ちょっと…。にちようびは どうですか。",
+          "はい、どようびに あいましょう。",
+          "すみません、にちようびは ちょっと…。どようびは どうですか。",
+        ],
+        answer: "すみません、どようびは ちょっと…。にちようびは どうですか。",
+        answerEnglish:
+          "Sorry, Saturday is a little difficult. How about Sunday?",
+        feedback:
+          "どようびは ちょっと… politely signals that Saturday is difficult. にちようびは どうですか offers Sunday.",
+      },
+    ],
+  },
 ] as const satisfies readonly DialogueGroup[];
