@@ -173,6 +173,13 @@ const lessonLinks = [
     icon: Sprout,
   },
   {
+    href: "/planning-path",
+    title: "Make plans in Japanese",
+    detail:
+      "Read dates and opening hours, reschedule an appointment, and write a message",
+    icon: Sprout,
+  },
+  {
     href: "/numbers",
     title: "Count from 1 to 99",
     detail: "Read Japanese numbers and practice the tens",

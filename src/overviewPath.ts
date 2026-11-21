@@ -11,6 +11,12 @@ export const overviewPaths = [
     href: "/travel-path",
     action: "Open travel path",
   },
+  {
+    id: 2,
+    title: "Make plans in Japanese",
+    href: "/planning-path",
+    action: "Open planning path",
+  },
 ] as const;
 
 export type OverviewPath = (typeof overviewPaths)[number]["id"];

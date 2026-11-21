@@ -22,10 +22,17 @@ import { dailyGoalProgress } from "../src/dailyGoal";
 import { JapaneseText } from "../src/JapaneseText";
 import { kana, lessons } from "../src/learning";
 import { overviewPaths } from "../src/overviewPath";
+import { planningPath } from "../src/planningPath";
 import { starterPath } from "../src/starterPath";
 import { travelPath } from "../src/travelPath";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
+
+const overviewSteps = {
+  "/starter-path": starterPath,
+  "/travel-path": travelPath,
+  "/planning-path": planningPath,
+};
 
 function Metric({
   label,
@@ -97,8 +104,7 @@ export default function Home() {
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
   const pathInfo = overviewPaths[data.overviewPath];
-  const path =
-    pathInfo.href === "/travel-path" ? travelPath(data) : starterPath(data);
+  const path = overviewSteps[pathInfo.href](data);
   const nextStep = path.find((step) => !step.complete);
   const completedSteps = path.filter((step) => step.complete).length;
   const goal = data.dailyGoal;
@@ -213,30 +219,32 @@ export default function Home() {
           </Pressable>
         </View>
       )}
-      {nextStep && (
-        <View style={s.starterCard}>
-          <View style={s.reviewCopy}>
-            <Text accessibilityRole="header" style={s.reviewTitle}>
-              {pathInfo.title}
-            </Text>
-            <Text style={s.metricLabel}>
-              {completedSteps} of {path.length} steps complete
-            </Text>
-            <Text style={s.nextStep}>{nextStep.title}</Text>
-          </View>
-          <Link href={pathInfo.href} asChild>
-            <Pressable
-              accessibilityRole="link"
-              style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
-            >
-              <Text style={s.linkText}>
-                {completedSteps ? "Continue path" : pathInfo.action}
-              </Text>
-              <ArrowRight size={16} color={themeColor("#345b45")} />
-            </Pressable>
-          </Link>
+      <View style={s.starterCard}>
+        <View style={s.reviewCopy}>
+          <Text accessibilityRole="header" style={s.reviewTitle}>
+            {pathInfo.title}
+          </Text>
+          <Text style={s.metricLabel}>
+            {completedSteps} of {path.length} steps complete
+          </Text>
+          <Text style={s.nextStep}>{nextStep?.title ?? "Path complete"}</Text>
         </View>
-      )}
+        <Link href={pathInfo.href} asChild>
+          <Pressable
+            accessibilityRole="link"
+            style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+          >
+            <Text style={s.linkText}>
+              {nextStep
+                ? completedSteps
+                  ? "Continue path"
+                  : pathInfo.action
+                : "Revisit path"}
+            </Text>
+            <ArrowRight size={16} color={themeColor("#345b45")} />
+          </Pressable>
+        </Link>
+      </View>
       {goal > 0 && (
         <View style={s.goalCard}>
           <Text accessibilityRole="header" style={s.reviewTitle}>
