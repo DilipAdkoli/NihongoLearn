@@ -1,5 +1,6 @@
 const cachePrefix = "nihongolearn-offline-";
 const catalogUrl = new URL("offline-assets.json", self.registration.scope);
+const indexUrl = new URL("index.html", self.registration.scope);
 const version = "__NIHONGO_CACHE_VERSION__";
 const activeCache = cachePrefix + version;
 
@@ -19,21 +20,54 @@ self.addEventListener("install", (event) => {
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "activate-update")
+    event.waitUntil(self.skipWaiting());
+});
+
+async function olderCaches() {
+  const names = await caches.keys();
+  const activeIndex = names.indexOf(activeCache);
+  if (activeIndex < 0) return [];
+  return names
+    .slice(0, activeIndex)
+    .filter((name) => name.startsWith(cachePrefix));
+}
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      const names = await caches.keys();
+      const older = await olderCaches();
+      // Tabs with the previous build can still request its bundled assets.
+      let previous;
+      for (const name of [...older].reverse()) {
+        if (await caches.match(indexUrl, { cacheName: name })) {
+          previous = name;
+          break;
+        }
+      }
       await Promise.all(
-        names
-          .filter(
-            (name) => name.startsWith(cachePrefix) && name !== activeCache,
-          )
+        older
+          .filter((name) => name !== previous)
           .map((name) => caches.delete(name)),
       );
       await self.clients.claim();
     })(),
   );
 });
+
+async function findAsset(cache, request) {
+  const key = request.mode === "navigate" ? indexUrl : request;
+  const cached = await cache.match(key, { ignoreSearch: true });
+  if (cached || request.mode === "navigate") return cached;
+  for (const name of (await olderCaches()).reverse()) {
+    const previous = await caches.match(key, {
+      cacheName: name,
+      ignoreSearch: true,
+    });
+    if (previous) return previous;
+  }
+}
 
 async function audioRange(cached, header) {
   const range = /^bytes=(\d*)-(\d*)$/.exec(header);
@@ -80,11 +114,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       const cache = await caches.open(activeCache);
-      const key =
-        request.mode === "navigate"
-          ? new URL("index.html", self.registration.scope)
-          : request;
-      const cached = await cache.match(key, { ignoreSearch: true });
+      const cached = await findAsset(cache, request);
       if (!cached) return fetch(request);
       const range = request.headers.get("Range");
       return range && url.pathname.endsWith(".mp3")

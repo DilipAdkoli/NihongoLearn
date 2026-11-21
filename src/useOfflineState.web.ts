@@ -8,8 +8,13 @@ export function useOfflineState(): OfflineState {
     if (!document.querySelector('script[src="/register-offline.js"]')) return;
     const worker = navigator.serviceWorker;
     function update() {
-      if (worker?.controller) setState("ready");
-      else if (!worker || document.documentElement.dataset.offlineUnavailable)
+      if (worker?.controller) {
+        setState(
+          document.documentElement.dataset.offlineUpdateReady === "true"
+            ? "update"
+            : "ready",
+        );
+      } else if (!worker || document.documentElement.dataset.offlineUnavailable)
         setState("unavailable");
       else setState("loading");
     }
@@ -24,4 +29,8 @@ export function useOfflineState(): OfflineState {
   }, []);
 
   return state;
+}
+
+export function applyOfflineUpdate() {
+  window.dispatchEvent(new Event("nihongolearn-offline-update"));
 }

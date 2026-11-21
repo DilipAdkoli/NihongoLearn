@@ -22,6 +22,7 @@ npm.cmd run preview:web
 ```
 
 In Chrome or Edge, use the browser’s **Install NihongoLearn** action to open the exported build as a standalone app.
+When a newer offline build downloads, use **Update app** in the header to reload that tab.
 
 Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage and shares updates across tabs open to the same local URL. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
 

@@ -23,12 +23,13 @@ import {
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StudyProvider, useStudy } from "../src/study";
-import { useOfflineState } from "../src/useOfflineState";
+import { applyOfflineUpdate, useOfflineState } from "../src/useOfflineState";
 
 const offlineLabels = {
   local: "Local study",
   loading: "Preparing offline",
   ready: "Available offline",
+  update: "Update app",
   unavailable: "Offline unavailable",
 };
 
@@ -94,12 +95,41 @@ function NavItem({
   );
 }
 
+function OfflineBadge() {
+  const s = useStyles();
+  const state = useOfflineState();
+  const content = (
+    <>
+      <View
+        style={[
+          s.dot,
+          state === "loading" && s.cachingDot,
+          state === "unavailable" && s.unavailableDot,
+        ]}
+      />
+      <Text accessibilityLiveRegion="polite" style={s.localText}>
+        {offlineLabels[state]}
+      </Text>
+    </>
+  );
+  return state === "update" ? (
+    <Pressable
+      accessibilityRole="button"
+      onPress={applyOfflineUpdate}
+      style={[s.local, s.updateBadge]}
+    >
+      {content}
+    </Pressable>
+  ) : (
+    <View style={s.local}>{content}</View>
+  );
+}
+
 function Frame() {
   const s = useStyles();
   const themeColor = useThemeColor();
   const { darkMode } = useStudy().data;
   const path = usePathname();
-  const offlineState = useOfflineState();
   const { width } = useWindowDimensions();
   const wide = width >= 960;
   const session = path === "/session";
@@ -153,18 +183,7 @@ function Frame() {
               ) : (
                 <Brand />
               )}
-              <View style={s.local}>
-                <View
-                  style={[
-                    s.dot,
-                    offlineState === "loading" && s.cachingDot,
-                    offlineState === "unavailable" && s.unavailableDot,
-                  ]}
-                />
-                <Text accessibilityLiveRegion="polite" style={s.localText}>
-                  {offlineLabels[offlineState]}
-                </Text>
-              </View>
+              <OfflineBadge />
             </View>
           )}
           {session ? (
@@ -308,6 +327,12 @@ const useStyles = createThemedStyles({
   muted: { fontFamily: "DMSans", fontSize: 13, color: "#737a6d" },
   crumbName: { fontFamily: "DMSansBold", fontSize: 13, color: "#485748" },
   local: { flexDirection: "row", alignItems: "center", gap: 7 },
+  updateBadge: {
+    minHeight: 44,
+    paddingHorizontal: 8,
+    backgroundColor: "#dfe8d9",
+    borderRadius: 8,
+  },
   localText: { fontFamily: "DMSans", fontSize: 12, color: "#59684f" },
   dot: { height: 7, width: 7, borderRadius: 4, backgroundColor: "#73926a" },
   cachingDot: { backgroundColor: "#8e6a28" },
