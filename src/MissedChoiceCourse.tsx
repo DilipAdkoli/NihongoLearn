@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { ChoiceCourse } from "./ChoiceCourse";
+import { ChoiceCourse, type CourseGroup } from "./ChoiceCourse";
 import { grammarTopics } from "./grammarCourse";
 import { missedQuestions } from "./missedQuestions";
+import { passageListening } from "./passageListening";
+import { reading } from "./reading";
 import type { Attempt } from "./storage.types";
 import { useStudy } from "./study";
 import { vocabulary, vocabularyRecall } from "./vocabulary";
@@ -12,6 +14,11 @@ const choices = {
   "vocabulary-recall": {
     title: "Recall missed words",
     groups: vocabularyRecall,
+  },
+  reading: { title: "Review reading passages", groups: reading },
+  "passage-listening": {
+    title: "Review listening passages",
+    groups: passageListening,
   },
 };
 
@@ -26,19 +33,29 @@ export function missedLessons(
 
 export function MissedChoiceCourse({ course }: { course: ReviewCourse }) {
   const { data } = useStudy();
-  const [lessons] = useState(() =>
-    missedLessons(data.attempts, course).slice(0, 6),
-  );
+  const [groups] = useState<readonly CourseGroup[]>(() => {
+    const lessons = missedLessons(data.attempts, course).slice(0, 6);
+    if (!lessons.length) return [];
+    if (course !== "reading" && course !== "passage-listening") {
+      return [{ lessons }];
+    }
+    return choices[course].groups
+      .map((group) => ({
+        ...group,
+        lessons: lessons.filter((lesson) => group.lessons.includes(lesson)),
+      }))
+      .filter((group) => group.lessons.length > 0);
+  });
   return (
     <ChoiceCourse
       title={choices[course].title}
       description={
-        lessons.length
+        groups.length
           ? "Try the questions you missed most recently. Correct answers clear questions from your next round."
           : "You’re caught up on this review."
       }
       course={course}
-      groups={[{ lessons }]}
+      groups={groups}
       reviewQuestions
       backHref="/review"
       backLabel="‹ Back to Review"

@@ -499,6 +499,11 @@ export function Review() {
   const grammarCount = missedLessons(data.attempts, "grammar").length;
   const recognitionCount = missedLessons(data.attempts, "vocabulary").length;
   const recallCount = missedLessons(data.attempts, "vocabulary-recall").length;
+  const readingCount = missedLessons(data.attempts, "reading").length;
+  const listeningCount = missedLessons(
+    data.attempts,
+    "passage-listening",
+  ).length;
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
@@ -523,7 +528,7 @@ export function Review() {
     <View style={s.page}>
       <Heading
         title="Review"
-        detail="Revisit kana, grammar, and words from past lessons."
+        detail="Revisit kana and retry questions from past lessons."
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
@@ -618,6 +623,30 @@ export function Review() {
               <ReviewLink
                 href={{ pathname: "/word-review", params: { mode: "recall" } }}
                 label={`Recall ${recallCount} missed ${recallCount === 1 ? "word" : "words"}`}
+              />
+            )}
+          </View>
+        </View>
+      )}
+      {readingCount + listeningCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Passages to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {readingCount > 0 && (
+              <ReviewLink
+                href="/passage-review"
+                label={`Review ${readingCount} reading ${readingCount === 1 ? "question" : "questions"}`}
+              />
+            )}
+            {listeningCount > 0 && (
+              <ReviewLink
+                href={{
+                  pathname: "/passage-review",
+                  params: { mode: "listening" },
+                }}
+                label={`Review ${listeningCount} listening ${listeningCount === 1 ? "question" : "questions"}`}
               />
             )}
           </View>
