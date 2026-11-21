@@ -2,6 +2,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { JapaneseText } from "../src/JapaneseText";
+import { kana } from "../src/learning";
 import {
   mistakeJournal,
   mistakeSkillCounts,
@@ -14,11 +15,12 @@ export default function Mistakes() {
   const s = useStyles();
   const { data } = useStudy();
   const [skill, setSkill] = useState("All");
-  const entries = mistakeJournal(data.attempts, reviewCourses);
+  const entries = mistakeJournal(data.attempts, reviewCourses, kana);
   const skills = mistakeSkillCounts(entries);
-  const shown = skill === "All"
-    ? entries
-    : entries.filter((entry) => entry.skill === skill);
+  const shown =
+    skill === "All"
+      ? entries
+      : entries.filter((entry) => entry.skill === skill);
 
   return (
     <View style={s.page}>
