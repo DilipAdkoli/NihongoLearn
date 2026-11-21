@@ -649,7 +649,7 @@ export function Review() {
   const themeColor = useThemeColor();
   const { data } = useStudy();
   const { queue, due, now } = useReviewQueue(data);
-  const journalCount = mistakeJournal(data.attempts, reviewCourses).length;
+  const journalCount = mistakeJournal(data.attempts, reviewCourses, kana).length;
   const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
   const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
   const wordQueue = vocabularyReviewQueue(data, vocabularyWordIds, now);
