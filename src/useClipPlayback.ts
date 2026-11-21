@@ -7,7 +7,10 @@ export function useClipPlayback() {
   const playback = useRef<AbortController | null>(null);
   useEffect(() => () => playback.current?.abort(), []);
 
-  async function play(clip: number, options?: Omit<ClipOptions, "signal">) {
+  async function play(
+    clip: number | string,
+    options?: Omit<ClipOptions, "signal">,
+  ) {
     playback.current?.abort();
     const controller = new AbortController();
     playback.current = controller;

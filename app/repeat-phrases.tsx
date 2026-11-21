@@ -5,6 +5,10 @@ import { Pressable, Text, View } from "react-native";
 import { dialogueGroups } from "../src/dialogueAudio";
 import { JapaneseText } from "../src/JapaneseText";
 import { useClipPlayback } from "../src/useClipPlayback";
+import {
+  useVoiceRecording,
+  voiceRecordingLimit,
+} from "../src/useVoiceRecording";
 
 const phrases = dialogueGroups.flatMap((group) =>
   group.lessons.map((lesson) => ({
@@ -20,10 +24,15 @@ export default function RepeatPhrases() {
   const [index, setIndex] = useState(0);
   const [translation, setTranslation] = useState(false);
   const { play, stop, playing, audioError } = useClipPlayback();
+  const voice = useVoiceRecording();
+  const recordingUri = voice.uri;
+  const recording = voice.phase === "recording";
+  const audioBusy = voice.phase !== "idle";
   const phrase = phrases[index];
 
   function goTo(next: number) {
     stop();
+    voice.reset();
     setIndex(next);
     setTranslation(false);
   }
@@ -46,15 +55,17 @@ export default function RepeatPhrases() {
         <View style={s.controls}>
           <Pressable
             accessibilityRole="button"
+            disabled={audioBusy}
             onPress={() => play(phrase.clip)}
-            style={[s.button, s.primary]}
+            style={[s.button, s.primary, audioBusy && s.disabled]}
           >
             <Text style={s.primaryText}>Listen</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
+            disabled={audioBusy}
             onPress={() => play(phrase.clip, { rate: 0.8 })}
-            style={s.button}
+            style={[s.button, audioBusy && s.disabled]}
           >
             <Text style={s.buttonText}>Listen slowly</Text>
           </Pressable>
@@ -81,6 +92,74 @@ export default function RepeatPhrases() {
         {audioError && (
           <Text accessibilityLiveRegion="polite" style={s.error}>
             Audio couldn’t play. Tap Listen to retry.
+          </Text>
+        )}
+      </View>
+      <View style={s.card}>
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Record yourself
+        </Text>
+        <Text style={s.body}>
+          Record up to {voiceRecordingLimit} seconds. Your recording stays on
+          this device and is cleared when you change phrases or leave this
+          screen.
+        </Text>
+        <View style={s.controls}>
+          <Pressable
+            accessibilityRole="button"
+            disabled={audioBusy && !recording}
+            onPress={() => {
+              if (recording) {
+                void voice.stop();
+              } else {
+                stop();
+                void voice.start();
+              }
+            }}
+            style={[s.button, audioBusy && !recording && s.disabled]}
+          >
+            <Text style={s.buttonText}>
+              {recording
+                ? "Stop recording"
+                : voice.phase === "requesting"
+                  ? "Opening microphone…"
+                  : voice.phase === "stopping"
+                    ? "Finishing recording…"
+                    : recordingUri
+                      ? "Record again"
+                      : "Start recording"}
+            </Text>
+          </Pressable>
+          {recordingUri && (
+            <>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => play(recordingUri)}
+                style={s.button}
+              >
+                <Text style={s.buttonText}>Play my recording</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  stop();
+                  voice.reset();
+                }}
+                style={s.button}
+              >
+                <Text style={s.buttonText}>Discard recording</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+        {recording && (
+          <Text accessibilityLiveRegion="polite" style={s.body}>
+            Recording now
+          </Text>
+        )}
+        {voice.error && (
+          <Text accessibilityLiveRegion="polite" style={s.error}>
+            {voice.error}
           </Text>
         )}
       </View>
@@ -116,6 +195,7 @@ const useStyles = createThemedStyles({
     lineHeight: 45,
   },
   phrase: { color: "#203730", fontSize: 28 },
+  sectionTitle: { color: "#203730", fontFamily: "DMSansBold", fontSize: 19 },
   body: {
     color: "#566860",
     fontFamily: "DMSans",

@@ -123,7 +123,7 @@ export type ClipOptions = {
 };
 
 export async function playClip(
-  clip: number,
+  clip: number | string,
   { signal, repeat = false, rate = 1 }: ClipOptions = {},
 ): Promise<void> {
   if (signal?.aborted) return;
