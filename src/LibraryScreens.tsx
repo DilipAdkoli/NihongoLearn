@@ -211,6 +211,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/schedule-listening",
+    title: "Listen for dates and times",
+    detail: "Hear calendar dates and clock times in Japanese",
+    icon: AudioLines,
+  },
+  {
     href: "/conversation",
     title: "Everyday dialogue",
     detail:
@@ -858,6 +864,9 @@ export function Progress() {
   const dateAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("calendar:"),
   );
+  const scheduleListeningAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("schedule-listening:"),
+  );
   const wordRecallAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("vocabulary-recall:"),
   );
@@ -967,6 +976,12 @@ export function Progress() {
       )}
       {!!dateAttempts.length && (
         <Score label="Calendar dates" attempts={dateAttempts} />
+      )}
+      {!!scheduleListeningAttempts.length && (
+        <Score
+          label="Listening for dates and times"
+          attempts={scheduleListeningAttempts}
+        />
       )}
       {!!wordRecallAttempts.length && (
         <Score label="Vocabulary recall" attempts={wordRecallAttempts} />

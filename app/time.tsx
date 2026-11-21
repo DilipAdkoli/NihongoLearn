@@ -35,6 +35,12 @@ export default function TimeLesson() {
           ),
         )}
       </View>
+      <Link
+        href={{ pathname: "/schedule-listening", params: { topic: "times" } }}
+        style={s.back}
+      >
+        Practice listening to clock times ›
+      </Link>
       <ChoiceCourse
         title="Practice reading the time"
         course="time"

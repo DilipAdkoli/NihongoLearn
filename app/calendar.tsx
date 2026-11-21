@@ -36,6 +36,12 @@ export default function CalendarLesson() {
         Many later days use the number plus にち. Watch for readings like
         じゅうよっか (14日), はつか (20日), and にじゅうよっか (24日).
       </Text>
+      <Link
+        href={{ pathname: "/schedule-listening", params: { topic: "dates" } }}
+        style={s.back}
+      >
+        Practice listening to dates ›
+      </Link>
       <ChoiceCourse
         title="Practice reading dates"
         course="calendar"

@@ -51,7 +51,8 @@ type Course =
   | "prices"
   | "beginner-check"
   | "writing-type"
-  | "sound-listening";
+  | "sound-listening"
+  | "schedule-listening";
 
 type PassageData = {
   japanese: string;
