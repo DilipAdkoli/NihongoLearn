@@ -1,4 +1,4 @@
-import { LearningPath } from "../src/LearningPath";
+import { LearningPath } from "../src/learningPathView";
 import { planningPath } from "../src/planningPath";
 import { useStudy } from "../src/study";
 

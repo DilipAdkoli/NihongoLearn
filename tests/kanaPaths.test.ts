@@ -4,7 +4,7 @@ import { selectedPathSteps } from "../src/dailyStudyPlan.ts";
 import { hiraganaPath, katakanaPath } from "../src/kanaPaths.ts";
 import { kana, lessons, type Script } from "../src/learning.ts";
 import { readOverviewPath } from "../src/overviewPath.ts";
-import type { StudyData } from "../src/storage.types.ts";
+import type { Attempt, StudyData } from "../src/storage.types.ts";
 
 const fresh: StudyData = {
   seen: [],
@@ -44,8 +44,54 @@ for (const [script, createPath] of [
     const first = path[0];
     assert.ok("seen" in first);
     const resumed = createPath({ ...fresh, seen: [...first.seen] });
-    assert.equal(resumed[0].complete, true);
+    assert.equal(resumed[0].complete, false);
     assert.equal(resumed[1].complete, false);
+  });
+
+  test(`${script} path requires correct recall and listening mastery`, () => {
+    const path = createPath(fresh);
+    const first = path[0];
+    assert.ok("seen" in first);
+    const attempt = (
+      kanaId: string,
+      mode: Attempt["mode"],
+      correct: boolean,
+      at: number,
+    ): Attempt => ({
+      id: `${kanaId}-${mode}-${at}`,
+      kanaId,
+      mode,
+      answer: "",
+      correct,
+      at,
+    });
+    const seen = { ...fresh, seen: [...first.seen] };
+    const recallAttempts = first.seen.map((kanaId, index) =>
+      attempt(kanaId, "recall", true, index + 1),
+    );
+    assert.equal(
+      createPath({ ...seen, attempts: recallAttempts })[0].complete,
+      false,
+    );
+    const listeningAttempts = first.seen.map((kanaId, index) =>
+      attempt(kanaId, "listening", true, index + 10),
+    );
+    const mastered = createPath({
+      ...seen,
+      attempts: [...recallAttempts, ...listeningAttempts],
+    });
+    assert.equal(mastered[0].complete, true);
+    const forgotten = createPath({
+      ...seen,
+      attempts: [
+        ...recallAttempts,
+        ...listeningAttempts,
+        ...first.seen.map((kanaId, index) =>
+          attempt(kanaId, "recall", false, index + 20),
+        ),
+      ],
+    });
+    assert.equal(forgotten[0].complete, false);
   });
 }
 

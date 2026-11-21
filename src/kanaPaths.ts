@@ -15,6 +15,17 @@ function scriptSteps(script: Script): readonly LearningStep[] {
       title: `Lesson ${index + 1}: ${lesson.title}`,
       detail: lesson.detail,
       seen: lesson.ids,
+      mastery: {
+        href: {
+          pathname: "/session",
+          params: {
+            ids: lesson.ids.join(","),
+            mode: "listening",
+          },
+        },
+        answers: lesson.ids,
+        modes: ["recall", "listening"],
+      },
     }));
 }
 

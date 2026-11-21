@@ -25,8 +25,21 @@
   The feature commit's Vercel preview was READY. The final formatting/handoff
   commit needs its own preview build status checked before release.
 - These paths track whether each character has been *studied*; they are **not**
-  yet proficiency certifications. The current app tracks separate recall and
-  listening results elsewhere.
+  yet proficiency certifications.
+- Updated the Hiragana and Katakana guided paths to require latest correct
+  recall and listening attempts for every character in a row before marking
+  that lesson step complete. Existing `seen` progress remains saved, and a
+  learner is not re-certified until they complete the measured checks. Each
+  row now exposes a direct listening-check action.
+- Renamed the learning-path UI module from `LearningPath.tsx` to
+  `learningPathView.tsx` to remove a Windows-only filename casing collision
+  with `learningPath.ts`.
+- Verification for this mastery update: `npm ci` succeeded,
+  `npm run typecheck` succeeded, `npm test` passed **78/78 tests**, changed
+  implementation files pass Prettier, and `npm run export:web` succeeded.
+  The repository-wide `npm run format:check` remains a baseline failure,
+  reporting 182 existing or line-ending-sensitive files; changed files were
+  formatted and checked separately.
 
 ## Recently completed in prior sprints
 
@@ -54,13 +67,10 @@
 
 ## Next concrete development tasks
 
-1. Verify the final formatting/handoff commit's preview deployment; the
-   functional code and tests were already validated locally in a sandbox.
-2. Extend guided kana routes with *measured* recall/listening mastery checks
-   rather than treating `seen` as mastery; protect existing user progress.
-3. Expand and verify a cohesive beginner N5 learning sequence.
-4. Validate the Android APK and offline audio on a real phone.
-5. Plan a reviewed development-to-production merge, checking divergence.
+1. Verify this measured-mastery commit's preview deployment.
+2. Expand and verify a cohesive beginner N5 learning sequence.
+3. Validate the Android APK and offline audio on a real phone.
+4. Plan a reviewed development-to-production merge, checking divergence.
 
 **Handoff rule:** Every coding agent should read this document first and
 append/update the sprint summary and next actions whenever code changes.

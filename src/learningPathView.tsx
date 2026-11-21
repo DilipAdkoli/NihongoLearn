@@ -29,14 +29,27 @@ function StepAction({ step }: { step: Step }) {
     );
   }
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${label} ${step.title}`}
-      onPress={() => startLesson([...step.seen])}
-      style={style}
-    >
-      {text}
-    </Pressable>
+    <View style={s.actions}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${label} ${step.title}`}
+        onPress={() => startLesson([...step.seen])}
+        style={style}
+      >
+        {text}
+      </Pressable>
+      {step.mastery && (
+        <Link href={step.mastery.href} asChild>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={`Listening check ${step.title}`}
+            style={[s.button, s.checkButton]}
+          >
+            <Text style={s.checkButtonText}>Listening check</Text>
+          </Pressable>
+        </Link>
+      )}
+    </View>
   );
 }
 
@@ -130,6 +143,7 @@ const useStyles = createThemedStyles({
     padding: 12,
     gap: 6,
   },
+  actions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   nextCard: { backgroundColor: "#e9eee2", borderColor: "#a8bea7" },
   track: {
     height: 7,
@@ -149,4 +163,10 @@ const useStyles = createThemedStyles({
   buttonText: { color: "#fffef8", fontFamily: "DMSansBold" },
   doneButton: { backgroundColor: "#dfe8d9" },
   doneButtonText: { color: "#215848" },
+  checkButton: {
+    backgroundColor: "#fffef8",
+    borderWidth: 1,
+    borderColor: "#215848",
+  },
+  checkButtonText: { color: "#215848", fontFamily: "DMSansBold" },
 });

@@ -1,4 +1,4 @@
-import { LearningPath } from "../src/LearningPath";
+import { LearningPath } from "../src/learningPathView";
 import { hiraganaPath } from "../src/kanaPaths";
 import { useStudy } from "../src/study";
 
