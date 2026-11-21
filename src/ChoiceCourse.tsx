@@ -38,6 +38,7 @@ type Course =
   | "passage-listening"
   | "kanji"
   | "kanji-reading"
+  | "kanji-recall"
   | "conversation"
   | "saved-words"
   | "saved-word-recall"
@@ -233,7 +234,11 @@ function PracticeCard({
         </Pressable>
       ) : (
         <>
-          {!questionHeading && <Text style={s.body}>{lesson.prompt}</Text>}
+          {!questionHeading && (
+            <JapaneseText style={s.body} scaleText={hasJapanese(lesson.prompt)}>
+              {lesson.prompt}
+            </JapaneseText>
+          )}
           {!!lesson.stem && lesson.stem !== lesson.title && (
             <JapaneseText
               style={s.japanese}

@@ -5,6 +5,12 @@ import { useThemeColor } from "../src/theme";
 
 export default function Kanji() {
   const themeColor = useThemeColor();
+  const linkStyle = {
+    alignSelf: "flex-start" as const,
+    paddingVertical: 10,
+    color: themeColor("#215848"),
+    fontFamily: "DMSansBold",
+  };
   return (
     <ChoiceCourse
       title="First kanji in context"
@@ -12,16 +18,11 @@ export default function Kanji() {
       groups={kanjiCourse}
       browseTopics
     >
-      <Link
-        href="/kanji-reading"
-        style={{
-          alignSelf: "flex-start",
-          paddingVertical: 10,
-          color: themeColor("#215848"),
-          fontFamily: "DMSansBold",
-        }}
-      >
+      <Link href="/kanji-reading" style={linkStyle}>
         Practice kanji readings ›
+      </Link>
+      <Link href="/kanji-recall" style={linkStyle}>
+        Practice writing kanji words ›
       </Link>
     </ChoiceCourse>
   );

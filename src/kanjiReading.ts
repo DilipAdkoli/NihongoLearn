@@ -105,3 +105,28 @@ export const kanjiReading: readonly CourseGroup[] = topics.map(
     })),
   }),
 );
+
+export const kanjiRecall: readonly CourseGroup[] = topics.map(
+  ({ title, questions }) => ({
+    title,
+    lessons: questions.map(
+      ({ id, title, word, stem, answer: reading, feedback }) => {
+        const entry = glossaryEntries.find((item) => item.spelling === word);
+        return {
+          id,
+          title,
+          explanation: "",
+          japanese: "",
+          english: "",
+          prompt: `Write ${reading}${entry ? ` (${entry.meaning})` : ""} using kanji.`,
+          stem: stem.replace(`【${word}】`, "＿＿"),
+          choices: [],
+          answer: word,
+          acceptedAnswers: [word],
+          feedback,
+          answerAudio: entry?.audio,
+        };
+      },
+    ),
+  }),
+);

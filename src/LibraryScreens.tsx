@@ -258,6 +258,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/kanji-recall",
+    title: "Write kanji words",
+    detail: "Type the missing kanji word from its reading and meaning",
+    icon: BookOpen,
+  },
+  {
     href: "/reading",
     title: "Beginner reading",
     detail: "Short passages with questions and optional translations",
@@ -817,6 +823,9 @@ export function Progress() {
   const kanjiReadingAttempts = data.attempts.filter((attempt) =>
     attempt.kanaId.startsWith("kanji-reading:"),
   );
+  const kanjiRecallAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("kanji-recall:"),
+  );
   const conversationAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("conversation:"),
   );
@@ -926,6 +935,9 @@ export function Progress() {
       )}
       {!!kanjiReadingAttempts.length && (
         <Score label="Kanji readings" attempts={kanjiReadingAttempts} />
+      )}
+      {!!kanjiRecallAttempts.length && (
+        <Score label="Kanji spelling" attempts={kanjiRecallAttempts} />
       )}
       {!!conversationAttempts.length && (
         <Score label="Dialogue" attempts={conversationAttempts} />
