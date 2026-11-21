@@ -568,4 +568,80 @@ export const reading: readonly {
       },
     ],
   },
+  {
+    id: "weather-plans",
+    title: "Make plans for sun or rain",
+    passage: {
+      japanese:
+        "あした、はれたら、こうえんで ピクニックを します。\nあめだったら、えきの まえの きっさてんで あいます。\nどちらでも、ごぜん じゅうじに あいましょう。",
+      standardJapanese:
+        "明日、晴れたら、公園でピクニックをします。\n雨だったら、駅の前の喫茶店で会います。\nどちらでも、午前十時に会いましょう。",
+      english:
+        "If it’s sunny tomorrow, we’ll have a picnic in the park.\nIf it rains, we’ll meet at the café in front of the station.\nLet’s meet at 10 a.m. either way.",
+      lookupWords: [
+        "晴れる",
+        "雨",
+        "公園",
+        "喫茶店",
+        "ピクニック",
+        "どちらでも",
+      ],
+    },
+    lessons: [
+      {
+        id: "picnic-sun-place",
+        title: "The sunny-day plan",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Where will they go if it’s sunny?",
+        stem: "",
+        choices: ["The park", "The station", "The café"],
+        answer: "The park",
+        feedback:
+          "はれたら means if it’s sunny. こうえんで identifies the park as the place for the picnic.",
+      },
+      {
+        id: "picnic-activity",
+        title: "What they’ll do outside",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "What will they do if it’s sunny?",
+        stem: "",
+        choices: ["Go for a walk", "Have a picnic", "Buy tickets"],
+        answer: "Have a picnic",
+        feedback: "ピクニックを します means to have a picnic.",
+      },
+      {
+        id: "picnic-rain-place",
+        title: "The rainy-day plan",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "Where will they meet if it rains?",
+        stem: "",
+        choices: [
+          "At the café next to the station",
+          "At the park behind the station",
+          "At the café in front of the station",
+        ],
+        answer: "At the café in front of the station",
+        feedback:
+          "あめだったら means if it’s rainy. えきの まえの きっさてん identifies the café in front of the station.",
+      },
+      {
+        id: "picnic-time",
+        title: "The meeting time",
+        explanation: "",
+        japanese: "",
+        english: "",
+        prompt: "When will they meet in either plan?",
+        stem: "",
+        choices: ["9 a.m.", "10 a.m.", "10 p.m."],
+        answer: "10 a.m.",
+        feedback: "どちらでも means either way. ごぜん じゅうじ means 10 a.m.",
+      },
+    ],
+  },
 ];

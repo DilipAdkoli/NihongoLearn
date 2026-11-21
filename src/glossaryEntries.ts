@@ -130,6 +130,30 @@ addEntry({
   meaning: "in total",
   romaji: "zenbu de",
 });
+addEntry({
+  spelling: "晴れる",
+  kana: "はれる",
+  meaning: "to clear up or be sunny",
+  romaji: "hareru",
+});
+addEntry({
+  spelling: "喫茶店",
+  kana: "きっさてん",
+  meaning: "café",
+  romaji: "kissaten",
+});
+addEntry({
+  spelling: "ピクニック",
+  kana: "ピクニック",
+  meaning: "picnic",
+  romaji: "pikunikku",
+});
+addEntry({
+  spelling: "どちらでも",
+  kana: "どちらでも",
+  meaning: "either way",
+  romaji: "dochira demo",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({
