@@ -163,7 +163,7 @@ const lessonLinks = [
   {
     href: "/beginner-check",
     title: "Beginner skill check",
-    detail: "Check your vocabulary, grammar, reading, and listening",
+    detail: "Check your vocabulary, grammar, reading, listening, and writing",
     icon: CircleHelp,
   },
   {

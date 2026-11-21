@@ -3,6 +3,15 @@ import type { Attempt } from "./storage.types";
 
 export const beginnerCheckCourse = "beginner-check";
 
+const stationReadingAnswers = [
+  "きのうえきでほんをよみました",
+  "きのうほんをえきでよみました",
+  "えきできのうほんをよみました",
+  "えきでほんをきのうよみました",
+  "ほんをきのうえきでよみました",
+  "ほんをえきできのうよみました",
+];
+
 export const beginnerCheck = [
   {
     title: "Vocabulary",
@@ -99,6 +108,41 @@ export const beginnerCheck = [
         choices: ["Reading a book", "Eating bread", "Drinking water"],
         answer: "Drinking water",
         feedback: "みずを のんでいます means I’m drinking water.",
+      },
+    ],
+  },
+  {
+    title: "Writing",
+    href: "/write-japanese",
+    lessons: [
+      {
+        id: "writing-station-reading",
+        title: "Reading at the station",
+        prompt:
+          "Write “I read a book at the station yesterday” in polite Japanese.",
+        stem: "Use きのう, えき, ほん, and the polite past of よむ.",
+        choices: [],
+        answer: stationReadingAnswers[0],
+        acceptedAnswers: [
+          ...stationReadingAnswers,
+          ...stationReadingAnswers.map((answer) => `わたしは${answer}`),
+        ],
+        feedback:
+          "えきで gives the location, ほんを marks the object, and よみました is the polite past of よむ.",
+      },
+      {
+        id: "writing-water-permission",
+        title: "Ask for permission",
+        prompt: "Write “May I drink water here?” in Japanese.",
+        stem: "Ask with 〜てもいいですか.",
+        choices: [],
+        answer: "ここでみずをのんでもいいですか",
+        acceptedAnswers: [
+          "ここでみずをのんでもいいですか",
+          "みずをここでのんでもいいですか",
+        ],
+        feedback:
+          "ここで gives the place. のむ becomes のんで before もいいですか.",
       },
     ],
   },

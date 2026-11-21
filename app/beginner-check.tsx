@@ -8,6 +8,7 @@ import {
 } from "../src/beginnerCheck";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { useStudy } from "../src/study";
+import { normalizeSentenceAnswer } from "../src/writing";
 
 const promptAudio: Readonly<Partial<Record<string, number>>> = {
   "departure-time": require("../assets/audio/check-departure-time.mp3"),
@@ -24,6 +25,8 @@ const groups = beginnerCheck.map((group) => ({
     explanation: "",
     stem: "stem" in lesson ? lesson.stem : "",
     promptAudio: promptAudio[lesson.id],
+    normalizeAnswer:
+      "acceptedAnswers" in lesson ? normalizeSentenceAnswer : undefined,
   })),
 }));
 
@@ -39,7 +42,7 @@ export default function BeginnerCheck() {
   return (
     <ChoiceCourse
       title="Beginner skill check"
-      description="Answer questions on vocabulary, grammar, reading, and listening. Your latest answer to each question counts."
+      description="Practice vocabulary, grammar, reading, listening, and writing. Your latest answer to each question counts."
       course={beginnerCheckCourse}
       groups={groups}
     >
