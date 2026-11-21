@@ -40,7 +40,7 @@ const steps = [
     id: "reading",
     title: "Read a short conversation",
     detail: "Answer the desk and location questions.",
-    href: { pathname: "/reading", params: { topic: "desk" } },
+    href: { pathname: "/reading", params: { topic: "desk-objects" } },
     answers: ["reading:desk-first", "reading:desk-second"],
   },
   {

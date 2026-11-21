@@ -59,6 +59,11 @@
 - Android work is paused until the user explicitly requests it to resume.
   Do not add Android features, broaden APK triggers, or claim device validation
   until that request.
+- Corrected the beginner journey reading route to open the real `desk-objects`
+  passage and added topic-integrity coverage for its reading and listening steps.
+- Verification after the routing fix: `npm run typecheck` succeeded,
+  `npm test` passed **81/81 tests**, changed files pass Prettier, and
+  `npm run export:web` succeeded.
 
 ## Recently completed in prior sprints
 

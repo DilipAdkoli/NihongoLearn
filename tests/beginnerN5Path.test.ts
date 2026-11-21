@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { beginnerN5Path } from "../src/beginnerN5Path.ts";
+import { reading } from "../src/reading.ts";
 import type { Attempt, StudyData } from "../src/storage.types.ts";
 
 const fresh: StudyData = {
@@ -80,4 +81,29 @@ test("beginner journey requires all correct answers in a step", () => {
     ],
   });
   assert.equal(laterWrong[2].complete, false);
+});
+
+test("beginner journey reading routes use real lesson topics", () => {
+  const readingStep = beginnerN5Path(fresh).find(
+    (step) => step.id === "reading",
+  );
+  const listeningStep = beginnerN5Path(fresh).find(
+    (step) => step.id === "listening",
+  );
+  assert.ok(readingStep && "href" in readingStep);
+  assert.ok(listeningStep && "href" in listeningStep);
+  assert.ok(
+    reading.some(
+      (group) =>
+        readingStep.href === "/reading" ||
+        (typeof readingStep.href === "object" &&
+          "params" in readingStep.href &&
+          readingStep.href.params?.topic === group.id),
+    ),
+  );
+  assert.ok(
+    typeof listeningStep.href === "object" &&
+      "params" in listeningStep.href &&
+      listeningStep.href.params?.topic === "yesterday",
+  );
 });
