@@ -19,21 +19,13 @@ import {
   View,
 } from "react-native";
 import { dailyGoalProgress } from "../src/dailyGoal";
+import { selectedPathSteps } from "../src/dailyStudyPlan";
 import { JapaneseText } from "../src/JapaneseText";
 import { kana, lessons } from "../src/learning";
 import type { LearningStep } from "../src/learningPath";
 import { overviewPaths } from "../src/overviewPath";
-import { planningPath } from "../src/planningPath";
-import { starterPath } from "../src/starterPath";
-import { travelPath } from "../src/travelPath";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
-
-const overviewSteps = {
-  "/starter-path": starterPath,
-  "/travel-path": travelPath,
-  "/planning-path": planningPath,
-};
 
 function NextPathStep({ step }: { step: LearningStep }) {
   const s = useStyles();
@@ -127,7 +119,7 @@ export default function Home() {
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
   const pathInfo = overviewPaths[data.overviewPath];
-  const path = overviewSteps[pathInfo.href](data);
+  const path = selectedPathSteps(data);
   const nextStep = path.find((step) => !step.complete);
   const completedSteps = path.filter((step) => step.complete).length;
   const goal = data.dailyGoal;
@@ -160,12 +152,17 @@ export default function Home() {
         >
           Your study desk
         </Text>
-        {!phone && (
-          <View style={s.date}>
-            <CalendarDays size={15} color={themeColor("#727a69")} />
-            <Text style={s.dateText}>{date}</Text>
-          </View>
-        )}
+        <View style={s.headerActions}>
+          {!phone && (
+            <View style={s.date}>
+              <CalendarDays size={15} color={themeColor("#727a69")} />
+              <Text style={s.dateText}>{date}</Text>
+            </View>
+          )}
+          <Link href="/daily-plan" style={s.pathLink}>
+            Today’s study plan ›
+          </Link>
+        </View>
       </View>
       <View style={[s.hero, narrow && { flexDirection: "column-reverse" }]}>
         <View
@@ -374,7 +371,14 @@ export default function Home() {
   );
 }
 const useStyles = createThemedStyles({
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  },
   headingRow: {
+    flexWrap: "wrap",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
