@@ -16,9 +16,9 @@ const questions = studySkillIndex(reviewCourses);
 export default function DailyPlan() {
   const s = useStyles();
   const { data } = useStudy();
-  const { due, now } = useReviewQueue(data);
+  const { queue, now } = useReviewQueue(data);
   const queues = {
-    kana: due,
+    kana: queue,
     vocabulary: vocabularyReviewQueue(data, vocabularyWordIds, now),
     saved: savedWordRecallQueue(data, glossaryEntries, now),
   };
