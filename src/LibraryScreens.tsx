@@ -36,9 +36,11 @@ import { japaneseTextSizes } from "./japaneseTextSize";
 import { listeningReviewCourses, missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, mixedKanaSample, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
+import { mistakeJournal } from "./mistakeJournal";
 import { passageListening } from "./passageListening";
 import { placementSample } from "./placement";
 import { reading } from "./reading";
+import { reviewCourses } from "./reviewCourses";
 import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
@@ -647,6 +649,7 @@ export function Review() {
   const themeColor = useThemeColor();
   const { data } = useStudy();
   const { queue, due, now } = useReviewQueue(data);
+  const journalCount = mistakeJournal(data.attempts, reviewCourses).length;
   const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
   const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
   const wordQueue = vocabularyReviewQueue(data, vocabularyWordIds, now);
@@ -696,6 +699,17 @@ export function Review() {
         title="Review"
         detail="Revisit kana and retry questions from past lessons."
       />
+      <View style={s.feature}>
+        <Text accessibilityRole="header" style={s.featureTitle}>
+          Understand your mistakes
+        </Text>
+        <Text style={s.body}>
+          {journalCount
+            ? `${journalCount} ${journalCount === 1 ? "question needs" : "questions need"} another try. See your answer, the correct response, and an explanation.`
+            : "When you miss a question, its correction will appear in your personal journal."}
+        </Text>
+        <ReviewLink href="/mistakes" label="Open mistake journal" />
+      </View>
       <View style={s.feature}>
         <View style={s.iconLabel}>
           <RotateCcw size={18} color={themeColor(green)} />
