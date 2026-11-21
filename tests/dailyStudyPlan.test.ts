@@ -82,7 +82,13 @@ test("the earliest due queue precedes targeted practice and the guided activity,
   const items = plan(data, queues);
   assert.deepEqual(
     items.map((item) => item.title),
-    ["Recall saved words", "Review due kana", "Recall everyday vocabulary", "Practice reading", "Study the five vowels"],
+    [
+      "Recall saved words",
+      "Review due kana",
+      "Recall everyday vocabulary",
+      "Practice reading",
+      "Study the five vowels",
+    ],
   );
   assert.deepEqual(items[0].action, {
     href: { pathname: "/saved-practice", params: { mode: "recall" } },
