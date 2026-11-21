@@ -249,6 +249,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/kanji-reading",
+    title: "Read kanji words",
+    detail: "Choose the kana reading for kanji in everyday sentences",
+    icon: BookOpen,
+  },
+  {
     href: "/reading",
     title: "Beginner reading",
     detail: "Short passages with questions and optional translations",
@@ -705,6 +711,9 @@ export function Progress() {
   const kanjiAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("kanji:"),
   );
+  const kanjiReadingAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("kanji-reading:"),
+  );
   const conversationAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("conversation:"),
   );
@@ -811,6 +820,9 @@ export function Progress() {
       )}
       {!!kanjiAttempts.length && (
         <Score label="Kanji" attempts={kanjiAttempts} />
+      )}
+      {!!kanjiReadingAttempts.length && (
+        <Score label="Kanji readings" attempts={kanjiReadingAttempts} />
       )}
       {!!conversationAttempts.length && (
         <Score label="Dialogue" attempts={conversationAttempts} />

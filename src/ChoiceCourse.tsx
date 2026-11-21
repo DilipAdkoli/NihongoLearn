@@ -37,6 +37,7 @@ type Course =
   | "reading"
   | "passage-listening"
   | "kanji"
+  | "kanji-reading"
   | "conversation"
   | "saved-words"
   | "saved-word-recall"
