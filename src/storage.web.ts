@@ -1,3 +1,9 @@
+import { readDailyGoal, type DailyGoal } from "./dailyGoal.ts";
+import {
+  readJapaneseTextSize,
+  type JapaneseTextSize,
+} from "./japaneseTextSize.ts";
+import { readOverviewPath, type OverviewPath } from "./overviewPath.ts";
 import type { Attempt, StudyData, StudyPreference } from "./storage.types";
 
 export type { Attempt, StudyData } from "./storage.types";
@@ -8,7 +14,7 @@ const seenPrefix = namespace + "seen:";
 const wordPrefix = namespace + "word:";
 const attemptPrefix = namespace + "attempt:";
 
-export async function loadStudy(): Promise<StudyData> {
+function readStudy(): StudyData {
   const storage = globalThis.localStorage;
   const seen: string[] = [];
   const savedWords: string[] = [];
@@ -32,8 +38,48 @@ export async function loadStudy(): Promise<StudyData> {
     seen,
     savedWords: savedWords.sort(),
     attempts,
+    dailyGoal: readDailyGoal(Number(storage.getItem(namespace + "daily-goal"))),
+    overviewPath: readOverviewPath(
+      Number(storage.getItem(namespace + "overview-path")),
+    ),
+    japaneseTextSize: readJapaneseTextSize(
+      Number(storage.getItem(namespace + "japanese-text-size")),
+    ),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
+    darkMode: storage.getItem(namespace + "darkMode") === "on",
+  };
+}
+
+export async function loadStudy(): Promise<StudyData> {
+  return readStudy();
+}
+
+export function subscribeStudyChanges(listener: (study: StudyData) => void) {
+  let refresh: number | undefined;
+  function changed(event: StorageEvent) {
+    if (
+      event.storageArea !== window.localStorage ||
+      (event.key !== null && !event.key.startsWith(namespace)) ||
+      refresh !== undefined
+    )
+      return;
+    refresh = window.setTimeout(() => {
+      refresh = undefined;
+      let study: StudyData;
+      try {
+        study = readStudy();
+      } catch {
+        return;
+      }
+      listener(study);
+    }, 16);
+  }
+
+  window.addEventListener("storage", changed);
+  return () => {
+    window.removeEventListener("storage", changed);
+    window.clearTimeout(refresh);
   };
 }
 
@@ -59,4 +105,21 @@ export async function setWordSaved(id: string, saved: boolean): Promise<void> {
   const key = wordPrefix + id;
   if (saved) globalThis.localStorage.setItem(key, "on");
   else globalThis.localStorage.removeItem(key);
+}
+
+export async function setDailyGoal(goal: DailyGoal): Promise<void> {
+  globalThis.localStorage.setItem(namespace + "daily-goal", String(goal));
+}
+
+export async function setOverviewPath(path: OverviewPath): Promise<void> {
+  globalThis.localStorage.setItem(namespace + "overview-path", String(path));
+}
+
+export async function setJapaneseTextSize(
+  size: JapaneseTextSize,
+): Promise<void> {
+  globalThis.localStorage.setItem(
+    namespace + "japanese-text-size",
+    String(size),
+  );
 }

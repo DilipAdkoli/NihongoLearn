@@ -13,7 +13,9 @@ export default function SessionRoute() {
   const ids =
     typeof params.ids === "string" ? params.ids.split(",") : lessons[0].ids;
   const mode =
-    params.mode === "contrast" || params.mode === "placement"
+    params.mode === "contrast" ||
+    params.mode === "placement" ||
+    params.mode === "mixed"
       ? params.mode
       : params.mode === "listening" || params.listening === "1"
         ? "listening"
@@ -35,6 +37,15 @@ export default function SessionRoute() {
         router.replace({
           pathname: "/session",
           params: { ids: suggested.join(","), mode: "study" },
+        })
+      }
+      onRetryMissed={(missed) =>
+        router.replace({
+          pathname: "/session",
+          params: {
+            ids: missed.join(","),
+            mode: mode === "listening" ? "listening" : "review",
+          },
         })
       }
       onFinish={() => router.replace("/progress")}

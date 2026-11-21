@@ -1,4 +1,5 @@
-import { router } from "expo-router";
+import { createThemedStyles, useThemeColor } from "../src/theme";
+import { Link, router } from "expo-router";
 import {
   ArrowRight,
   BookMarked,
@@ -13,14 +14,40 @@ import {
 import {
   Image,
   Pressable,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
+import { dailyGoalProgress } from "../src/dailyGoal";
+import { selectedPathSteps } from "../src/dailyStudyPlan";
+import { JapaneseText } from "../src/JapaneseText";
 import { kana, lessons } from "../src/learning";
+import type { LearningStep } from "../src/learningPath";
+import { overviewPaths } from "../src/overviewPath";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "../src/useReviewQueue";
 import { startLesson, useStudy } from "../src/study";
+
+function NextPathStep({ step }: { step: LearningStep }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const button = (
+    <Pressable
+      accessibilityRole={"href" in step ? "link" : "button"}
+      onPress={"seen" in step ? () => startLesson([...step.seen]) : undefined}
+      style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+    >
+      <Text style={s.linkText}>Continue next step</Text>
+      <ArrowRight size={16} color={themeColor("#345b45")} />
+    </Pressable>
+  );
+  return "href" in step ? (
+    <Link href={step.href} asChild>
+      {button}
+    </Link>
+  ) : (
+    button
+  );
+}
 
 function Metric({
   label,
@@ -33,6 +60,8 @@ function Metric({
   icon: LucideIcon;
   tone: "sage" | "clay" | "gold";
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const colors = {
     sage: ["#e6edde", "#3d664e"],
     clay: ["#f7e7db", "#a34e35"],
@@ -40,8 +69,13 @@ function Metric({
   }[tone];
   return (
     <View style={s.metric}>
-      <View style={[s.metricIcon, { backgroundColor: colors[0] }]}>
-        <Icon size={20} strokeWidth={1.8} color={colors[1]} />
+      <View
+        style={[
+          s.metricIcon,
+          { backgroundColor: themeColor(colors[0], "background") },
+        ]}
+      >
+        <Icon size={20} strokeWidth={1.8} color={themeColor(colors[1])} />
       </View>
       <View style={{ flexShrink: 1 }}>
         <Text style={s.metricValue}>{value}</Text>
@@ -60,6 +94,8 @@ function SectionTitle({
   link: string;
   onPress: () => void;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <View style={s.sectionTitle}>
       <Text accessibilityRole="header" style={s.h2}>
@@ -71,15 +107,23 @@ function SectionTitle({
         style={({ pressed }) => [s.link, pressed && s.pressed]}
       >
         <Text style={s.linkText}>{link}</Text>
-        <ArrowRight size={15} color="#345b45" />
+        <ArrowRight size={15} color={themeColor("#345b45")} />
       </Pressable>
     </View>
   );
 }
 
 export default function Home() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
+  const pathInfo = overviewPaths[data.overviewPath];
+  const path = selectedPathSteps(data);
+  const nextStep = path.find((step) => !step.complete);
+  const completedSteps = path.filter((step) => step.complete).length;
+  const goal = data.dailyGoal;
+  const goalStatus = dailyGoalProgress(data.attempts, goal, new Date());
   const { width } = useWindowDimensions();
   const narrow = width < 700;
   const phone = width < 520;
@@ -108,12 +152,17 @@ export default function Home() {
         >
           Your study desk
         </Text>
-        {!phone && (
-          <View style={s.date}>
-            <CalendarDays size={15} color="#727a69" />
-            <Text style={s.dateText}>{date}</Text>
-          </View>
-        )}
+        <View style={s.headerActions}>
+          {!phone && (
+            <View style={s.date}>
+              <CalendarDays size={15} color={themeColor("#727a69")} />
+              <Text style={s.dateText}>{date}</Text>
+            </View>
+          )}
+          <Link href="/daily-plan" style={s.pathLink}>
+            Today’s study plan ›
+          </Link>
+        </View>
       </View>
       <View style={[s.hero, narrow && { flexDirection: "column-reverse" }]}>
         <View
@@ -142,13 +191,18 @@ export default function Home() {
               <Text style={s.startText}>
                 {nextIndex < 0 ? "Revisit lesson" : "Start lesson"}
               </Text>
-              <ArrowRight size={17} color="#fffdf6" />
+              <ArrowRight size={17} color={themeColor("#fffdf6")} />
             </Pressable>
             <View style={s.time}>
-              <Clock3 size={15} color="#d4dfd0" />
+              <Clock3 size={15} color={themeColor("#d4dfd0")} />
               <Text style={s.timeText}>~5 min</Text>
             </View>
           </View>
+          {data.seen.length === 0 && data.attempts.length === 0 && (
+            <Link href="/getting-started" style={s.heroPathLink}>
+              Choose a study path ›
+            </Link>
+          )}
         </View>
         <View
           style={
@@ -186,8 +240,62 @@ export default function Home() {
             style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
           >
             <Text style={s.linkText}>Start review</Text>
-            <ArrowRight size={16} color="#345b45" />
+            <ArrowRight size={16} color={themeColor("#345b45")} />
           </Pressable>
+        </View>
+      )}
+      <View style={s.starterCard}>
+        <View style={s.reviewCopy}>
+          <Text accessibilityRole="header" style={s.reviewTitle}>
+            {pathInfo.title}
+          </Text>
+          <Text style={s.metricLabel}>
+            {completedSteps} of {path.length} steps complete
+          </Text>
+          <Text style={s.nextStep}>{nextStep?.title ?? "Path complete"}</Text>
+        </View>
+        {nextStep && completedSteps > 0 ? (
+          <View style={s.pathActions}>
+            <NextPathStep step={nextStep} />
+            <Link href={pathInfo.href} style={s.pathLink}>
+              View full path
+            </Link>
+          </View>
+        ) : (
+          <Link href={pathInfo.href} asChild>
+            <Pressable
+              accessibilityRole="link"
+              style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+            >
+              <Text style={s.linkText}>
+                {nextStep ? pathInfo.action : "Revisit path"}
+              </Text>
+              <ArrowRight size={16} color={themeColor("#345b45")} />
+            </Pressable>
+          </Link>
+        )}
+      </View>
+      {goal > 0 && (
+        <View style={s.goalCard}>
+          <Text accessibilityRole="header" style={s.reviewTitle}>
+            Today’s practice goal
+          </Text>
+          <Text style={s.metricLabel}>
+            {goalStatus.answered} of {goal} questions answered
+            {goalStatus.complete ? " · Goal reached" : ""}
+          </Text>
+          <View
+            style={s.goalTrack}
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityValue={{
+              min: 0,
+              max: goal,
+              now: Math.min(goal, goalStatus.answered),
+            }}
+          >
+            <View style={[s.goalFill, { width: `${goalStatus.percent}%` }]} />
+          </View>
         </View>
       )}
       <SectionTitle
@@ -226,7 +334,7 @@ export default function Home() {
       />
       <View style={s.notebook}>
         <View style={s.bookHead}>
-          <BookMarked size={17} color="#5b6956" />
+          <BookMarked size={17} color={themeColor("#5b6956")} />
           <Text style={s.bookLabel}>{lesson.script.toUpperCase()}</Text>
           <View style={s.separator} />
           <Text style={s.bookGroup}>{lesson.notebook}</Text>
@@ -248,12 +356,12 @@ export default function Home() {
             >
               {data.seen.includes(item.id) && (
                 <View style={s.seen}>
-                  <Check size={12} color="#356446" />
+                  <Check size={12} color={themeColor("#356446")} />
                 </View>
               )}
-              <Text style={[s.character, phone && { fontSize: 31 }]}>
+              <JapaneseText style={[s.character, phone && { fontSize: 31 }]}>
                 {item.glyph}
-              </Text>
+              </JapaneseText>
               {data.romaji && <Text style={s.romaji}>{item.reading}</Text>}
             </Pressable>
           ))}
@@ -262,8 +370,15 @@ export default function Home() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  },
   headingRow: {
+    flexWrap: "wrap",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -331,6 +446,12 @@ const s = StyleSheet.create({
     gap: 12,
   },
   startText: { color: "#fffdf6", fontFamily: "DMSansBold", fontSize: 14 },
+  heroPathLink: {
+    color: "#e1e8da",
+    fontFamily: "DMSansBold",
+    alignSelf: "flex-start",
+    paddingVertical: 8,
+  },
   time: { flexDirection: "row", alignItems: "center", gap: 6 },
   timeText: { fontFamily: "DMSans", fontSize: 12, color: "#e1e8da" },
   fill: { width: "100%", height: "100%", position: "absolute" },
@@ -349,6 +470,26 @@ const s = StyleSheet.create({
   },
   reviewCopy: { flexGrow: 1, flexShrink: 1, gap: 3 },
   reviewTitle: { color: "#253e32", fontSize: 18, fontFamily: "DMSansBold" },
+  starterCard: {
+    backgroundColor: "#f3ecd6",
+    borderColor: "#dfd4b7",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 10,
+  },
+  nextStep: { fontFamily: "DMSansBold", fontSize: 14, color: "#253e32" },
+  pathActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  pathLink: { color: "#345b45", fontFamily: "DMSansBold", paddingVertical: 12 },
   reviewButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -359,6 +500,22 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: "#fffef8",
   },
+  goalCard: {
+    backgroundColor: "#fffef8",
+    borderColor: "#d9dfd3",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    gap: 6,
+  },
+  goalTrack: {
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "#dce5d6",
+    overflow: "hidden",
+  },
+  goalFill: { height: 7, backgroundColor: "#215848" },
   sectionTitle: {
     flexDirection: "row",
     alignItems: "center",

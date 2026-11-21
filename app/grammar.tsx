@@ -1,16 +1,16 @@
-import { ChoiceCourse } from "../src/ChoiceCourse";
-import { grammar, particles, verbs } from "../src/grammar";
+import { ChoiceCourse, useChoiceTopic } from "../src/ChoiceCourse";
+import { grammarTopics } from "../src/grammarCourse";
 
 export default function Grammar() {
+  const initialTopic = useChoiceTopic();
   return (
     <ChoiceCourse
+      key={initialTopic}
       title="First Japanese sentences"
       course="grammar"
-      groups={[
-        { title: "Statements and questions", lessons: grammar },
-        { title: "Objects, places, and destinations", lessons: particles },
-        { title: "Polite verb forms", lessons: verbs },
-      ]}
+      browseTopics
+      initialTopic={initialTopic}
+      groups={grammarTopics}
     />
   );
 }

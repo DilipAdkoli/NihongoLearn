@@ -4,8 +4,12 @@ import {
   evaluateAnswer,
   kana,
   lessons,
+  latestAttemptResult,
   makeExercises,
+  missedKanaIds,
+  mixedKanaSample,
 } from "../src/learning.ts";
+import type { Attempt } from "../src/storage.types.ts";
 
 test("kana lessons have unique glyphs and examples readable with taught characters", () => {
   assert.deepEqual(
@@ -56,6 +60,59 @@ test("a session quizzes each selected kana once per mode and spaces its recall",
   assert.deepEqual(makeExercises([]), []);
 });
 
+test("session summaries return unique kana IDs for incorrect answers", () => {
+  const attempt = (id: string, kanaId: string, correct: boolean): Attempt => ({
+    id,
+    kanaId,
+    mode: "recognition",
+    answer: "",
+    correct,
+    at: 1,
+  });
+  assert.deepEqual(
+    missedKanaIds([
+      attempt("1", "a", false),
+      attempt("2", "i", true),
+      attempt("3", "a", false),
+      attempt("4", "u", false),
+    ]),
+    ["a", "u"],
+  );
+  assert.deepEqual(missedKanaIds([attempt("1", "a", true)]), []);
+});
+
+test("latest kana result is separate for recognition, recall, and listening", () => {
+  const attempts: Attempt[] = [
+    {
+      id: "1",
+      kanaId: "a",
+      mode: "recognition",
+      answer: "あ",
+      correct: true,
+      at: 1,
+    },
+    {
+      id: "2",
+      kanaId: "a",
+      mode: "recognition",
+      answer: "い",
+      correct: false,
+      at: 2,
+    },
+    {
+      id: "3",
+      kanaId: "a",
+      mode: "recall",
+      answer: "a",
+      correct: true,
+      at: 3,
+    },
+  ];
+  assert.equal(latestAttemptResult(attempts, "a", "recognition"), false);
+  assert.equal(latestAttemptResult(attempts, "a", "recall"), true);
+  assert.equal(latestAttemptResult(attempts, "a", "listening"), undefined);
+});
+
 test("recognition includes exactly one correct glyph among four distinct choices", () => {
   for (const item of kana) {
     const [question] = makeExercises([item.id]);
@@ -99,6 +156,40 @@ test("recall accepts both the spelling and common pronunciation of を", () => {
   assert.equal(evaluateAnswer(question, "w"), false);
 });
 
+test("recall accepts systematic romanizations and common Japanese keyboard spellings in both scripts", () => {
+  const cases = [
+    ["shi", "si"],
+    ["chi", "ti"],
+    ["tsu", "tu"],
+    ["fu", "hu"],
+    ["ji", "zi"],
+    ["di", "zi"],
+    ["sha", "sya"],
+    ["shu", "syu"],
+    ["sho", "syo"],
+    ["cha", "tya", "cya"],
+    ["chu", "tyu", "cyu"],
+    ["cho", "tyo", "cyo"],
+    ["ja", "zya", "jya"],
+    ["ju", "zyu", "jyu"],
+    ["jo", "zyo", "jyo"],
+  ];
+  for (const [id, ...aliases] of cases) {
+    for (const prefix of ["", "kata-"]) {
+      const [, recall] = makeExercises([prefix + id]);
+      for (const alias of aliases)
+        assert.ok(
+          evaluateAnswer(recall, alias),
+          prefix + id + " accepts " + alias,
+        );
+      assert.equal(evaluateAnswer(recall, "a"), false);
+    }
+  }
+  const [, shi] = makeExercises(["shi"]);
+  assert.ok(evaluateAnswer(shi, " ＳＩ "));
+  assert.equal(evaluateAnswer(shi, "zi"), false);
+});
+
 test("ぢ and づ accept their standard readings and keyboard spellings", () => {
   const [, di] = makeExercises(["di"]);
   const [, du] = makeExercises(["du"]);
@@ -138,5 +229,31 @@ test("contrast practice includes the other kana even across rows", () => {
     assert.ok(question.choices.includes("シ"));
     assert.ok(question.choices.includes("ツ"));
     assert.equal(new Set(question.choices).size, 4);
+  }
+});
+
+test("mixed practice balances studied scripts and distinguishes matching sounds", () => {
+  assert.deepEqual(mixedKanaSample(["a", "i", "unknown"]), []);
+  const seen = ["a", "i", "u", "e", "kata-a", "kata-i", "kata-u", "kata-e"];
+  const ids = mixedKanaSample(seen);
+  assert.equal(ids.length, 6);
+  assert.equal(new Set(ids).size, 6);
+  assert.equal(ids.filter((id) => id.startsWith("kata-")).length, 3);
+  assert.ok(ids.every((id) => seen.includes(id)));
+  const questions = makeExercises(ids, "mixed");
+  assert.equal(questions.length, 12);
+  for (const question of questions.slice(0, 6)) {
+    const item = kana.find(({ id }) => id === question.kanaId)!;
+    const counterpart = kana.find(
+      ({ id }) =>
+        id ===
+        (item.script === "hiragana" ? `kata-${item.id}` : item.id.slice(5)),
+    )!;
+    assert.ok(question.choices.includes(counterpart.glyph));
+    assert.equal(new Set(question.choices).size, 4);
+    assert.deepEqual(
+      question.choices.filter((choice) => evaluateAnswer(question, choice)),
+      [item.glyph],
+    );
   }
 });

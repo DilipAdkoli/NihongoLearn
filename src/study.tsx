@@ -1,5 +1,8 @@
+import type { DailyGoal } from "./dailyGoal";
 import type { parseBackup } from "./backup";
+import type { JapaneseTextSize } from "./japaneseTextSize";
 import type { SessionMode } from "./learning";
+import type { OverviewPath } from "./overviewPath";
 import {
   createContext,
   useContext,
@@ -18,6 +21,9 @@ type StudyContext = {
   answer: (attempt: Attempt) => Promise<void>;
   mergeProgress: (backup: ReturnType<typeof parseBackup>) => Promise<void>;
   saveWord: (id: string, saved: boolean) => Promise<void>;
+  changeDailyGoal: (goal: DailyGoal) => Promise<void>;
+  changeOverviewPath: (path: OverviewPath) => Promise<void>;
+  changeJapaneseTextSize: (size: JapaneseTextSize) => Promise<void>;
   changePreference: (name: StudyPreference, enabled: boolean) => Promise<void>;
 };
 
@@ -41,6 +47,7 @@ export function StudyProvider({ children }: PropsWithChildren) {
       active = false;
     };
   }, [retry]);
+  useEffect(() => storage.subscribeStudyChanges(setData), []);
 
   if (!data)
     return (
@@ -133,6 +140,18 @@ export function StudyProvider({ children }: PropsWithChildren) {
         else words.delete(id);
         return { ...old, savedWords: [...words] };
       });
+    },
+    async changeDailyGoal(goal) {
+      await storage.setDailyGoal(goal);
+      setData((old) => old && { ...old, dailyGoal: goal });
+    },
+    async changeOverviewPath(path) {
+      await storage.setOverviewPath(path);
+      setData((old) => old && { ...old, overviewPath: path });
+    },
+    async changeJapaneseTextSize(size) {
+      await storage.setJapaneseTextSize(size);
+      setData((old) => old && { ...old, japaneseTextSize: size });
     },
     async changePreference(name, enabled) {
       await storage.setPreference(name, enabled);

@@ -1,11 +1,12 @@
-import { Link } from "expo-router";
+import { createThemedStyles, useThemeColor } from "./theme";
+import { Link, router, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
   Pressable,
-  StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import {
@@ -21,15 +22,37 @@ import {
 } from "lucide-react-native";
 
 import { ActivityChart } from "./ActivityChart";
+import { DelayedRecallCard } from "./DelayedRecallCard";
 import { createBackup, parseBackup } from "./backup";
 import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
+import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
-import { kana, lessons, type Script } from "./learning";
+import { conversation } from "./conversation";
+import { glossaryEntries } from "./glossaryEntries";
+import { grammarTopics } from "./grammarCourse";
+import { JapaneseText } from "./JapaneseText";
+import { japaneseTextSizes } from "./japaneseTextSize";
+import { listeningReviewCourses, missedLessons } from "./MissedChoiceCourse";
+import {
+  kana,
+  latestAttemptResult,
+  lessons,
+  mixedKanaSample,
+  type Script,
+} from "./learning";
+import { overviewPaths } from "./overviewPath";
+import { mistakeJournal } from "./mistakeJournal";
+import { passageListening } from "./passageListening";
 import { placementSample } from "./placement";
+import { reading } from "./reading";
+import { journalCourses } from "./journalCourses";
+import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
-import type { Attempt, StudyPreference } from "./storage.types";
+import type { Attempt } from "./storage.types";
+import { vocabularyWordIds, wordGroups } from "./vocabulary";
+import { vocabularyReviewQueue } from "./vocabularyReview";
 
 const ink = "#203730";
 const green = "#215848";
@@ -38,6 +61,7 @@ const coral = "#c95634";
 const firstLessonIds = lessons[0].ids;
 
 function Heading({ title, detail }: { title: string; detail: string }) {
+  const s = useStyles();
   return (
     <View style={s.heading}>
       <Text accessibilityRole="header" style={s.title}>
@@ -49,6 +73,8 @@ function Heading({ title, detail }: { title: string; detail: string }) {
 }
 
 function Action({ label, onPress }: { label: string; onPress: () => void }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <Pressable
       accessibilityRole="button"
@@ -56,7 +82,7 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
       style={({ pressed }) => [s.action, pressed && s.pressed]}
     >
       <Text style={s.actionLabel}>{label}</Text>
-      <ArrowRight size={18} color="white" />
+      <ArrowRight size={18} color={themeColor("white")} />
     </Pressable>
   );
 }
@@ -70,6 +96,8 @@ function KanaChart({
   script: Script;
   romaji: boolean;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const [expanded, setExpanded] = useState(false);
   const characters = kana.filter((item) => item.script === script);
   return (
@@ -91,7 +119,7 @@ function KanaChart({
         </View>
         <ChevronRight
           size={18}
-          color={muted}
+          color={themeColor(muted)}
           style={{ transform: [{ rotate: expanded ? "90deg" : "0deg" }] }}
         />
       </Pressable>
@@ -119,7 +147,9 @@ function KanaChart({
                             pressed && s.pressed,
                           ]}
                         >
-                          <Text style={s.glyph}>{item.glyph}</Text>
+                          <JapaneseText style={s.glyph}>
+                            {item.glyph}
+                          </JapaneseText>
                           {romaji && (
                             <Text style={s.detail}>{item.reading}</Text>
                           )}
@@ -137,21 +167,127 @@ function KanaChart({
 
 const lessonLinks = [
   {
+    href: "/getting-started",
+    title: "Choose a study path",
+    detail: "Set a daily goal and pick a starting point",
+    icon: Sprout,
+  },
+  {
+    href: "/starter-path",
+    title: "Start learning Japanese",
+    detail: "Follow six steps from vowels to first conversations",
+    icon: Sprout,
+  },
+  {
+    href: "/hiragana-path",
+    title: "Learn all hiragana",
+    detail: "Follow small sessions through the complete hiragana course",
+    icon: BookOpen,
+  },
+  {
+    href: "/katakana-path",
+    title: "Learn all katakana",
+    detail: "Follow small sessions through the complete katakana course",
+    icon: BookOpen,
+  },
+  {
+    href: "/beginner-check",
+    title: "Beginner skill check",
+    detail: "Check your vocabulary, grammar, reading, listening, and writing",
+    icon: CircleHelp,
+  },
+  {
+    href: "/travel-path",
+    title: "Japanese for travel",
+    detail: "Follow five steps from reading signs to buying a train ticket",
+    icon: Sprout,
+  },
+  {
+    href: "/planning-path",
+    title: "Make plans in Japanese",
+    detail:
+      "Read dates and opening hours, reschedule an appointment, and write a message",
+    icon: Sprout,
+  },
+  {
+    href: "/beginner-n5-path",
+    title: "Complete beginner journey",
+    detail:
+      "Follow kana, grammar, reading, listening, travel, and planning lessons in sequence",
+    icon: Sprout,
+  },
+  {
+    href: "/numbers",
+    title: "Count from 1 to 99",
+    detail: "Read Japanese numbers and practice the tens",
+    icon: BookOpen,
+  },
+  {
+    href: "/prices",
+    title: "Read prices in yen",
+    detail: "Hundreds, thousands, and the 万 unit",
+    icon: BookOpen,
+  },
+
+  {
+    href: "/counters",
+    title: "Count things, people, and animals",
+    detail: "Practice つ, 枚, 人, 本, and 匹",
+    icon: BookOpen,
+  },
+  {
+    href: "/time",
+    title: "Tell the time",
+    detail: "Read hours, minutes, and half past",
+    icon: BookOpen,
+  },
+  {
+    href: "/calendar",
+    title: "Read calendar dates",
+    detail: "Learn months and irregular day readings",
+    icon: BookOpen,
+  },
+  {
+    href: "/schedule-listening",
+    title: "Listen for dates and times",
+    detail: "Hear calendar dates and clock times in Japanese",
+    icon: AudioLines,
+  },
+  {
     href: "/conversation",
     title: "Everyday dialogue",
-    detail: "Introductions and ordering tea",
+    detail:
+      "Introductions, cafés, stations, shops, asking for help, invitations, and family",
+    icon: AudioLines,
+  },
+  {
+    href: "/repeat-phrases",
+    title: "Listen and repeat",
+    detail: "Say model phrases aloud at normal or slower speed",
     icon: AudioLines,
   },
   {
     href: "/vocabulary",
     title: "Everyday vocabulary",
-    detail: "Food, drinks, and familiar objects",
+    detail: "Food, travel, routines, weather, places in town, and family",
     icon: BookOpen,
+  },
+  {
+    href: "/word-recall",
+    title: "Recall Japanese words",
+    detail: "Type kana or kanji from an English clue",
+    icon: BookOpen,
+  },
+  {
+    href: "/word-listening",
+    title: "Listen to everyday words",
+    detail: "Hear each word and choose its meaning",
+    icon: AudioLines,
   },
   {
     href: "/grammar",
     title: "First Japanese sentences",
-    detail: "Polite statements, particles, and verbs",
+    detail: "Beginner grammar, including particles and verb forms",
     icon: BookOpen,
   },
   {
@@ -161,27 +297,70 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/write-japanese",
+    title: "Write a sentence in Japanese",
+    detail: "Type Japanese sentences in kana or kanji",
+    icon: BookOpen,
+  },
+  {
     href: "/kanji",
     title: "First kanji in context",
-    detail: "The seven days of the week",
+    detail: "Weekdays, places, and directions",
+    icon: BookOpen,
+  },
+  {
+    href: "/kanji-reading",
+    title: "Read kanji words",
+    detail: "Choose the kana reading for kanji in everyday sentences",
+    icon: BookOpen,
+  },
+  {
+    href: "/kanji-recall",
+    title: "Write kanji words",
+    detail: "Type the missing kanji word from its reading and meaning",
     icon: BookOpen,
   },
   {
     href: "/reading",
     title: "Beginner reading",
-    detail: "Two short passages with questions",
+    detail: "Short passages with questions and optional translations",
     icon: BookOpen,
   },
   {
     href: "/passage-listening",
     title: "Listen to short passages",
-    detail: "Two speeds and an optional transcript",
+    detail: "Train announcements, weather, and daily routines",
     icon: AudioLines,
   },
   {
     href: "/sound-rules",
     title: "Sound and spelling rules",
     detail: "Small っ and ッ, long vowels, and ー",
+    icon: AudioLines,
+  },
+  {
+    href: "/compare-kana",
+    title: "Compare similar kana",
+    detail: "See and practice the differences between lookalikes",
+    icon: BookOpen,
+  },
+  {
+    href: "/kana-strokes",
+    title: "Kana stroke order",
+    detail:
+      "Watch and trace the strokes of all 208 hiragana and katakana study entries",
+    icon: BookOpen,
+  },
+  {
+    href: "/loanwords",
+    title: "Katakana loanword sounds",
+    detail: "Look up ファ, ティ, and other combinations",
+    icon: BookOpen,
+  },
+  {
+    href: "/loanword-practice",
+    title: "Practice katakana loanwords",
+    detail: "Quiz the combination sounds and meanings you’ve learned",
     icon: AudioLines,
   },
   {
@@ -192,134 +371,361 @@ const lessonLinks = [
   },
 ] as const;
 
+function normalizeLessonSearch(text: string) {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFC")
+    .toLowerCase();
+}
+
+const topicCourses = [
+  {
+    pathname: "/grammar",
+    groups: grammarTopics,
+    detail: "Grammar practice",
+    icon: BookOpen,
+  },
+  {
+    pathname: "/reading",
+    groups: reading,
+    detail: "Reading practice",
+    icon: BookOpen,
+  },
+  {
+    pathname: "/passage-listening",
+    groups: passageListening,
+    detail: "Listening practice",
+    icon: AudioLines,
+  },
+] as const;
+
+const courseLinks = lessonLinks.map((link) => ({
+  ...link,
+  key: link.href,
+  searchable: normalizeLessonSearch(`${link.title} ${link.detail}`),
+}));
+
+const searchableTopics = [
+  ...topicCourses.flatMap(({ pathname, groups, detail, icon }) =>
+    groups.map(({ id, title, passage, lessons }) => ({
+      id,
+      pathname,
+      title,
+      detail,
+      icon,
+      keywords: passage
+        ? [passage.japanese, passage.standardJapanese, passage.english]
+        : lessons.flatMap(({ title, japanese, english }) => [
+            title,
+            japanese,
+            english,
+          ]),
+    })),
+  ),
+  ...wordGroups.map(({ id, title, words }) => ({
+    id,
+    title,
+    pathname: "/vocabulary" as const,
+    detail: "Vocabulary study",
+    icon: BookOpen,
+    keywords: words.flatMap(({ kana, spelling, romaji, meaning }) => [
+      kana,
+      spelling,
+      romaji,
+      meaning,
+    ]),
+  })),
+  ...conversation.map(({ id, title, lessons }) => ({
+    id,
+    title,
+    pathname: "/conversation" as const,
+    detail: "Dialogue practice",
+    icon: AudioLines,
+    keywords: lessons.flatMap(
+      ({ title, japanese, english, answer, answerEnglish }) => [
+        title,
+        japanese,
+        english,
+        answer,
+        answerEnglish,
+      ],
+    ),
+  })),
+];
+
+const lessonSearchLinks = [
+  ...courseLinks,
+  ...searchableTopics.map(
+    ({ id, pathname, title, detail, icon, keywords }) => ({
+      key: `${pathname}/${id}`,
+      href: { pathname, params: { topic: id } },
+      title,
+      detail,
+      icon,
+      searchable: normalizeLessonSearch([title, detail, ...keywords].join(" ")),
+    }),
+  ),
+];
+
+const kanaById = new Map(kana.map((item) => [item.id, item.glyph]));
+const kanaLessons = (["hiragana", "katakana"] as const).flatMap((script) =>
+  lessons
+    .filter((lesson) => lesson.script === script)
+    .map((lesson, index) => ({
+      lesson,
+      number: index + 1,
+      searchable: normalizeLessonSearch(
+        `${script} ${lesson.title} ${lesson.detail} ${lesson.ids.map((id) => kanaById.get(id)).join("")}`,
+      ),
+    })),
+);
+
 export function Learn() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const [script, setScript] = useState<Script>("hiragana");
+  const [query, setQuery] = useState("");
+  const terms = normalizeLessonSearch(query).split(/\s+/).filter(Boolean);
+  const searching = terms.length > 0;
+  const courses = searching
+    ? lessonSearchLinks.filter(({ searchable }) =>
+        terms.every((term) => searchable.includes(term)),
+      )
+    : courseLinks;
+  const visibleKana = kanaLessons.filter(({ lesson, searchable }) =>
+    searching
+      ? terms.every((term) => searchable.includes(term))
+      : lesson.script === script,
+  );
+  const studiedScripts = new Set(
+    kana.filter(({ id }) => data.seen.includes(id)).map(({ script }) => script),
+  );
   return (
     <View style={s.page}>
       <Heading
         title="Learn"
         detail="Choose a kana lesson or practice everyday Japanese."
       />
-      <View style={s.section}>
-        <Text accessibilityRole="header" style={s.sectionTitle}>
-          Beginner Japanese
-        </Text>
-        <View style={s.courseGrid}>
-          {lessonLinks.map(({ href, title, detail, icon: Icon }) => (
-            <Link key={href} href={href} asChild>
-              <Pressable
-                accessibilityRole="link"
-                style={({ pressed }) => [
-                  s.list,
-                  s.courseLink,
-                  pressed && s.pressed,
-                ]}
-              >
-                <Icon size={18} color={green} />
-                <Text style={s.rowTitle}>{title}</Text>
-                <Text style={s.detail}>{detail}</Text>
-              </Pressable>
-            </Link>
-          ))}
-        </View>
-      </View>
-      <Text accessibilityRole="header" style={s.sectionTitle}>
-        Kana lessons
-      </Text>
-      <View accessibilityRole="tablist" style={s.chartRow}>
-        {(["hiragana", "katakana"] as const).map((option) => (
-          <Pressable
-            key={option}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: script === option }}
-            onPress={() => setScript(option)}
-            style={[s.chartTile, script === option && s.chartStudied]}
-          >
-            <Text style={s.rowTitle}>
-              {option === "hiragana" ? "Hiragana" : "Katakana"}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-      <KanaChart
-        key={script}
-        seen={data.seen}
-        script={script}
-        romaji={data.romaji}
+      <TextInput
+        accessibilityLabel="Search lessons"
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search lessons"
+        placeholderTextColor={themeColor(muted)}
+        autoCorrect={false}
+        autoCapitalize="none"
+        returnKeyType="search"
+        maxLength={100}
+        style={s.search}
       />
-      <View style={s.feature}>
-        <Text style={s.featureTitle}>Check your basic {script}</Text>
-        <Text style={s.body}>
-          Try ten characters across the basic rows. Get a lesson suggestion
-          based on your answers.
-        </Text>
-        <View style={s.featureFooter}>
-          <Action
-            label="Start kana check"
-            onPress={() => startLesson(placementSample(script), "placement")}
-          />
+      {!searching && (
+        <View style={s.feature}>
+          <View style={s.iconLabel}>
+            <BookOpen size={18} color={themeColor(green)} />
+            <Text style={s.kicker}>KANJI</Text>
+          </View>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Learn kanji in context
+          </Text>
+          <Text style={s.body}>
+            Study weekday and place signs, choose kanji readings, and type
+            familiar kanji words.
+          </Text>
+          <View style={s.featureFooter}>
+            <Action label="First kanji" onPress={() => router.push("/kanji")} />
+            <Action
+              label="Read kanji"
+              onPress={() => router.push("/kanji-reading")}
+            />
+            <Action
+              label="Write kanji"
+              onPress={() => router.push("/kanji-recall")}
+            />
+          </View>
         </View>
-      </View>
-      {lessons
-        .filter((lesson) => lesson.script === script)
-        .map((lesson, index) => {
-          const studied = lesson.ids.filter((id) =>
-            data.seen.includes(id),
-          ).length;
-          return (
-            <View key={lesson.title} style={s.feature}>
-              <View style={s.iconLabel}>
-                <BookOpen size={18} color={green} />
-                <Text style={s.kicker}>
-                  {script.toUpperCase()} / LESSON {index + 1}
-                </Text>
-              </View>
-              <Text style={s.featureTitle}>{lesson.title}</Text>
-              <Text style={s.body}>{lesson.detail}</Text>
-              <View style={s.featureFooter}>
-                <Action
-                  label={
-                    studied === lesson.ids.length
-                      ? "Revisit lesson"
-                      : studied
-                        ? "Continue lesson"
-                        : "Start lesson"
-                  }
-                  onPress={() => startLesson(lesson.ids)}
-                />
-                <Text style={s.detail}>
-                  {studied} of {lesson.ids.length} characters studied
-                </Text>
-              </View>
+      )}
+      {courses.length > 0 && (
+        <View style={s.section}>
+          <Text accessibilityRole="header" style={s.sectionTitle}>
+            Beginner Japanese
+          </Text>
+          <View style={s.courseGrid}>
+            {courses.map(({ href, key, title, detail, icon: Icon }) => (
+              <Link key={key} href={href} asChild>
+                <Pressable
+                  accessibilityRole="link"
+                  style={({ pressed }) => [
+                    s.list,
+                    s.courseLink,
+                    pressed && s.pressed,
+                  ]}
+                >
+                  <Icon size={18} color={themeColor(green)} />
+                  <Text style={s.rowTitle}>{title}</Text>
+                  <Text style={s.detail}>{detail}</Text>
+                </Pressable>
+              </Link>
+            ))}
+          </View>
+        </View>
+      )}
+      {(!searching || visibleKana.length > 0) && (
+        <Text accessibilityRole="header" style={s.sectionTitle}>
+          Kana lessons
+        </Text>
+      )}
+      {!searching && (
+        <>
+          {studiedScripts.size === 2 && (
+            <View style={s.feature}>
+              <Text accessibilityRole="header" style={s.featureTitle}>
+                Mixed kana practice
+              </Text>
+              <Text style={s.body}>
+                Switch between hiragana and katakana you’ve studied in a short
+                round of recognition and typed recall.
+              </Text>
+              <Action
+                label="Practice both scripts"
+                onPress={() => startLesson(mixedKanaSample(data.seen), "mixed")}
+              />
             </View>
-          );
-        })}
+          )}
+          <View accessibilityRole="tablist" style={s.chartRow}>
+            {(["hiragana", "katakana"] as const).map((option) => (
+              <Pressable
+                key={option}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: script === option }}
+                onPress={() => setScript(option)}
+                style={[s.chartTile, script === option && s.chartStudied]}
+              >
+                <Text style={s.rowTitle}>
+                  {option === "hiragana" ? "Hiragana" : "Katakana"}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <KanaChart
+            key={script}
+            seen={data.seen}
+            script={script}
+            romaji={data.romaji}
+          />
+          <View style={s.feature}>
+            <Text style={s.featureTitle}>Check your basic {script}</Text>
+            <Text style={s.body}>
+              Try ten characters across the basic rows. Get a lesson suggestion
+              based on your answers.
+            </Text>
+            <View style={s.featureFooter}>
+              <Action
+                label="Start kana check"
+                onPress={() =>
+                  startLesson(placementSample(script), "placement")
+                }
+              />
+            </View>
+          </View>
+        </>
+      )}
+      {searching && !courses.length && !visibleKana.length && (
+        <Text accessibilityLiveRegion="polite" style={s.detail}>
+          No lessons match this search.
+        </Text>
+      )}
+      {visibleKana.map(({ lesson, number }) => {
+        const studied = lesson.ids.filter((id) =>
+          data.seen.includes(id),
+        ).length;
+        return (
+          <View key={`${lesson.script}:${lesson.title}`} style={s.feature}>
+            <View style={s.iconLabel}>
+              <BookOpen size={18} color={themeColor(green)} />
+              <Text style={s.kicker}>
+                {lesson.script.toUpperCase()} / LESSON {number}
+              </Text>
+            </View>
+            <Text style={s.featureTitle}>{lesson.title}</Text>
+            <Text style={s.body}>{lesson.detail}</Text>
+            <View style={s.featureFooter}>
+              <Action
+                label={
+                  studied === lesson.ids.length
+                    ? "Revisit lesson"
+                    : studied
+                      ? "Continue lesson"
+                      : "Start lesson"
+                }
+                onPress={() => startLesson(lesson.ids)}
+              />
+              <Text style={s.detail}>
+                {studied} of {lesson.ids.length} characters studied
+              </Text>
+            </View>
+          </View>
+        );
+      })}
     </View>
   );
 }
 
-function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
-  let latest: Attempt | undefined;
-  for (const attempt of attempts) {
-    if (
-      attempt.kanaId === id &&
-      attempt.mode === mode &&
-      (!latest || attempt.at >= latest.at)
-    )
-      latest = attempt;
-  }
-  return latest?.correct;
+function ReviewLink({ href, label }: { href: Href; label: string }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  return (
+    <Link href={href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        style={({ pressed }) => [s.action, pressed && s.pressed]}
+      >
+        <Text style={s.actionLabel}>{label}</Text>
+        <ArrowRight size={18} color={themeColor("white")} />
+      </Pressable>
+    </Link>
+  );
 }
 
 export function Review() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
-  const { queue, due } = useReviewQueue(data);
+  const { queue, due, now } = useReviewQueue(data);
+  const journalCount = mistakeJournal(
+    data.attempts,
+    journalCourses,
+    kana,
+  ).length;
+  const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
+  const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
+  const wordQueue = vocabularyReviewQueue(data, vocabularyWordIds, now);
+  const dueWords = wordQueue.filter(({ dueAt }) => dueAt <= now).length;
+  const grammarCount = missedLessons(data.attempts, "grammar").length;
+  const recognitionCount = missedLessons(data.attempts, "vocabulary").length;
+  const recallCount = missedLessons(data.attempts, "vocabulary-recall").length;
+  const readingCount = missedLessons(data.attempts, "reading").length;
+  const listeningCount = missedLessons(
+    data.attempts,
+    "passage-listening",
+  ).length;
+  const kanjiWritingCount = missedLessons(data.attempts, "kanji-recall").length;
+  const sentenceWritingCount = missedLessons(
+    data.attempts,
+    "writing-type",
+  ).length;
+  const missedListening = listeningReviewCourses
+    .map((option) => ({
+      ...option,
+      count: missedLessons(data.attempts, option.course).length,
+    }))
+    .filter(({ count }) => count > 0);
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
-      latestResult(data.attempts, id, "recognition") === false ||
-      latestResult(data.attempts, id, "recall") === false,
+      latestAttemptResult(data.attempts, id, "recognition") === false ||
+      latestAttemptResult(data.attempts, id, "recall") === false,
   );
   const focus = (due.length ? due : missed.length ? missed : queue).slice(
     0,
@@ -339,11 +745,22 @@ export function Review() {
     <View style={s.page}>
       <Heading
         title="Review"
-        detail="Return to the sounds you’ve been learning."
+        detail="Revisit kana and retry questions from past lessons."
       />
       <View style={s.feature}>
+        <Text accessibilityRole="header" style={s.featureTitle}>
+          Understand your mistakes
+        </Text>
+        <Text style={s.body}>
+          {journalCount
+            ? `${journalCount} ${journalCount === 1 ? "question needs" : "questions need"} another try. See your answer, the correct response, and an explanation.`
+            : "When you miss a question, its correction will appear in your personal journal."}
+        </Text>
+        <ReviewLink href="/mistakes" label="Open mistake journal" />
+      </View>
+      <View style={s.feature}>
         <View style={s.iconLabel}>
-          <RotateCcw size={18} color={green} />
+          <RotateCcw size={18} color={themeColor(green)} />
           <Text style={s.kicker}>PERSONAL PRACTICE</Text>
         </View>
         <Text style={s.featureTitle}>{title}</Text>
@@ -352,9 +769,9 @@ export function Review() {
           <View style={s.chips}>
             {focus.map(({ id }) => (
               <View style={s.chip} key={id}>
-                <Text style={s.glyph}>
+                <JapaneseText style={s.glyph}>
                   {kana.find((item) => item.id === id)?.glyph}
-                </Text>
+                </JapaneseText>
               </View>
             ))}
           </View>
@@ -390,6 +807,140 @@ export function Review() {
           )}
         </View>
       </View>
+      {savedRecall.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Saved word recall
+          </Text>
+          <Text style={s.body}>
+            {savedRecallDue
+              ? `${savedRecallDue} saved ${savedRecallDue === 1 ? "word is" : "words are"} ready for recall.`
+              : `Next saved word review ${new Date(savedRecall[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.`}
+          </Text>
+          <ReviewLink
+            href={{ pathname: "/saved-practice", params: { mode: "recall" } }}
+            label={savedRecallDue ? "Review saved words" : "Recall words early"}
+          />
+        </View>
+      )}
+      {wordQueue.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Everyday word recall
+          </Text>
+          <Text style={s.body}>
+            {dueWords
+              ? `${dueWords} ${dueWords === 1 ? "word is" : "words are"} ready for recall.`
+              : `Next word review ${new Date(wordQueue[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.`}
+          </Text>
+          <ReviewLink
+            href="/vocabulary-review"
+            label={
+              dueWords ? "Review everyday words" : "Recall everyday words early"
+            }
+          />
+        </View>
+      )}
+      {grammarCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Grammar to try again
+          </Text>
+          <Text style={s.body}>
+            Your latest answer was incorrect on {grammarCount}{" "}
+            {grammarCount === 1 ? "question" : "questions"}.
+          </Text>
+          <ReviewLink href="/grammar-review" label="Review grammar" />
+        </View>
+      )}
+      {recognitionCount + recallCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Words to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {recognitionCount > 0 && (
+              <ReviewLink
+                href="/word-review"
+                label={`Recognize ${recognitionCount} missed ${recognitionCount === 1 ? "word" : "words"}`}
+              />
+            )}
+            {recallCount > 0 && (
+              <ReviewLink
+                href={{ pathname: "/word-review", params: { mode: "recall" } }}
+                label={`Recall ${recallCount} missed ${recallCount === 1 ? "word" : "words"}`}
+              />
+            )}
+          </View>
+        </View>
+      )}
+      {readingCount + listeningCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Passages to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {readingCount > 0 && (
+              <ReviewLink
+                href="/passage-review"
+                label={`Review ${readingCount} reading ${readingCount === 1 ? "question" : "questions"}`}
+              />
+            )}
+            {listeningCount > 0 && (
+              <ReviewLink
+                href={{
+                  pathname: "/passage-review",
+                  params: { mode: "listening" },
+                }}
+                label={`Review ${listeningCount} listening ${listeningCount === 1 ? "question" : "questions"}`}
+              />
+            )}
+          </View>
+        </View>
+      )}
+      {missedListening.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Listening to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {missedListening.map(({ course, label, count }) => (
+              <ReviewLink
+                key={course}
+                href={{
+                  pathname: "/listening-review",
+                  params: { skill: course },
+                }}
+                label={`Retry ${count} ${label}${count === 1 ? "" : "s"}`}
+              />
+            ))}
+          </View>
+        </View>
+      )}
+      {kanjiWritingCount + sentenceWritingCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Writing to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {kanjiWritingCount > 0 && (
+              <ReviewLink
+                href={{
+                  pathname: "/writing-review",
+                  params: { mode: "kanji" },
+                }}
+                label={`Retry ${kanjiWritingCount} kanji ${kanjiWritingCount === 1 ? "word" : "words"}`}
+              />
+            )}
+            {sentenceWritingCount > 0 && (
+              <ReviewLink
+                href="/writing-review"
+                label={`Retry ${sentenceWritingCount} typed ${sentenceWritingCount === 1 ? "sentence" : "sentences"}`}
+              />
+            )}
+          </View>
+        </View>
+      )}
       {!!pairs.length && (
         <View style={s.section}>
           <Text accessibilityRole="header" style={s.sectionTitle}>
@@ -403,7 +954,7 @@ export function Review() {
               <View style={s.chips}>
                 {items.map((item) => (
                   <View key={item.id} style={s.chartTile}>
-                    <Text style={s.glyph}>{item.glyph}</Text>
+                    <JapaneseText style={s.glyph}>{item.glyph}</JapaneseText>
                     <Text style={s.detail}>{item.reading}</Text>
                   </View>
                 ))}
@@ -430,6 +981,7 @@ export function Review() {
 }
 
 function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
+  const s = useStyles();
   const correct = attempts.filter((item) => item.correct).length;
   return (
     <View style={s.stat}>
@@ -449,6 +1001,8 @@ function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
 }
 
 export function Progress() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const studied = kana.filter((item) => data.seen.includes(item.id)).length;
   const grammarAttempts = data.attempts.filter((a) =>
@@ -457,23 +1011,65 @@ export function Progress() {
   const vocabularyAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("vocabulary:"),
   );
+  const vocabularyListeningAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("vocabulary-listening:"),
+  );
   const readingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("reading:"),
   );
   const passageAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("passage-listening:"),
   );
+  const soundAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("sound-listening:"),
+  );
   const writingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("writing:"),
   );
+  const typedSentenceAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("writing-type:"),
+  );
   const kanjiAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("kanji:"),
+  );
+  const kanjiReadingAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("kanji-reading:"),
+  );
+  const kanjiRecallAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("kanji-recall:"),
   );
   const conversationAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("conversation:"),
   );
   const savedWordAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("saved-words:"),
+  );
+  const savedRecallAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith(`${savedRecallCourse}:`),
+  );
+  const loanwordAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("loanwords:"),
+  );
+  const countingAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("numbers:"),
+  );
+  const priceAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("prices:"),
+  );
+  const timeAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("time:"),
+  );
+  const dateAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("calendar:"),
+  );
+  const scheduleListeningAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("schedule-listening:"),
+  );
+  const wordRecallAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("vocabulary-recall:"),
+  );
+  const counterAttempts = data.attempts.filter((attempt) =>
+    attempt.kanaId.startsWith("counters:"),
   );
   const kanaIds = new Set(kana.map((item) => item.id));
   const kanaAttempts = data.attempts.filter((a) => kanaIds.has(a.kanaId));
@@ -485,7 +1081,7 @@ export function Progress() {
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
-          <Sprout size={19} color={green} />
+          <Sprout size={19} color={themeColor(green)} />
           <Text style={s.kicker}>KANA</Text>
         </View>
         <Text style={s.featureTitle}>
@@ -531,8 +1127,20 @@ export function Progress() {
       {!!vocabularyAttempts.length && (
         <Score label="Vocabulary" attempts={vocabularyAttempts} />
       )}
+      {!!vocabularyListeningAttempts.length && (
+        <Score
+          label="Vocabulary listening"
+          attempts={vocabularyListeningAttempts}
+        />
+      )}
       {!!readingAttempts.length && (
         <Score label="Reading" attempts={readingAttempts} />
+      )}
+      {!!priceAttempts.length && (
+        <Score label="Prices in yen" attempts={priceAttempts} />
+      )}
+      {!!soundAttempts.length && (
+        <Score label="Sound distinctions" attempts={soundAttempts} />
       )}
       {!!passageAttempts.length && (
         <Score label="Passage listening" attempts={passageAttempts} />
@@ -540,8 +1148,17 @@ export function Progress() {
       {!!writingAttempts.length && (
         <Score label="Sentence building" attempts={writingAttempts} />
       )}
+      {!!typedSentenceAttempts.length && (
+        <Score label="Typed sentences" attempts={typedSentenceAttempts} />
+      )}
       {!!kanjiAttempts.length && (
         <Score label="Kanji" attempts={kanjiAttempts} />
+      )}
+      {!!kanjiReadingAttempts.length && (
+        <Score label="Kanji readings" attempts={kanjiReadingAttempts} />
+      )}
+      {!!kanjiRecallAttempts.length && (
+        <Score label="Kanji spelling" attempts={kanjiRecallAttempts} />
       )}
       {!!conversationAttempts.length && (
         <Score label="Dialogue" attempts={conversationAttempts} />
@@ -549,7 +1166,35 @@ export function Progress() {
       {!!savedWordAttempts.length && (
         <Score label="Saved words" attempts={savedWordAttempts} />
       )}
+      {!!savedRecallAttempts.length && (
+        <Score label="Saved word recall" attempts={savedRecallAttempts} />
+      )}
+      {!!loanwordAttempts.length && (
+        <Score label="Loanword sounds" attempts={loanwordAttempts} />
+      )}
+      {!!countingAttempts.length && (
+        <Score label="Counting" attempts={countingAttempts} />
+      )}
+      {!!timeAttempts.length && (
+        <Score label="Telling time" attempts={timeAttempts} />
+      )}
+      {!!dateAttempts.length && (
+        <Score label="Calendar dates" attempts={dateAttempts} />
+      )}
+      {!!scheduleListeningAttempts.length && (
+        <Score
+          label="Listening for dates and times"
+          attempts={scheduleListeningAttempts}
+        />
+      )}
+      {!!wordRecallAttempts.length && (
+        <Score label="Vocabulary recall" attempts={wordRecallAttempts} />
+      )}
+      {!!counterAttempts.length && (
+        <Score label="Counters" attempts={counterAttempts} />
+      )}
       <ActivityChart attempts={data.attempts} />
+      <DelayedRecallCard attempts={data.attempts} />
       <View style={s.section}>
         <Text accessibilityRole="header" style={s.sectionTitle}>
           By character
@@ -559,16 +1204,37 @@ export function Progress() {
             const attempts = data.attempts.filter(
               (attempt) => attempt.kanaId === item.id,
             );
+            const recognition = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "recognition",
+            );
+            const recall = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "recall",
+            );
+            const listening = latestAttemptResult(
+              data.attempts,
+              item.id,
+              "listening",
+            );
+            const status = (value: boolean | undefined) =>
+              value === undefined
+                ? "Not tried"
+                : value
+                  ? "Good"
+                  : "Needs retry";
             return (
               <View key={item.id} style={[s.row, index > 0 && s.rule]}>
                 <View style={s.glyphTile}>
-                  <Text style={s.glyph}>{item.glyph}</Text>
+                  <JapaneseText style={s.glyph}>{item.glyph}</JapaneseText>
                 </View>
                 <View style={s.grow}>
                   <Text style={s.rowTitle}>{item.reading}</Text>
                   <Text style={s.detail}>
                     {attempts.length
-                      ? `${attempts.filter((attempt) => attempt.correct).length} of ${attempts.length} correct`
+                      ? `Recognition: ${status(recognition)} · Recall: ${status(recall)} · Listening: ${status(listening)}`
                       : data.seen.includes(item.id)
                         ? "Studied · awaiting practice"
                         : "Ready to learn"}
@@ -584,17 +1250,26 @@ export function Progress() {
 }
 
 export function Settings() {
-  const { data, changePreference, mergeProgress } = useStudy();
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const {
+    data,
+    changePreference,
+    changeDailyGoal,
+    changeOverviewPath,
+    changeJapaneseTextSize,
+    mergeProgress,
+  } = useStudy();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const saving = useRef(false);
-  async function updatePreference(name: StudyPreference, value: boolean) {
+  async function savePreference(update: () => Promise<void>) {
     if (saving.current) return;
     saving.current = true;
     setPending(true);
     setMessage("");
     try {
-      await changePreference(name, value);
+      await update();
     } catch {
       setMessage("Your study preference could not be saved. Try again.");
     } finally {
@@ -647,7 +1322,24 @@ export function Settings() {
         </Text>
         <View style={s.list}>
           <View style={s.row}>
-            <AudioLines size={23} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Dark theme</Text>
+            </View>
+            <Switch
+              value={data.darkMode}
+              disabled={pending}
+              accessibilityLabel="Dark theme"
+              onValueChange={(value) =>
+                savePreference(() => changePreference("darkMode", value))
+              }
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
+            />
+          </View>
+          <View style={[s.row, s.rule]}>
+            <AudioLines size={23} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Pronunciation audio</Text>
               <Text style={s.detail}>
@@ -658,12 +1350,17 @@ export function Settings() {
               value={data.sound}
               disabled={pending}
               accessibilityLabel="Pronunciation audio"
-              onValueChange={(value) => updatePreference("sound", value)}
-              trackColor={{ false: "#bbc4be", true: green }}
+              onValueChange={(value) =>
+                savePreference(() => changePreference("sound", value))
+              }
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
             />
           </View>
           <View style={[s.row, s.rule]}>
-            <BookOpen size={22} color={green} />
+            <BookOpen size={22} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Kana reading hints</Text>
               <Text style={s.detail}>
@@ -675,12 +1372,47 @@ export function Settings() {
               value={data.romaji}
               disabled={pending}
               accessibilityLabel="Kana reading hints"
-              onValueChange={(value) => updatePreference("romaji", value)}
-              trackColor={{ false: "#bbc4be", true: green }}
+              onValueChange={(value) =>
+                savePreference(() => changePreference("romaji", value))
+              }
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
             />
           </View>
           <View style={[s.row, s.rule]}>
-            <HardDrive size={22} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Japanese text size</Text>
+              <JapaneseText style={s.glyph}>あいうえお</JapaneseText>
+              <View
+                style={s.chips}
+                accessibilityRole="radiogroup"
+                accessibilityLabel="Japanese text size"
+              >
+                {japaneseTextSizes.map((size) => (
+                  <Pressable
+                    key={size.id}
+                    accessibilityRole="radio"
+                    aria-checked={data.japaneseTextSize === size.id}
+                    disabled={pending}
+                    onPress={() =>
+                      savePreference(() => changeJapaneseTextSize(size.id))
+                    }
+                    style={[
+                      s.chip,
+                      { minHeight: 44, justifyContent: "center" },
+                      data.japaneseTextSize === size.id && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{size.title}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          </View>
+          <View style={[s.row, s.rule]}>
+            <HardDrive size={22} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Local progress</Text>
               <Text style={s.detail}>
@@ -732,6 +1464,67 @@ export function Settings() {
               </Pressable>
             </View>
           </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Daily practice goal</Text>
+              <Text style={s.detail}>
+                Choose how many questions to answer each day.
+              </Text>
+              <View style={s.chips} accessibilityRole="tablist">
+                {dailyGoals.map((goal) => (
+                  <Pressable
+                    key={goal}
+                    accessibilityRole="tab"
+                    accessibilityLabel={
+                      goal ? `${goal} questions per day` : "No daily goal"
+                    }
+                    accessibilityState={{
+                      selected: data.dailyGoal === goal,
+                      disabled: pending,
+                    }}
+                    disabled={pending}
+                    onPress={() => savePreference(() => changeDailyGoal(goal))}
+                    style={[
+                      s.chip,
+                      { minWidth: 44, minHeight: 44, justifyContent: "center" },
+                      data.dailyGoal === goal && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{goal || "Off"}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          </View>
+          <View style={[s.row, s.rule]}>
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Path on Overview</Text>
+              <View
+                style={s.chips}
+                accessibilityRole="radiogroup"
+                accessibilityLabel="Path on Overview"
+              >
+                {overviewPaths.map((path) => (
+                  <Pressable
+                    key={path.id}
+                    accessibilityRole="radio"
+                    aria-checked={data.overviewPath === path.id}
+                    disabled={pending}
+                    onPress={() =>
+                      savePreference(() => changeOverviewPath(path.id))
+                    }
+                    style={[
+                      s.chip,
+                      { minHeight: 44, justifyContent: "center" },
+                      data.overviewPath === path.id && s.chartStudied,
+                    ]}
+                  >
+                    <Text style={s.rowTitle}>{path.title}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          </View>
           {message ? (
             <Text
               accessibilityRole="alert"
@@ -747,7 +1540,7 @@ export function Settings() {
           Audio credits
         </Text>
         <View style={[s.list, s.credit]}>
-          <CircleHelp size={21} color={green} />
+          <CircleHelp size={21} color={themeColor(green)} />
           <View style={s.grow}>
             <Text style={s.body}>
               Kana audio synthesized with HTS Voice Mei, © Nagoya Institute of
@@ -767,7 +1560,7 @@ export function Settings() {
               style={({ pressed }) => [s.link, pressed && s.pressed]}
             >
               <Text style={s.linkText}>Audio license</Text>
-              <ExternalLink size={15} color={green} />
+              <ExternalLink size={15} color={themeColor(green)} />
             </Pressable>
           </View>
         </View>
@@ -776,7 +1569,18 @@ export function Settings() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
+  search: {
+    minHeight: 46,
+    color: ink,
+    borderColor: "#9bad9e",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontFamily: "DMSans",
+    fontSize: 16,
+    backgroundColor: "#fffef8",
+  },
   page: { gap: 26, paddingBottom: 28 },
   heading: { gap: 6 },
   title: {

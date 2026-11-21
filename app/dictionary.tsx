@@ -1,45 +1,29 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { glossaryEntries } from "../src/glossaryEntries";
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
+import { JapaneseText } from "../src/JapaneseText";
 import {
   glossaryKey,
   searchGlossary,
   type GlossaryEntry,
 } from "../src/glossary";
-import { useStudy } from "../src/study";
+import { useWordBookmarks } from "../src/useWordBookmarks";
 
 export default function Dictionary() {
-  const { data, saveWord } = useStudy();
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const { saved, saving, saveFailed, toggleWord } = useWordBookmarks();
   const [savedOnly, setSavedOnly] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
-  const savingRef = useRef(false);
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(24);
   const [failed, setFailed] = useState("");
-  const saved = new Set(data.savedWords);
   const source = glossaryEntries.filter(
     (entry) => !savedOnly || saved.has(glossaryKey(entry)),
   );
   const results = searchGlossary(source, query);
-
-  async function toggleWord(entry: GlossaryEntry) {
-    if (savingRef.current) return;
-    savingRef.current = true;
-    setSaving(true);
-    setSaveFailed(false);
-    const key = glossaryKey(entry);
-    try {
-      await saveWord(key, !saved.has(key));
-    } catch {
-      setSaveFailed(true);
-    } finally {
-      savingRef.current = false;
-      setSaving(false);
-    }
-  }
 
   async function listen(entry: GlossaryEntry) {
     if (entry.audio === undefined) return;
@@ -79,9 +63,20 @@ export default function Dictionary() {
         ))}
       </View>
       {savedOnly && source.length > 0 && (
-        <Link href="/saved-practice" style={[s.button, s.more, s.buttonLabel]}>
-          Practice saved words
-        </Link>
+        <View style={s.actions}>
+          <Link
+            href="/saved-practice"
+            style={[s.button, s.more, s.buttonLabel]}
+          >
+            Practice saved words
+          </Link>
+          <Link
+            href={{ pathname: "/saved-practice", params: { mode: "recall" } }}
+            style={[s.button, s.more, s.buttonLabel]}
+          >
+            Recall saved words
+          </Link>
+        </View>
       )}
       <TextInput
         accessibilityLabel="Search lesson glossary"
@@ -91,7 +86,7 @@ export default function Dictionary() {
           setLimit(24);
         }}
         placeholder="Search words"
-        placeholderTextColor="#566860"
+        placeholderTextColor={themeColor("#566860")}
         autoCorrect={false}
         autoCapitalize="none"
         returnKeyType="search"
@@ -112,9 +107,13 @@ export default function Dictionary() {
           {results.slice(0, limit).map((entry) => (
             <View key={glossaryKey(entry)} style={s.row}>
               <View style={s.grow}>
-                <Text style={s.word}>{entry.spelling}</Text>
+                <JapaneseText style={s.word}>{entry.spelling}</JapaneseText>
                 <Text style={s.detail}>
-                  {entry.kana !== entry.spelling ? entry.kana + " · " : ""}
+                  {entry.kana !== entry.spelling && (
+                    <JapaneseText style={s.detail}>
+                      {entry.kana} ·{" "}
+                    </JapaneseText>
+                  )}
                   {entry.meaning}
                   {entry.romaji ? " · " + entry.romaji : ""}
                 </Text>
@@ -148,7 +147,7 @@ export default function Dictionary() {
         </View>
       ) : (
         <Text accessibilityLiveRegion="polite" style={s.detail}>
-          {savedOnly && !data.savedWords.length
+          {savedOnly && !saved.size
             ? "Save a word to see it here."
             : "No matching lesson words."}
         </Text>
@@ -166,7 +165,7 @@ export default function Dictionary() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 14, width: "100%", maxWidth: 760 },
   back: {
     color: "#215848",

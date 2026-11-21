@@ -1,6 +1,8 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { Slot, router, usePathname } from "expo-router";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import {
   BookOpen,
   ChartNoAxesColumn,
@@ -15,13 +17,21 @@ import {
 import {
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { StudyProvider } from "../src/study";
+import { StudyProvider, useStudy } from "../src/study";
+import { applyOfflineUpdate, useOfflineState } from "../src/useOfflineState";
+
+const offlineLabels = {
+  local: "Local study",
+  loading: "Preparing offline",
+  ready: "Available offline",
+  update: "Update app",
+  unavailable: "Offline unavailable",
+};
 
 const tabs = [
   { path: "/", name: "Overview", icon: House },
@@ -32,6 +42,8 @@ const tabs = [
 ] as const;
 
 function Brand() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <View style={s.brand}>
       <View style={s.stamp}>
@@ -40,7 +52,7 @@ function Brand() {
         </Text>
       </View>
       <Text style={s.brandText}>
-        Nihongo<Text style={{ color: "#a94128" }}>Learn</Text>
+        Nihongo<Text style={{ color: themeColor("#a94128") }}>Learn</Text>
       </Text>
     </View>
   );
@@ -55,6 +67,8 @@ function NavItem({
   active: boolean;
   small: boolean;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const Icon: LucideIcon = tab.icon;
   return (
     <Pressable
@@ -72,7 +86,7 @@ function NavItem({
       <Icon
         size={small ? 20 : 19}
         strokeWidth={active ? 2.3 : 1.7}
-        color={active ? "#245643" : "#626b60"}
+        color={themeColor(active ? "#245643" : "#626b60")}
       />
       <Text style={[s.tabLabel, small && s.smallLabel, active && s.current]}>
         {tab.name}
@@ -81,15 +95,55 @@ function NavItem({
   );
 }
 
+function OfflineBadge() {
+  const s = useStyles();
+  const state = useOfflineState();
+  const content = (
+    <>
+      <View
+        style={[
+          s.dot,
+          state === "loading" && s.cachingDot,
+          state === "unavailable" && s.unavailableDot,
+        ]}
+      />
+      <Text accessibilityLiveRegion="polite" style={s.localText}>
+        {offlineLabels[state]}
+      </Text>
+    </>
+  );
+  return state === "update" ? (
+    <Pressable
+      accessibilityRole="button"
+      onPress={applyOfflineUpdate}
+      style={[s.local, s.updateBadge]}
+    >
+      {content}
+    </Pressable>
+  ) : (
+    <View style={s.local}>{content}</View>
+  );
+}
+
 function Frame() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const { darkMode } = useStudy().data;
   const path = usePathname();
   const { width } = useWindowDimensions();
   const wide = width >= 960;
   const session = path === "/session";
   const name = tabs.find((tab) => tab.path === path)?.name || "Lesson";
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", themeColor("#244f41", "background"));
+  }, [darkMode, themeColor]);
   return (
     <SafeAreaView style={s.full}>
-      <StatusBar style="dark" />
+      <StatusBar style={darkMode ? "light" : "dark"} />
       <View style={s.frame}>
         {wide && !session && (
           <View style={s.sidebar}>
@@ -107,7 +161,7 @@ function Frame() {
             </View>
             <View style={s.profile}>
               <View style={s.avatar}>
-                <CircleUserRound size={24} color="#536348" />
+                <CircleUserRound size={24} color={themeColor("#536348")} />
               </View>
               <View>
                 <Text style={s.profileName}>Guest learner</Text>
@@ -121,18 +175,15 @@ function Frame() {
             <View style={[s.top, !wide && s.topMobile]}>
               {wide ? (
                 <View style={s.crumb}>
-                  <LibraryBig size={17} color="#626b60" />
+                  <LibraryBig size={17} color={themeColor("#626b60")} />
                   <Text style={s.muted}>Workspace</Text>
-                  <ChevronRight size={13} color="#969a8c" />
+                  <ChevronRight size={13} color={themeColor("#969a8c")} />
                   <Text style={s.crumbName}>{name}</Text>
                 </View>
               ) : (
                 <Brand />
               )}
-              <View style={s.local}>
-                <View style={s.dot} />
-                <Text style={s.localText}>Local study</Text>
-              </View>
+              <OfflineBadge />
             </View>
           )}
           {session ? (
@@ -140,6 +191,7 @@ function Frame() {
           ) : (
             <ScrollView
               key={path}
+              keyboardShouldPersistTaps="handled"
               style={{ flex: 1 }}
               contentContainerStyle={s.scroll}
             >
@@ -188,7 +240,7 @@ export default function Layout() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   full: { flex: 1, backgroundColor: "#f7f6f0" },
   frame: { flex: 1, flexDirection: "row" },
   main: { flex: 1, minWidth: 0 },
@@ -275,8 +327,16 @@ const s = StyleSheet.create({
   muted: { fontFamily: "DMSans", fontSize: 13, color: "#737a6d" },
   crumbName: { fontFamily: "DMSansBold", fontSize: 13, color: "#485748" },
   local: { flexDirection: "row", alignItems: "center", gap: 7 },
+  updateBadge: {
+    minHeight: 44,
+    paddingHorizontal: 8,
+    backgroundColor: "#dfe8d9",
+    borderRadius: 8,
+  },
   localText: { fontFamily: "DMSans", fontSize: 12, color: "#59684f" },
   dot: { height: 7, width: 7, borderRadius: 4, backgroundColor: "#73926a" },
+  cachingDot: { backgroundColor: "#8e6a28" },
+  unavailableDot: { backgroundColor: "#a94128" },
   scroll: { alignItems: "center" },
   content: { width: "100%", maxWidth: 1350, paddingTop: 27, paddingBottom: 38 },
   bottom: {

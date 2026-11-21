@@ -15,6 +15,6 @@ export function useReviewQueue(data: StudyData) {
   return useMemo(() => {
     const now = Math.max(clock, Date.now());
     const queue = reviewQueue(data, kanaIds, now);
-    return { queue, due: queue.filter((card) => card.dueAt <= now) };
+    return { queue, due: queue.filter((card) => card.dueAt <= now), now };
   }, [data, clock]);
 }

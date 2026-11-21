@@ -137,3 +137,201 @@ export const verbs = [
     feedback: "いきませんでした gives both the negative and the past meaning.",
   },
 ] as const;
+
+export const adjectives = [
+  {
+    id: "i-adjective-noun",
+    title: "Describe a noun with an い-adjective",
+    explanation:
+      "An adjective such as おいしい (delicious) goes directly before the noun it describes.",
+    japanese: "おいしい パンです。",
+    english: "It’s delicious bread.",
+    prompt: "Choose the form that fits directly before パン.",
+    stem: "＿＿ パンです。",
+    choices: ["おいしいな", "おいしい", "おいしいです"],
+    answer: "おいしい",
+    feedback: "おいしい is an い-adjective. Put it directly before パン.",
+  },
+  {
+    id: "na-adjective-noun",
+    title: "Connect a な-adjective to a noun",
+    explanation:
+      "A な-adjective takes な before a noun. This includes きれい (clean or pretty), even though its kana spelling ends in い.",
+    japanese: "きれいな へやです。",
+    english: "It’s a clean room.",
+    prompt: "Choose the form for “a quiet town.”",
+    stem: "＿＿ まちです。",
+    choices: ["しずか", "しずかです", "しずかな"],
+    answer: "しずかな",
+    feedback:
+      "Use しずかな before the noun まち. At the end of a sentence, use しずかです.",
+  },
+  {
+    id: "i-adjective-negative",
+    title: "Make an い-adjective negative",
+    explanation:
+      "For many い-adjectives, replace the final い with くない, then add です for politeness. いい (good) is irregular and becomes よくない.",
+    japanese: "この スープは あつくないです。",
+    english: "This soup isn’t hot.",
+    prompt: "Choose the polite form for “The tea isn’t hot.”",
+    stem: "おちゃは＿＿。",
+    choices: ["あつくないです", "あついです", "あつくなかったです"],
+    answer: "あつくないです",
+    feedback:
+      "あつい becomes あつくない. Add です to make the statement polite.",
+  },
+  {
+    id: "na-adjective-negative",
+    title: "Make a な-adjective negative",
+    explanation:
+      "Use では ありません after a な-adjective for a polite negative. The linking な appears before nouns and drops here.",
+    japanese: "この へやは しずかでは ありません。",
+    english: "This room isn’t quiet.",
+    prompt: "Choose the polite negative for “This room isn’t clean.”",
+    stem: "この へやは＿＿。",
+    choices: ["きれいです", "きれいでは ありません", "きれいでした"],
+    answer: "きれいでは ありません",
+    feedback:
+      "きれい is a な-adjective and takes では ありません in this polite negative.",
+  },
+] as const;
+
+export const teForm = [
+  {
+    id: "te-ichidan",
+    title: "Form て with an ichidan verb",
+    explanation:
+      "For an ichidan verb, drop the final る and add て. For example, たべる becomes たべて. Some verbs that end in る belong to other groups.",
+    japanese: "たべて ください。",
+    english: "Please eat.",
+    prompt: "Use the て-form of みる (to look) to say “Please look.”",
+    stem: "＿＿ ください。",
+    choices: ["みって", "みて", "みるて"],
+    answer: "みて",
+    feedback: "みる is an ichidan verb. Drop る and add て to make みて.",
+  },
+  {
+    id: "te-godan-u-tsu-ru",
+    title: "Use って for certain godan verbs",
+    explanation:
+      "Godan verbs ending in う, つ, or る use って in this form. まつ (to wait) becomes まって, and かう (to buy) becomes かって.",
+    japanese: "ここで まって ください。",
+    english: "Please wait here.",
+    prompt: "Use the て-form of かう (to buy) to say “Please buy bread.”",
+    stem: "パンを ＿＿ ください。",
+    choices: ["かいて", "かうて", "かって"],
+    answer: "かって",
+    feedback: "The う in かう becomes って in this form.",
+  },
+  {
+    id: "te-godan-mu-bu-nu",
+    title: "Use んで with む, ぶ, and ぬ verbs",
+    explanation:
+      "Godan verbs ending in む, ぶ, or ぬ take んで. For example, よむ (to read) becomes よんで.",
+    japanese: "この ほんを よんで ください。",
+    english: "Please read this book.",
+    prompt: "Use the て-form of のむ (to drink) to say “Please drink water.”",
+    stem: "みずを ＿＿ ください。",
+    choices: ["のんで", "のむて", "のって"],
+    answer: "のんで",
+    feedback: "Replace the final む of のむ with んで.",
+  },
+  {
+    id: "te-godan-ku-gu-su",
+    title: "Read the endings いて, いで, and して",
+    explanation:
+      "For most godan verbs ending in く, use いて. For ぐ, use いで, and for す, use して. いく (to go) is a major exception and becomes いって.",
+    japanese: "なまえを かいて ください。",
+    english: "Please write your name.",
+    prompt: "Use the て-form of いく to say “Please go to the station.”",
+    stem: "えきに ＿＿ ください。",
+    choices: ["いいて", "いって", "いくて"],
+    answer: "いって",
+    feedback: "いく is an exception. Its て-form is いって.",
+  },
+  {
+    id: "te-irregular",
+    title: "Make requests with する and くる",
+    explanation:
+      "The irregular verbs する (to do) and くる (to come) become して and きて. Put ください after the て-form for a polite request.",
+    japanese: "ここに きて ください。",
+    english: "Please come here.",
+    prompt: "Complete “Please do your homework” using the て-form of する.",
+    stem: "しゅくだいを ＿＿ ください。",
+    choices: ["すって", "するて", "して"],
+    answer: "して",
+    feedback: "する becomes して, so して ください means “please do it.”",
+  },
+] as const;
+
+export const demonstratives = [
+  {
+    id: "demonstrative-standalone",
+    title: "Point to a thing with これ, それ, or あれ",
+    explanation:
+      "Use これ for something near you, それ for something near the person you’re speaking to, and あれ for something away from both of you. These words stand on their own.",
+    japanese: "それは なんですか。",
+    english: "What is that near you?",
+    prompt: "The key is in your own hand. Say “This is a key.”",
+    stem: "＿＿は かぎです。",
+    choices: ["あれ", "これ", "それ"],
+    answer: "これ",
+    feedback: "The key is near you, the speaker, so use これ.",
+  },
+  {
+    id: "demonstrative-before-noun",
+    title: "Put この, その, or あの before a noun",
+    explanation:
+      "Use この, その, and あの with a following noun. They follow the same distance pattern as これ, それ, and あれ.",
+    japanese: "この ほんは おもしろいです。",
+    english: "This book is interesting.",
+    prompt:
+      "The umbrella is beside the person you’re talking to. Choose “that umbrella near you.”",
+    stem: "＿＿ かさです。",
+    choices: ["それ", "あの", "その"],
+    answer: "その",
+    feedback: "その goes before the noun かさ when it is near the listener.",
+  },
+  {
+    id: "demonstrative-which",
+    title: "Ask which one with どれ or どの",
+    explanation:
+      "どれ means “which one” by itself. Use どの when it is followed by a noun, as in どの でんしゃ (which train).",
+    japanese: "ミカさんの かさは どれですか。",
+    english: "Which one is Mika’s umbrella?",
+    prompt: "Complete the question “Which train goes to Kyoto?”",
+    stem: "＿＿ でんしゃが きょうとに いきますか。",
+    choices: ["どの", "どれ", "どこ"],
+    answer: "どの",
+    feedback:
+      "Use どの before でんしゃ to ask which train. が marks the train that goes there.",
+  },
+  {
+    id: "demonstrative-places",
+    title: "Point to a place with ここ, そこ, or あそこ",
+    explanation:
+      "ここ means here near the speaker. そこ points to a place near the listener, and あそこ points to a place away from both.",
+    japanese: "ここは きっさてんです。",
+    english: "This place is a café.",
+    prompt:
+      "The station is over there, away from both of you. Say “The station is over there.”",
+    stem: "えきは ＿＿です。",
+    choices: ["ここ", "そこ", "あそこ"],
+    answer: "あそこ",
+    feedback:
+      "あそこ refers to a place away from both the speaker and the listener.",
+  },
+  {
+    id: "demonstrative-where",
+    title: "Ask where with どこ",
+    explanation:
+      "Use どこ to ask where a place or thing is. A common pattern is [thing or place] は どこですか.",
+    japanese: "トイレは どこですか。",
+    english: "Where is the restroom?",
+    prompt: "Complete “Where is the station?”",
+    stem: "えきは ＿＿ですか。",
+    choices: ["どれ", "どこ", "そこ"],
+    answer: "どこ",
+    feedback: "どこ asks for a location. どれ asks which one.",
+  },
+] as const;

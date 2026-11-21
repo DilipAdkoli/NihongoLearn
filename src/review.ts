@@ -11,11 +11,10 @@ export function reviewQueue(
   const known = new Set(knownIds);
   const cards = new Map<string, Card>();
   const studied = new Set(data.seen.filter((id) => known.has(id)));
-  const history = [...data.attempts].sort(
-    (a, b) => a.at - b.at || a.id.localeCompare(b.id),
-  );
+  const history = data.attempts
+    .filter((attempt) => known.has(attempt.kanaId))
+    .sort((a, b) => a.at - b.at || a.id.localeCompare(b.id));
   for (const attempt of history) {
-    if (!known.has(attempt.kanaId)) continue;
     studied.add(attempt.kanaId);
     if (attempt.mode !== "recall") continue;
     const time = new Date(attempt.at);

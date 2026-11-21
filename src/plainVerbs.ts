@@ -1,0 +1,81 @@
+export const plainVerbs = [
+  {
+    id: "plain-nonpast",
+    title: "Use the dictionary form in plain speech",
+    explanation:
+      "The dictionary form is the plain affirmative non-past form. In casual conversation, いく can mean go regularly or will go, depending on the time words and context.",
+    japanese: "あした、がっこうに いく。",
+    english: "I’ll go to school tomorrow.",
+    prompt: "Use the plain form to say “I drink water every day.”",
+    stem: "まいにち、みずを ＿＿。",
+    choices: ["のみます", "のんだ", "のむ"],
+    answer: "のむ",
+    feedback: "のむ is the plain non-past form and fits the daily routine.",
+  },
+  {
+    id: "plain-negative-ichidan",
+    title: "Make a る-verb negative",
+    explanation:
+      "For る-verbs like たべる and みる, replace the final る with ない. Learn the verb group with each new word because verbs ending in る can belong to either group.",
+    japanese: "きょうは パンを たべない。",
+    english: "I won’t eat bread today.",
+    prompt: "Use the plain negative of みる to say “I won’t watch TV today.”",
+    stem: "きょうは テレビを ＿＿。",
+    choices: ["みない", "みた", "みなかった"],
+    answer: "みない",
+    feedback: "Drop る from みる and add ない to form みない.",
+  },
+  {
+    id: "plain-negative-godan",
+    title: "Make a う-verb negative",
+    explanation:
+      "For う-verbs, change the final kana to its a-row partner and add ない. よむ becomes よまない. For a verb ending in う, use わ, as in かう → かわない.",
+    japanese: "この ほんは かわない。",
+    english: "I won’t buy this book.",
+    prompt: "Use the plain negative of よむ to say “I won’t read this book.”",
+    stem: "この ほんは ＿＿。",
+    choices: ["よんだ", "よまない", "よみたい"],
+    answer: "よまない",
+    feedback: "Change む to ま and add ない. よむ becomes よまない.",
+  },
+  {
+    id: "plain-past",
+    title: "Make the plain past with た or だ",
+    explanation:
+      "Use the same sound changes as the て-form. Replace a final て with た or a final で with だ. のんで becomes のんだ.",
+    japanese: "きのう、おちゃを のんだ。",
+    english: "I drank tea yesterday.",
+    prompt:
+      "Say “I went to the station yesterday.” The て-form of いく is いって.",
+    stem: "きのう、えきに ＿＿。",
+    choices: ["いく", "いかない", "いった"],
+    answer: "いった",
+    feedback: "The past form is いった. The final て in いって becomes た.",
+  },
+  {
+    id: "plain-past-negative",
+    title: "Say what you didn’t do with なかった",
+    explanation:
+      "To make a plain negative verb past, replace its ending ない with なかった. For example, のまない becomes のまなかった.",
+    japanese: "けさ、コーヒーを のまなかった。",
+    english: "I didn’t drink coffee this morning.",
+    prompt: "Use the plain past negative to say “I didn’t eat bread.”",
+    stem: "パンを ＿＿。",
+    choices: ["たべなかった", "たべない", "たべた"],
+    answer: "たべなかった",
+    feedback: "たべない becomes たべなかった when the action is in the past.",
+  },
+  {
+    id: "plain-irregular-negatives",
+    title: "Use the irregular negatives しない and こない",
+    explanation:
+      "The plain negatives of する (do) and くる (come) are しない and こない. The reading of 来 changes to こ in 来ない.",
+    japanese: "あしたは しゅくだいを しない。",
+    english: "I won’t do homework tomorrow.",
+    prompt: "Use the plain negative to say “My friend won’t come today.”",
+    stem: "きょうは ともだちが ＿＿。",
+    choices: ["くる", "きた", "こない"],
+    answer: "こない",
+    feedback: "くる becomes こない in the plain negative.",
+  },
+] as const;

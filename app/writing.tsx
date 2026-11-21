@@ -1,11 +1,14 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { JapaneseText } from "../src/JapaneseText";
 import type { Attempt } from "../src/storage.types";
 import { useStudy } from "../src/study";
 import { isSentenceAnswer, writingTasks } from "../src/writing";
 
 function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
+  const s = useStyles();
   const { answer } = useStudy();
   const [selected, setSelected] = useState<number[]>([]);
   const [result, setResult] = useState<Attempt>();
@@ -68,7 +71,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
             }
             style={[s.tile, s.added]}
           >
-            <Text style={s.tileText}>{task.tiles[index]}</Text>
+            <JapaneseText style={s.tileText}>{task.tiles[index]}</JapaneseText>
           </Pressable>
         ))}
       </View>
@@ -89,7 +92,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
               }
               style={[s.tile, chosen && s.muted]}
             >
-              <Text style={s.tileText}>{tile}</Text>
+              <JapaneseText style={s.tileText}>{tile}</JapaneseText>
             </Pressable>
           );
         })}
@@ -125,6 +128,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
 }
 
 export default function Writing() {
+  const s = useStyles();
   return (
     <View style={s.page}>
       <Link href="/learn" style={s.back}>
@@ -137,6 +141,9 @@ export default function Writing() {
         Tap words to put them in order. Tap a word in your sentence to remove
         it.
       </Text>
+      <Link href="/write-japanese" style={s.back}>
+        Type a sentence ›
+      </Link>
       {writingTasks.map((task) => (
         <Sentence key={task.id} task={task} />
       ))}
@@ -144,7 +151,7 @@ export default function Writing() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 16, width: "100%", maxWidth: 760 },
   title: { color: "#203730", fontFamily: "DMSerifText", fontSize: 36 },
   heading: { color: "#203730", fontFamily: "DMSerifText", fontSize: 23 },

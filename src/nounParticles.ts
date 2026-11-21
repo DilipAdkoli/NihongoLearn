@@ -1,0 +1,67 @@
+export const nounParticles = [
+  {
+    id: "noun-connection-no",
+    title: "Connect two nouns with の",
+    explanation:
+      "の connects two nouns. In わたしの かぎ, the first noun tells you whose key it is. In にほんごの ほん, the first noun gives the subject of the book.",
+    japanese: "これは わたしの かぎです。",
+    english: "This is my key.",
+    prompt: "Connect ともだち and かさ to say “This is my friend’s umbrella.”",
+    stem: "これは ともだち＿＿ かさです。",
+    choices: ["で", "の", "も"],
+    answer: "の",
+    feedback: "ともだちの かさ means my friend’s umbrella.",
+  },
+  {
+    id: "also-mo",
+    title: "Include another person or thing with も",
+    explanation:
+      "も can mean also or too. When you compare yourself with someone who is a student, わたしも がくせいです says you belong to that group too.",
+    japanese: "わたしも がくせいです。",
+    english: "I’m a student too.",
+    prompt: "Say “I drink tea every morning too,” just like your friend.",
+    stem: "わたし＿＿ まいあさ おちゃを のみます。",
+    choices: ["も", "は", "の"],
+    answer: "も",
+    feedback: "わたしも means I do too in this context.",
+  },
+  {
+    id: "companion-to",
+    title: "Say who comes with you with と",
+    explanation:
+      "Place と after a person to say you do something together. ともだちと can mean with a friend.",
+    japanese: "ともだちと えきに いきます。",
+    english: "I’m going to the station with a friend.",
+    prompt: "Say “I’ll study with a friend tomorrow.”",
+    stem: "あした、ともだち＿＿ べんきょうします。",
+    choices: ["で", "を", "と"],
+    answer: "と",
+    feedback: "ともだちと identifies the friend as your study companion.",
+  },
+  {
+    id: "starting-point-kara",
+    title: "Mark a starting point with から",
+    explanation:
+      "Put から after a time or place to say where or when something starts. くじから means from nine o’clock.",
+    japanese: "くじから ごじまで はたらきます。",
+    english: "I work from nine to five.",
+    prompt: "Mark the station as the place you leave from.",
+    stem: "えき＿＿ バスに のります。",
+    choices: ["まで", "から", "も"],
+    answer: "から",
+    feedback: "えきから means from the station, where you board the bus.",
+  },
+  {
+    id: "end-point-made",
+    title: "Mark an endpoint with まで",
+    explanation:
+      "Put まで after a time or place to say how long or how far something goes. ごじまで means until five o’clock.",
+    japanese: "ごじまで べんきょうします。",
+    english: "I’ll study until five.",
+    prompt: "Say “I’ll walk as far as the park.”",
+    stem: "こうえん＿＿ あるきます。",
+    choices: ["まで", "から", "と"],
+    answer: "まで",
+    feedback: "こうえんまで identifies the park as the endpoint of the walk.",
+  },
+] as const;

@@ -1,5 +1,5 @@
 import { glossaryKey, type GlossaryEntry } from "./glossary";
-import { weekdayWords } from "./kanji";
+import { kanjiWords } from "./kanji";
 import { kana } from "./learning";
 import { wordGroups } from "./vocabulary";
 
@@ -24,7 +24,136 @@ for (const group of wordGroups) {
       audio: word.audio,
     });
 }
-for (const word of weekdayWords) addEntry(word);
+for (const word of kanjiWords) addEntry(word);
+addEntry({
+  spelling: "本屋",
+  kana: "ほんや",
+  meaning: "bookstore",
+  romaji: "honya",
+});
+addEntry({
+  spelling: "営業時間",
+  kana: "えいぎょうじかん",
+  meaning: "opening hours",
+  romaji: "eigyou jikan",
+});
+addEntry({
+  spelling: "明後日",
+  kana: "あさって",
+  meaning: "the day after tomorrow",
+  romaji: "asatte",
+});
+addEntry({
+  spelling: "まっすぐ",
+  kana: "まっすぐ",
+  meaning: "straight ahead",
+  romaji: "massugu",
+});
+addEntry({ spelling: "角", kana: "かど", meaning: "corner", romaji: "kado" });
+addEntry({ spelling: "部屋", kana: "へや", meaning: "room", romaji: "heya" });
+addEntry({
+  spelling: "四人",
+  kana: "よにん",
+  meaning: "four people",
+  romaji: "yonin",
+});
+addEntry({
+  spelling: "歯医者",
+  kana: "はいしゃ",
+  meaning: "dentist",
+  romaji: "haisha",
+});
+addEntry({
+  spelling: "予約",
+  kana: "よやく",
+  meaning: "appointment or reservation",
+  romaji: "yoyaku",
+});
+addEntry({
+  spelling: "午前",
+  kana: "ごぜん",
+  meaning: "a.m.",
+  romaji: "gozen",
+});
+addEntry({ spelling: "午後", kana: "ごご", meaning: "p.m.", romaji: "gogo" });
+addEntry({
+  spelling: "一泊",
+  kana: "いっぱく",
+  meaning: "one night’s stay",
+  romaji: "ippaku",
+});
+addEntry({
+  spelling: "曲がる",
+  kana: "まがる",
+  meaning: "to turn",
+  romaji: "magaru",
+});
+addEntry({
+  spelling: "コーヒー",
+  kana: "コーヒー",
+  meaning: "coffee",
+  romaji: "koohii",
+});
+addEntry({
+  spelling: "サンドイッチ",
+  kana: "サンドイッチ",
+  meaning: "sandwich",
+  romaji: "sandoicchi",
+});
+addEntry({
+  spelling: "セット",
+  kana: "セット",
+  meaning: "set meal",
+  romaji: "setto",
+});
+addEntry({
+  spelling: "一つずつ",
+  kana: "ひとつずつ",
+  meaning: "one of each",
+  romaji: "hitotsu zutsu",
+});
+addEntry({
+  spelling: "ホット",
+  kana: "ホット",
+  meaning: "hot (of a drink)",
+  romaji: "hotto",
+});
+addEntry({
+  spelling: "アイス",
+  kana: "アイス",
+  meaning: "iced (of a drink)",
+  romaji: "aisu",
+});
+addEntry({
+  spelling: "全部で",
+  kana: "ぜんぶで",
+  meaning: "in total",
+  romaji: "zenbu de",
+});
+addEntry({
+  spelling: "晴れる",
+  kana: "はれる",
+  meaning: "to clear up or be sunny",
+  romaji: "hareru",
+});
+addEntry({
+  spelling: "喫茶店",
+  kana: "きっさてん",
+  meaning: "café",
+  romaji: "kissaten",
+});
+addEntry({
+  spelling: "ピクニック",
+  kana: "ピクニック",
+  meaning: "picnic",
+  romaji: "pikunikku",
+});
+addEntry({
+  spelling: "どちらでも",
+  kana: "どちらでも",
+  meaning: "either way",
+  romaji: "dochira demo",
+});
 for (const item of kana) {
   if (item.example)
     addEntry({

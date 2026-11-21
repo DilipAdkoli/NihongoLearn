@@ -1,21 +1,51 @@
 # NihongoLearn 🇯🇵
 
-> **Development checkpoint — kana curriculum.** The Expo app teaches all 46 basic hiragana and 25 kana with dakuten or handakuten across 15 lessons, 33 contracted hiragana sounds across 11 lessons, plus matching basic, voiced, and contracted katakana across 26 lessons, with bundled audio, recognition and typed recall. The remaining roadmap is a backlog.
+> **Coding agents:** Read [AGENTS.md](AGENTS.md) and the current [AI development handoff](docs/AI_HANDOFF.md) before making changes. Update the handoff with each implemented feature.
+
+> **Development preview.** Learn kana and everyday Japanese, hear bundled pronunciations, and review your progress locally on Android or in a browser.
 
 ## Run the app
 
-Use Node 24.3 or newer in the 24.x series. From the repository root, run `npm ci`, then `npm run web` for the browser or `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
+**Windows 10 or 11, x64.** Sign in to GitHub, open a successful App checks run that lists the Windows preview, and download **NihongoLearn-Windows-x64** under **Artifacts**. Right-click the ZIP, choose **Extract All**, and double-click **Start NihongoLearn.cmd** in the extracted folder. It opens the app in your browser and includes its own Node runtime. Keep the terminal window open while you study. [Download a preview](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml?query=branch%3Acodex%2Fnihongolearn)
 
-For a web build that can reopen offline, run `npm run export:web` and serve `dist/` from the root of an HTTPS origin or from localhost. Open it once with a connection so the service worker can cache the app and audio.
+Use Node.js 24 LTS (24.3 or newer). In VS Code, open the cloned `NihongoLearn` folder and run these commands in its terminal to try the development branch.
+
+```powershell
+git fetch origin
+git switch codex/nihongolearn
+git pull --ff-only origin codex/nihongolearn
+npm.cmd ci
+npm.cmd run web
+```
+
+Open the local URL printed in the terminal. In Bash or a similar shell, use `npm` for the npm commands. To preview the exported build in PowerShell, press Ctrl+C to stop the development server, then run the following commands and open the URL printed by the preview server. Wait for **Available offline** to confirm that the app and audio have been cached.
+
+```powershell
+npm.cmd run export:web
+npm.cmd run preview:web
+```
+
+In Chrome or Edge, use the browser’s **Install NihongoLearn** action to open the exported build as a standalone app.
+When a newer offline build downloads, use **Update app** in the header to reload that tab.
+
+Run `npm start` for Expo Go with SDK 58. Android stores study data in SQLite. The web version uses browser local storage and shares updates across tabs open to the same local URL. Run `npm run typecheck` and `npm test` for the learning and persistence checks.
+
+To try a prebuilt copy, download `NihongoLearn-web` from **Artifacts** on the latest successful App checks run for `codex/nihongolearn`. Unzip it, open the folder containing `index.html` in VS Code, and run `node serve.mjs` in its terminal. Open the local URL it prints. [Web builds](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/checks.yml?query=branch%3Acodex%2Fnihongolearn)
+
+The Android test APK workflow builds an ARM64 APK with the JavaScript and audio bundled. Sign in to GitHub and download `NihongoLearn-test-arm64` from **Artifacts** on a successful run. Unzip it, transfer `app-release.apk` to the phone, and open it on the phone. The APK uses the test signing key. New builds also include `SHA256SUMS.txt` with the APK’s checksum and `BUILD.txt` with the source commit. [Android test APK runs](https://github.com/DilipAdkoli/NihongoLearn/actions/workflows/android-apk.yml)
 
 ## Current build
 
-- **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. The sound guide compares small っ and ッ and long vowels.
-- **Beginner lessons.** Practice polite grammar, everyday words, sentence building, weekday kanji, and scripted dialogue. Reading and listening passages offer optional translations. Listening includes two playback speeds and transcripts. The glossary searches lesson words by Japanese, romaji, or English and offers practice with saved words.
-- **Review and progress.** Overview shows due kana and opens the next review batch. FSRS schedules recall from saved answers. A kana check suggests a lesson, and Review offers targeted drills for pairs learners have mixed up. Progress shows separate skill scores and seven days of activity.
-- **Local settings.** Pronunciation audio and kana reading hints can be toggled independently. Settings exports study data as JSON and merges imported progress without changing local preferences.
+Search Learn by lesson title, topic, or kana. Search by grammar pattern, vocabulary spelling or meaning, dialogue phrase, or text from a reading or listening passage.
 
-TypeScript, formatting, and 25 automated tests passed. Browser checks covered lesson and review flows, backup export and import, and persistence across reloads. The Android JavaScript bundle exported successfully. APK assembly still needs access to `repo.reactnative.dev` for React Native and Hermes. Confirm playback and persistence on a physical Android device in airplane mode before marking Phase 1 complete. Draft lesson content and synthesized pronunciation still need human review.
+- **Kana.** 208 study entries across hiragana and katakana cover the 46 basic characters per script, dakuten and handakuten, and 33 common contracted sounds per script. Study uses bundled synthesized audio, with recognition, typed recall, and listening drills. Mixed kana practice combines studied hiragana and katakana in the same round. The sound guide teaches small っ and ッ and long vowels, with six listening questions. A lookalike guide compares similar kana side by side with audio and practice. The stroke-order guide animates all 208 kana entries, including combinations with small kana, and lets learners reveal each stroke manually, trace it, or hide the guide to write from memory. A searchable loanword reference covers 13 katakana combinations with bundled examples and quizzes.
+- **Beginner lessons.** Grammar covers particles for possession, company, and ranges, polite and plain verb forms, verbs that describe nouns, the て-form, adjectives, demonstratives, existence, location, questions, comparisons, actions in progress, permission, requests and obligations, wants, ability, invitations, conditions, and connecting ideas. Practice 68 everyday words with typed recall and audio-to-meaning questions, including weather, places, family, and descriptions. Other lessons cover counting through 99, larger numbers in yen prices, 5 counters including 本 and 匹, clock and calendar readings with listening practice, arranged and typed sentences for locations, permission, requests, and wants, kanji in weekdays and signs, common kanji components and how readings change in different words, kana readings and typed kanji spellings in sentences, and scripted dialogue with audio responses for introductions, cafés, stations, shops, asking for help, making weekend plans, and talking about family. Read directions around town, a morning routine, a casual message, a bookstore’s hours, two lodging options, a family introduction, a café menu, and plans that depend on the weather. Listen to a train announcement, an evening routine, a short weather forecast, walking directions, an appointment change, and a café order with two playback speeds, repeat and stop controls, and transcripts. Switch reading passages and listening transcripts between kana and standard Japanese with kanji. Look up and save key vocabulary from passages and transcripts. Reading and listening have optional translations. Listen and repeat lets you choose a dialogue topic and say nineteen model phrases aloud at two speeds and optionally record and replay your voice on Android or a secure web page. Recordings stay on the device and are cleared when you change phrases or leave practice. The glossary searches lesson words by Japanese, romaji, or English and offers recognition and typed recall for saved words.
+- **Review and progress.** Overview shows due kana and opens the next review batch. FSRS schedules recall for kana, everyday vocabulary, and saved words from typed answers. A kana check suggests a lesson, and Review offers targeted drills for pairs learners have mixed up. Review also offers grammar, word recognition, typed recall, reading, listening, kanji spelling, and typed sentence questions whose latest answer was incorrect. Listening review includes passages, vocabulary, dates and times, and sound differences. Progress shows separate skill scores and seven days of activity. Overview tracks an optional daily question goal. New learners can choose a path and goal from Overview. Settings keeps both choices available.
+- **Starter path.** Open the starter path from Overview or choose Start learning Japanese in Learn for six guided steps from hiragana vowels through a café exchange. Existing study progress counts toward the path. Continue the next step directly from Overview after completing a step. The beginner skill check covers vocabulary, grammar, reading, listening, and writing and links back to skills to revisit. Japanese for travel offers five steps from reading signs to asking for a train ticket. Make plans in Japanese guides learners through dates, business hours, rescheduling, requests, and a typed message.
+- **Beginner journey.** The Complete beginner journey overview path links kana, basic sentences, everyday words, reading, listening, dates, travel, and planning activities into one continued sequence. It uses existing lesson answer keys and local progress; it is a curated beginner route, not an official JLPT certification.
+- **Local settings.** Settings offers a dark theme, pronunciation audio, kana reading hints, and Japanese text size. Settings exports study data as JSON and merges imported progress without changing local preferences.
+
+TypeScript, formatting, and 84 automated tests passed. Browser checks covered offline lessons, review, backup export and import, and persistence across reloads. The Learn catalog exposes the beginner journey, kana, guided paths, vocabulary, grammar, reading, listening, writing, kanji, dialogue, counters, calendar, and loanword practice. Android build and physical-device validation are paused at the user's request. Draft lesson content and synthesized pronunciation still need human review.
 
 **Vision:** An Android-first, offline-capable Japanese learning app for beginners through advanced learners, combining an evidence-informed curriculum, real-world immersion, spaced repetition, error-aware personalization, and an optional privacy-respecting open-source AI tutor called **Sensei AI**.
 

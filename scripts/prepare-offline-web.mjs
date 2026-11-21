@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const output = "dist";
@@ -18,16 +18,21 @@ async function filesUnder(directory) {
 }
 
 const html = await readFile(join(output, "index.html"), "utf8");
-const registration = '<script src="/register-offline.js" defer></script>';
+const offlineHead = [
+  '<link rel="manifest" href="/manifest.webmanifest" />',
+  '<link rel="apple-touch-icon" href="/icon-192.png" />',
+  '<meta name="theme-color" content="#244f41" />',
+  '<script src="/register-offline.js" defer></script>',
+].join("\n");
 if (!html.includes("</head>"))
   throw new Error("Web export is missing its HTML head.");
 await writeFile(
   join(output, "index.html"),
-  html.replace("</head>", registration + "</head>"),
+  html.replace("</head>", offlineHead + "\n</head>"),
 );
 
 const files = (await filesUnder(""))
-  .filter((file) => file !== "offline-assets.json")
+  .filter((file) => file !== "offline-assets.json" && file !== "serve.mjs")
   .sort();
 const hash = createHash("sha256");
 for (const file of files) {
@@ -46,5 +51,9 @@ const assets = files.filter((file) => file !== "service-worker.js");
 await writeFile(
   join(output, "offline-assets.json"),
   JSON.stringify({ version, assets }) + "\n",
+);
+await copyFile(
+  new URL("./serve-web.mjs", import.meta.url),
+  join(output, "serve.mjs"),
 );
 console.log(`Prepared offline cache ${version} with ${assets.length} assets.`);

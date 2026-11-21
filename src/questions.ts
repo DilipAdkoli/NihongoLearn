@@ -1,0 +1,67 @@
+export const questionWords = [
+  {
+    id: "question-itsu",
+    title: "Ask when with いつ",
+    explanation:
+      "いつ asks when something happens. If you want the clock time, ask なんじ instead.",
+    japanese: "いつ がっこうに いきますか。",
+    english: "When are you going to school?",
+    prompt: "Ask “When will you meet your friend?”",
+    stem: "＿＿ ともだちに あいますか。",
+    choices: ["だれ", "いくら", "いつ"],
+    answer: "いつ",
+    feedback: "いつ asks when. ともだちに あいます means meet a friend.",
+  },
+  {
+    id: "question-dare",
+    title: "Ask who with だれ",
+    explanation:
+      "だれ asks who someone is. どなた is a more polite alternative in contexts where you want to be especially respectful.",
+    japanese: "あの ひとは だれですか。",
+    english: "Who is that person?",
+    prompt: "Ask “Who is this person?” using the common neutral question word.",
+    stem: "この ひとは ＿＿ですか。",
+    choices: ["だれ", "どれ", "いつ"],
+    answer: "だれ",
+    feedback: "だれ asks for the identity of a person.",
+  },
+  {
+    id: "question-nani",
+    title: "Ask what with なに or なん",
+    explanation:
+      "Both なに and なん mean what. Common patterns are なんですか (what is it?) and なにを (what, as the object of an action).",
+    japanese: "なにを たべますか。",
+    english: "What will you eat?",
+    prompt: "Complete “What is this?”",
+    stem: "これは ＿＿ですか。",
+    choices: ["どこ", "なん", "いくら"],
+    answer: "なん",
+    feedback: "なん is the usual reading of 何 in なんですか.",
+  },
+  {
+    id: "question-ikura",
+    title: "Ask the price with いくら",
+    explanation:
+      "いくら asks how much something costs. Point out the item, then ask いくらですか.",
+    japanese: "この パンは いくらですか。",
+    english: "How much is this bread?",
+    prompt: "Ask how much the ticket costs.",
+    stem: "この きっぷは ＿＿ですか。",
+    choices: ["いくら", "どこ", "なんじ"],
+    answer: "いくら",
+    feedback: "いくら asks for the price.",
+  },
+  {
+    id: "question-douyatte",
+    title: "Ask how to get somewhere with どうやって",
+    explanation:
+      "Use どうやって to ask how someone does something, especially about the method or means of getting somewhere.",
+    japanese: "えきに どうやって いきますか。",
+    english: "How do I get to the station?",
+    prompt: "Ask how to get to the café.",
+    stem: "きっさてんに ＿＿ いきますか。",
+    choices: ["だれ", "いくら", "どうやって"],
+    answer: "どうやって",
+    feedback: "どうやって asks what method of travel to use.",
+  },
+] as const;

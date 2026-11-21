@@ -1,19 +1,21 @@
+import { createThemedStyles, useThemeColor } from "./theme";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import {
   Keyboard,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
 import { playKana } from "./audio";
+import { JapaneseText } from "./JapaneseText";
 import {
   evaluateAnswer,
   kana,
   lessons,
   makeExercises,
+  missedKanaIds,
   type Kana,
   type SessionMode,
 } from "./learning";
@@ -30,6 +32,7 @@ type SessionProps = {
   onClose: () => void;
   onFinish: () => void;
   onRecommendedLesson: (ids: string[]) => void;
+  onRetryMissed: (ids: string[]) => void;
 };
 
 function Action({
@@ -41,6 +44,7 @@ function Action({
   disabled?: boolean;
   onPress: () => void;
 }) {
+  const s = useStyles();
   return (
     <Pressable
       accessibilityRole="button"
@@ -59,6 +63,7 @@ function Action({
 }
 
 function ListenButton({ id, label }: { id: string; label: string }) {
+  const s = useStyles();
   const [audioError, setAudioError] = useState(false);
   async function listen() {
     try {
@@ -96,17 +101,18 @@ function LessonCard({
   sound: boolean;
   romaji: boolean;
 }) {
+  const s = useStyles();
   return (
     <>
       <View style={s.studyCard}>
-        <Text
+        <JapaneseText
           style={s.glyph}
           accessibilityLabel={
             romaji ? `${item.script} ${item.reading}` : undefined
           }
         >
           {item.glyph}
-        </Text>
+        </JapaneseText>
         {romaji && <Text style={s.reading}>{item.reading}</Text>}
         {sound && (
           <ListenButton
@@ -119,12 +125,12 @@ function LessonCard({
       {item.example && (
         <View style={s.example}>
           <Text style={s.label}>IN A WORD</Text>
-          <Text style={s.exampleWord}>
+          <JapaneseText style={s.exampleWord}>
             {item.example}
             {romaji && (
               <Text style={s.exampleReading}> {item.exampleReading}</Text>
             )}
-          </Text>
+          </JapaneseText>
           <Text style={s.body}>{item.meaning}</Text>
         </View>
       )}
@@ -142,7 +148,10 @@ export default function Session({
   onClose,
   onFinish,
   onRecommendedLesson,
+  onRetryMissed,
 }: SessionProps) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const listening = mode === "listening";
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
   const [exercises] = useState(() => makeExercises(ids, mode));
@@ -240,10 +249,13 @@ export default function Session({
         ? "Listening practice"
         : mode === "contrast"
           ? "Compare kana"
-          : mode === "review"
-            ? "Review"
-            : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
+          : mode === "mixed"
+            ? "Mixed kana practice"
+            : mode === "review"
+              ? "Review"
+              : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
+  const missedIds = stage === "results" ? missedKanaIds(attempts) : [];
 
   const suggestion =
     stage === "results" && mode === "placement"
@@ -336,7 +348,8 @@ export default function Session({
                         ? "ROMAJI"
                         : item.script.toUpperCase()}
                     </Text>
-                    <Text
+                    <JapaneseText
+                      scaleText={exercise.mode !== "recognition"}
                       style={
                         exercise.mode === "recognition"
                           ? s.promptReading
@@ -346,7 +359,7 @@ export default function Session({
                       {exercise.mode === "recognition"
                         ? item.reading
                         : item.glyph}
-                    </Text>
+                    </JapaneseText>
                   </View>
                 )}
                 {exercise.mode !== "recall" ? (
@@ -373,7 +386,9 @@ export default function Session({
                           pressed && s.pressed,
                         ]}
                       >
-                        <Text style={s.choiceGlyph}>{choice}</Text>
+                        <JapaneseText style={s.choiceGlyph}>
+                          {choice}
+                        </JapaneseText>
                       </Pressable>
                     ))}
                   </View>
@@ -388,7 +403,7 @@ export default function Session({
                       autoCorrect={false}
                       maxLength={32}
                       placeholder="Type here"
-                      placeholderTextColor="#72796f"
+                      placeholderTextColor={themeColor("#72796f")}
                       returnKeyType="done"
                       style={s.input}
                       editable={!busy && !feedback && !error}
@@ -466,7 +481,17 @@ export default function Session({
               </Text>
             )}
             {stage === "results" ? (
-              <Action label="View progress" onPress={onFinish} />
+              <View style={s.resultActions}>
+                {missedIds.length > 0 && (
+                  <Action
+                    label={`Retry ${missedIds.length} missed ${
+                      missedIds.length === 1 ? "item" : "items"
+                    }`}
+                    onPress={() => onRetryMissed(missedIds)}
+                  />
+                )}
+                <Action label="View progress" onPress={onFinish} />
+              </View>
             ) : feedback ? (
               <Action
                 label={last ? "See results" : "Next question"}
@@ -499,7 +524,7 @@ export default function Session({
 const ink = "#203730";
 const green = "#215848";
 const border = "#cdd3c7";
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   screen: { flex: 1, backgroundColor: "#f7f6f0" },
   page: {
     paddingHorizontal: 22,
@@ -662,6 +687,7 @@ const s = StyleSheet.create({
     borderRadius: 18,
     padding: 22,
   },
+  resultActions: { gap: 10 },
   score: {
     fontFamily: "DMSerifText",
     fontSize: 60,

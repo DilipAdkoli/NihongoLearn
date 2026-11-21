@@ -2,7 +2,7 @@ import type { Attempt } from "./storage.types";
 import { yoon } from "./yoon.ts";
 
 export type SessionMode =
-  "study" | "review" | "contrast" | "listening" | "placement";
+  "study" | "review" | "contrast" | "listening" | "placement" | "mixed";
 
 export type Script = "hiragana" | "katakana";
 
@@ -122,6 +122,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "shi",
     glyph: "し",
     reading: "shi",
+    aliases: ["si"],
     cue: "Start with a soft “sh” sound. Follow it with a short i.",
     example: "しお",
     exampleReading: "shio",
@@ -167,6 +168,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "chi",
     glyph: "ち",
     reading: "chi",
+    aliases: ["ti"],
     cue: "Start with a light “ch” sound. Follow it with a short i.",
     example: "ちち",
     exampleReading: "chichi",
@@ -176,6 +178,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "tsu",
     glyph: "つ",
     reading: "tsu",
+    aliases: ["tu"],
     cue: "Say “ts” as one sound, then add a short u.",
     example: "つき",
     exampleReading: "tsuki",
@@ -266,6 +269,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "fu",
     glyph: "ふ",
     reading: "fu",
+    aliases: ["hu"],
     cue: "Blow gently between your lips, then add a short u.",
     example: "ふね",
     exampleReading: "fune",
@@ -492,6 +496,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "ji",
     glyph: "じ",
     reading: "ji",
+    aliases: ["zi"],
     cue: "Add dakuten (two short marks) to し and say “ji”.",
     example: "じかん",
     exampleReading: "jikan",
@@ -541,7 +546,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     example: "はなぢ",
     exampleReading: "hanaji",
     meaning: "nosebleed",
-    aliases: ["di"],
+    aliases: ["di", "zi"],
   },
   {
     id: "du",
@@ -866,12 +871,26 @@ const katakanaExamples: readonly [string, string, string, string][] = [
   ["pyo", "ピョンピョン", "pyonpyon", "hopping"],
 ];
 
+const contractedAliases: Readonly<Partial<Record<string, readonly string[]>>> =
+  {
+    sha: ["sya"],
+    shu: ["syu"],
+    sho: ["syo"],
+    cha: ["tya", "cya"],
+    chu: ["tyu", "cyu"],
+    cho: ["tyo", "cyo"],
+    ja: ["zya", "jya"],
+    ju: ["zyu", "jyu"],
+    jo: ["zyo", "jyo"],
+  };
+
 const contracted: Kana[] = yoon.map(
   ([glyph, reading, example, exampleReading, meaning]) => ({
     id: reading,
     glyph,
     script: "hiragana",
     reading,
+    aliases: contractedAliases[reading],
     cue: `Combine ${glyph[0]} with small ${glyph[1]}. Read both together as one beat: ${reading}.`,
     example,
     exampleReading,
@@ -960,13 +979,28 @@ export type Exercise = {
   choices: string[];
 };
 
-function shuffled<T>(items: readonly T[]): T[] {
+export function shuffled<T>(items: readonly T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+export function mixedKanaSample(seen: readonly string[]) {
+  const learned = new Set(seen);
+  const hiragana = kana.filter(
+    ({ id, script }) => script === "hiragana" && learned.has(id),
+  );
+  const katakana = kana.filter(
+    ({ id, script }) => script === "katakana" && learned.has(id),
+  );
+  const perScript = Math.min(3, hiragana.length, katakana.length);
+  return [
+    ...shuffled(hiragana).slice(0, perScript),
+    ...shuffled(katakana).slice(0, perScript),
+  ].map(({ id }) => id);
 }
 
 function soundReading(item: Kana) {
@@ -996,8 +1030,19 @@ export function makeExercises(
       mode === "contrast"
         ? eligible.filter((entry) => ids.includes(entry.id))
         : [];
+    const counterpartId =
+      item.script === "hiragana" ? `kata-${item.id}` : item.id.slice(5);
+    const counterpart =
+      mode === "mixed"
+        ? kana.find(({ id }) => id === counterpartId)
+        : undefined;
     const distractors = [
-      ...new Set([...contrast, ...shuffled(neighbors), ...shuffled(otherPool)]),
+      ...new Set([
+        ...(counterpart ? [counterpart] : []),
+        ...contrast,
+        ...shuffled(neighbors),
+        ...shuffled(otherPool),
+      ]),
     ]
       .slice(0, 3)
       .map((other) => other.glyph);
@@ -1016,6 +1061,34 @@ export function makeExercises(
     choices: [],
   }));
   return [...recognition, ...recall];
+}
+
+export function missedKanaIds(attempts: readonly Attempt[]): string[] {
+  return [
+    ...new Set(
+      attempts
+        .filter((attempt) => !attempt.correct)
+        .map((attempt) => attempt.kanaId),
+    ),
+  ];
+}
+
+export function latestAttemptResult(
+  attempts: readonly Attempt[],
+  kanaId: string,
+  mode: Attempt["mode"],
+) {
+  let latest: Attempt | undefined;
+  for (const attempt of attempts) {
+    if (
+      attempt.kanaId === kanaId &&
+      attempt.mode === mode &&
+      (!latest || attempt.at >= latest.at)
+    ) {
+      latest = attempt;
+    }
+  }
+  return latest?.correct;
 }
 
 export function evaluateAnswer(exercise: Exercise, answer: string): boolean {

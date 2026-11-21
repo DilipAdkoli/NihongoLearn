@@ -1,9 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { grammar, particles, verbs } from "../src/grammar.ts";
+import { comparisons } from "../src/comparisons.ts";
+import { existence } from "../src/existence.ts";
+import { adjectives, demonstratives, teForm, verbs } from "../src/grammar.ts";
+import { grammarTopics } from "../src/grammarCourse.ts";
+import { missedQuestions } from "../src/missedQuestions.ts";
+import { questionWords } from "../src/questions.ts";
+import type { Attempt } from "../src/storage.types.ts";
 
 test("grammar lessons have stable IDs and a single selectable answer each", () => {
-  const lessons = [...grammar, ...particles, ...verbs];
+  const lessons = grammarTopics.flatMap((topic) => topic.lessons);
   assert.equal(
     new Set(lessons.map((lesson) => lesson.id)).size,
     lessons.length,
@@ -22,5 +28,73 @@ test("polite verb practice covers non-past and past in both polarities", () => {
   assert.deepEqual(
     verbs.map((lesson) => lesson.answer),
     ["よみます", "のみません", "たべました", "いきませんでした"],
+  );
+});
+
+test("adjective exercises teach both noun modifiers and both negative patterns", () => {
+  assert.deepEqual(
+    adjectives.map((lesson) => lesson.answer),
+    ["おいしい", "しずかな", "あつくないです", "きれいでは ありません"],
+  );
+});
+
+test("て-form practice includes ichidan, godan, and irregular responses", () => {
+  assert.deepEqual(
+    teForm.map((lesson) => lesson.answer),
+    ["みて", "かって", "のんで", "いって", "して"],
+  );
+});
+
+test("demonstrative questions distinguish standalone words, noun modifiers, and places", () => {
+  assert.deepEqual(
+    demonstratives.map((lesson) => lesson.answer),
+    ["これ", "その", "どの", "あそこ", "どこ"],
+  );
+});
+
+test("existence practice distinguishes objects and animals and teaches location particles", () => {
+  assert.deepEqual(
+    existence.map((lesson) => lesson.answer),
+    ["あります", "います", "に", "が", "の"],
+  );
+});
+
+test("everyday questions cover time, people, things, prices, and methods", () => {
+  assert.deepEqual(
+    questionWords.map((lesson) => lesson.answer),
+    ["いつ", "だれ", "なん", "いくら", "どうやって"],
+  );
+});
+
+test("comparison questions cover より, ほうが, どちら, and いちばん", () => {
+  assert.deepEqual(
+    comparisons.map((lesson) => lesson.answer),
+    ["より", "ほうが", "どちら", "いちばん"],
+  );
+});
+
+test("grammar review selects only known questions with an incorrect latest answer", () => {
+  const attempt = (kanaId: string, at: number, correct: boolean): Attempt => ({
+    id: String(at),
+    kanaId,
+    at,
+    correct,
+    mode: "recognition",
+    answer: "は",
+  });
+  const history = [
+    attempt("grammar:question-ka", 6, false),
+    attempt("grammar:desu", 5, true),
+    attempt("grammar:topic-wa", 4, false),
+    attempt("grammar:desu", 3, false),
+    attempt("grammar:question-ka", 2, false),
+    attempt("vocabulary:water", 7, false),
+    attempt("grammar:removed-lesson", 8, false),
+  ];
+  assert.deepEqual(
+    missedQuestions(history, "grammar", grammarTopics).map(
+      (lesson) => lesson.id,
+    ),
+    ["question-ka", "topic-wa"],
   );
 });
