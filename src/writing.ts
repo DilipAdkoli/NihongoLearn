@@ -63,6 +63,25 @@ export const writingTasks = [
     feedback:
       "きっさてんで means at the café. のみたいです means I want to drink.",
   },
+  {
+    id: "no-photos-here",
+    meaning: "Please don’t take photos here.",
+    tiles: ["しゃしん", "とらないで", "で", "ください", "ここ", "を"],
+    answers: [
+      ["ここ", "で", "しゃしん", "を", "とらないで", "ください"],
+      ["しゃしん", "を", "ここ", "で", "とらないで", "ください"],
+    ],
+    feedback:
+      "とる becomes とらない. Add でください to make the negative request.",
+  },
+  {
+    id: "coming-tomorrow-optional",
+    meaning: "You don’t have to come tomorrow.",
+    tiles: ["こなくても", "いいです", "あした", "は"],
+    answers: [["あした", "は", "こなくても", "いいです"]],
+    feedback:
+      "こない becomes こなくてもいいです to say that coming is optional.",
+  },
 ] as const;
 
 export function isSentenceAnswer(
@@ -92,6 +111,7 @@ const spellings = [
   ["撮", "と"],
   ["良い", "いい"],
   ["喫茶店", "きっさてん"],
+  ["来なく", "こなく"],
 ] as const;
 
 export function normalizeSentenceAnswer(text: string) {

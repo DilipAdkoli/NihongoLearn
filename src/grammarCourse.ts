@@ -15,6 +15,7 @@ import {
 import { nounParticles } from "./nounParticles.ts";
 import { plainVerbs } from "./plainVerbs.ts";
 import { questionWords } from "./questions.ts";
+import { requests } from "./requests.ts";
 
 export const grammarTopics: readonly CourseGroup[] = [
   { title: "Statements and questions", lessons: grammar },
@@ -29,6 +30,7 @@ export const grammarTopics: readonly CourseGroup[] = [
   { title: "Requests with the て-form", lessons: teForm },
   { title: "Actions, permission, and wants", lessons: actionPatterns },
   { title: "Plain verb forms", lessons: plainVerbs },
+  { title: "Requests and obligations", lessons: requests },
   { title: "Reasons and connections", lessons: connectors },
   { title: "Ability and potential verbs", lessons: ability },
 ];
