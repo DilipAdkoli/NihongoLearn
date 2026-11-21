@@ -82,6 +82,14 @@ export const writingTasks = [
     feedback:
       "こない becomes こなくてもいいです to say that coming is optional.",
   },
+  {
+    id: "book-i-read",
+    meaning: "This is the book I read yesterday.",
+    tiles: ["ほん", "これは", "よんだ", "です", "きのう"],
+    answers: [["これは", "きのう", "よんだ", "ほん", "です"]],
+    feedback:
+      "きのう よんだ goes before ほん and describes the book you read yesterday.",
+  },
 ] as const;
 
 export function isSentenceAnswer(
