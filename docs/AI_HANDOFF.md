@@ -53,6 +53,9 @@
 - Verification for the beginner journey: `npm run typecheck` succeeded,
   `npm test` passed **80/80 tests**, changed files pass Prettier, and
   `npm run export:web` succeeded.
+- Updated Android APK workflow triggers so app, source, asset, public, script,
+  package, lockfile, app configuration, and workflow changes all request a
+  test-arm64 build.
 
 ## Recently completed in prior sprints
 
