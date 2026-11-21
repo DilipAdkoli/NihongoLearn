@@ -41,6 +41,8 @@ import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
+import { vocabularyWordIds } from "./vocabulary";
+import { vocabularyReviewQueue } from "./vocabularyReview";
 
 const ink = "#203730";
 const green = "#215848";
@@ -603,6 +605,8 @@ export function Review() {
   const { queue, due, now } = useReviewQueue(data);
   const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
   const savedRecallDue = savedRecall.filter((word) => word.dueAt <= now).length;
+  const wordQueue = vocabularyReviewQueue(data, vocabularyWordIds, now);
+  const dueWords = wordQueue.filter(({ dueAt }) => dueAt <= now).length;
   const grammarCount = missedLessons(data.attempts, "grammar").length;
   const recognitionCount = missedLessons(data.attempts, "vocabulary").length;
   const recallCount = missedLessons(data.attempts, "vocabulary-recall").length;
@@ -710,6 +714,24 @@ export function Review() {
           <ReviewLink
             href={{ pathname: "/saved-practice", params: { mode: "recall" } }}
             label={savedRecallDue ? "Review saved words" : "Recall words early"}
+          />
+        </View>
+      )}
+      {wordQueue.length > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Everyday word recall
+          </Text>
+          <Text style={s.body}>
+            {dueWords
+              ? `${dueWords} ${dueWords === 1 ? "word is" : "words are"} ready for recall.`
+              : `Next word review ${new Date(wordQueue[0].dueAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.`}
+          </Text>
+          <ReviewLink
+            href="/vocabulary-review"
+            label={
+              dueWords ? "Review everyday words" : "Recall everyday words early"
+            }
           />
         </View>
       )}

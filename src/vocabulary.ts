@@ -599,6 +599,10 @@ function wordFeedback(word: Word) {
   return `${word.spelling} (${word.kana}) means ${word.meaning}.`;
 }
 
+export const vocabularyWordIds = wordGroups.flatMap(({ words }) =>
+  words.map(({ id }) => id),
+);
+
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
   id,
   title,
