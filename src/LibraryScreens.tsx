@@ -605,6 +605,11 @@ export function Review() {
     data.attempts,
     "passage-listening",
   ).length;
+  const kanjiWritingCount = missedLessons(data.attempts, "kanji-recall").length;
+  const sentenceWritingCount = missedLessons(
+    data.attempts,
+    "writing-type",
+  ).length;
   const pairs = confusedPairs(data.attempts, kana).slice(0, 3);
   const missed = queue.filter(
     ({ id }) =>
@@ -748,6 +753,30 @@ export function Review() {
                   params: { mode: "listening" },
                 }}
                 label={`Review ${listeningCount} listening ${listeningCount === 1 ? "question" : "questions"}`}
+              />
+            )}
+          </View>
+        </View>
+      )}
+      {kanjiWritingCount + sentenceWritingCount > 0 && (
+        <View style={s.feature}>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Writing to try again
+          </Text>
+          <View style={s.featureFooter}>
+            {kanjiWritingCount > 0 && (
+              <ReviewLink
+                href={{
+                  pathname: "/writing-review",
+                  params: { mode: "kanji" },
+                }}
+                label={`Retry ${kanjiWritingCount} kanji ${kanjiWritingCount === 1 ? "word" : "words"}`}
+              />
+            )}
+            {sentenceWritingCount > 0 && (
+              <ReviewLink
+                href="/writing-review"
+                label={`Retry ${sentenceWritingCount} typed ${sentenceWritingCount === 1 ? "sentence" : "sentences"}`}
               />
             )}
           </View>

@@ -122,3 +122,18 @@ export function normalizeSentenceAnswer(text: string) {
     compact,
   );
 }
+
+export const typedSentenceLessons = writingTasks.map((task) => ({
+  id: task.id,
+  title: task.meaning,
+  japanese: "",
+  english: "",
+  explanation: "",
+  stem: "",
+  prompt: "Type the sentence in Japanese.",
+  choices: [],
+  answer: task.answers[0].join(""),
+  acceptedAnswers: task.answers.map((order) => order.join("")),
+  normalizeAnswer: normalizeSentenceAnswer,
+  feedback: task.feedback,
+}));

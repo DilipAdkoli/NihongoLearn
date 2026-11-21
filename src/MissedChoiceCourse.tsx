@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ChoiceCourse, type CourseGroup } from "./ChoiceCourse";
 import { grammarTopics } from "./grammarCourse";
+import { kanjiRecall } from "./kanjiReading";
 import { missedQuestions } from "./missedQuestions";
 import { passageListening } from "./passageListening";
 import { reading } from "./reading";
 import type { Attempt } from "./storage.types";
 import { useStudy } from "./study";
 import { vocabulary, vocabularyRecall } from "./vocabulary";
+import { typedSentenceLessons } from "./writing";
 
 const choices = {
   grammar: { title: "Review grammar", groups: grammarTopics },
@@ -19,6 +21,11 @@ const choices = {
   "passage-listening": {
     title: "Review listening passages",
     groups: passageListening,
+  },
+  "kanji-recall": { title: "Review kanji spelling", groups: kanjiRecall },
+  "writing-type": {
+    title: "Review typed sentences",
+    groups: [{ lessons: typedSentenceLessons }],
   },
 };
 
