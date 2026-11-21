@@ -27,6 +27,7 @@ import { pickBackup } from "./pickBackup";
 import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
+import { conversation } from "./conversation";
 import { glossaryEntries } from "./glossaryEntries";
 import { grammarTopics } from "./grammarCourse";
 import { JapaneseText } from "./JapaneseText";
@@ -41,7 +42,7 @@ import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
 import type { Attempt } from "./storage.types";
-import { vocabularyWordIds } from "./vocabulary";
+import { vocabularyWordIds, wordGroups } from "./vocabulary";
 import { vocabularyReviewQueue } from "./vocabularyReview";
 
 const ink = "#203730";
@@ -371,29 +372,65 @@ const courseLinks = lessonLinks.map((link) => ({
   searchable: normalizeLessonSearch(`${link.title} ${link.detail}`),
 }));
 
-const lessonSearchLinks = [
-  ...courseLinks,
+const searchableTopics = [
   ...topicCourses.flatMap(({ pathname, groups, detail, icon }) =>
     groups.map(({ id, title, passage, lessons }) => ({
+      id,
+      pathname,
+      title,
+      detail,
+      icon,
+      keywords: passage
+        ? [passage.japanese, passage.standardJapanese, passage.english]
+        : lessons.flatMap(({ title, japanese, english }) => [
+            title,
+            japanese,
+            english,
+          ]),
+    })),
+  ),
+  ...wordGroups.map(({ id, title, words }) => ({
+    id,
+    title,
+    pathname: "/vocabulary" as const,
+    detail: "Vocabulary study",
+    icon: BookOpen,
+    keywords: words.flatMap(({ kana, spelling, romaji, meaning }) => [
+      kana,
+      spelling,
+      romaji,
+      meaning,
+    ]),
+  })),
+  ...conversation.map(({ id, title, lessons }) => ({
+    id,
+    title,
+    pathname: "/conversation" as const,
+    detail: "Dialogue practice",
+    icon: AudioLines,
+    keywords: lessons.flatMap(
+      ({ title, japanese, english, answer, answerEnglish }) => [
+        title,
+        japanese,
+        english,
+        answer,
+        answerEnglish,
+      ],
+    ),
+  })),
+];
+
+const lessonSearchLinks = [
+  ...courseLinks,
+  ...searchableTopics.map(
+    ({ id, pathname, title, detail, icon, keywords }) => ({
       key: `${pathname}/${id}`,
       href: { pathname, params: { topic: id } },
       title,
       detail,
       icon,
-      searchable: normalizeLessonSearch(
-        [
-          title,
-          detail,
-          ...(passage
-            ? [passage.japanese, passage.standardJapanese, passage.english]
-            : lessons.flatMap((lesson) => [
-                lesson.title,
-                lesson.japanese,
-                lesson.english,
-              ])),
-        ].join(" "),
-      ),
-    })),
+      searchable: normalizeLessonSearch([title, detail, ...keywords].join(" ")),
+    }),
   ),
 ];
 
