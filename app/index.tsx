@@ -21,6 +21,7 @@ import {
 import { dailyGoalProgress } from "../src/dailyGoal";
 import { JapaneseText } from "../src/JapaneseText";
 import { kana, lessons } from "../src/learning";
+import type { LearningStep } from "../src/learningPath";
 import { overviewPaths } from "../src/overviewPath";
 import { planningPath } from "../src/planningPath";
 import { starterPath } from "../src/starterPath";
@@ -33,6 +34,28 @@ const overviewSteps = {
   "/travel-path": travelPath,
   "/planning-path": planningPath,
 };
+
+function NextPathStep({ step }: { step: LearningStep }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const button = (
+    <Pressable
+      accessibilityRole={"href" in step ? "link" : "button"}
+      onPress={"seen" in step ? () => startLesson([...step.seen]) : undefined}
+      style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+    >
+      <Text style={s.linkText}>Continue next step</Text>
+      <ArrowRight size={16} color={themeColor("#345b45")} />
+    </Pressable>
+  );
+  return "href" in step ? (
+    <Link href={step.href} asChild>
+      {button}
+    </Link>
+  ) : (
+    button
+  );
+}
 
 function Metric({
   label,
@@ -234,21 +257,26 @@ export default function Home() {
           </Text>
           <Text style={s.nextStep}>{nextStep?.title ?? "Path complete"}</Text>
         </View>
-        <Link href={pathInfo.href} asChild>
-          <Pressable
-            accessibilityRole="link"
-            style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
-          >
-            <Text style={s.linkText}>
-              {nextStep
-                ? completedSteps
-                  ? "Continue path"
-                  : pathInfo.action
-                : "Revisit path"}
-            </Text>
-            <ArrowRight size={16} color={themeColor("#345b45")} />
-          </Pressable>
-        </Link>
+        {nextStep && completedSteps > 0 ? (
+          <View style={s.pathActions}>
+            <NextPathStep step={nextStep} />
+            <Link href={pathInfo.href} style={s.pathLink}>
+              View full path
+            </Link>
+          </View>
+        ) : (
+          <Link href={pathInfo.href} asChild>
+            <Pressable
+              accessibilityRole="link"
+              style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
+            >
+              <Text style={s.linkText}>
+                {nextStep ? pathInfo.action : "Revisit path"}
+              </Text>
+              <ArrowRight size={16} color={themeColor("#345b45")} />
+            </Pressable>
+          </Link>
+        )}
       </View>
       {goal > 0 && (
         <View style={s.goalCard}>
@@ -451,6 +479,13 @@ const useStyles = createThemedStyles({
     gap: 10,
   },
   nextStep: { fontFamily: "DMSansBold", fontSize: 14, color: "#253e32" },
+  pathActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  pathLink: { color: "#345b45", fontFamily: "DMSansBold", paddingVertical: 12 },
   reviewButton: {
     flexDirection: "row",
     alignItems: "center",
