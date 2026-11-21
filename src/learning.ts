@@ -122,6 +122,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "shi",
     glyph: "し",
     reading: "shi",
+    aliases: ["si"],
     cue: "Start with a soft “sh” sound. Follow it with a short i.",
     example: "しお",
     exampleReading: "shio",
@@ -167,6 +168,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "chi",
     glyph: "ち",
     reading: "chi",
+    aliases: ["ti"],
     cue: "Start with a light “ch” sound. Follow it with a short i.",
     example: "ちち",
     exampleReading: "chichi",
@@ -176,6 +178,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "tsu",
     glyph: "つ",
     reading: "tsu",
+    aliases: ["tu"],
     cue: "Say “ts” as one sound, then add a short u.",
     example: "つき",
     exampleReading: "tsuki",
@@ -266,6 +269,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "fu",
     glyph: "ふ",
     reading: "fu",
+    aliases: ["hu"],
     cue: "Blow gently between your lips, then add a short u.",
     example: "ふね",
     exampleReading: "fune",
@@ -492,6 +496,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     id: "ji",
     glyph: "じ",
     reading: "ji",
+    aliases: ["zi"],
     cue: "Add dakuten (two short marks) to し and say “ji”.",
     example: "じかん",
     exampleReading: "jikan",
@@ -541,7 +546,7 @@ const hiragana: readonly Omit<Kana, "script">[] = [
     example: "はなぢ",
     exampleReading: "hanaji",
     meaning: "nosebleed",
-    aliases: ["di"],
+    aliases: ["di", "zi"],
   },
   {
     id: "du",
@@ -866,12 +871,26 @@ const katakanaExamples: readonly [string, string, string, string][] = [
   ["pyo", "ピョンピョン", "pyonpyon", "hopping"],
 ];
 
+const contractedAliases: Readonly<Partial<Record<string, readonly string[]>>> =
+  {
+    sha: ["sya"],
+    shu: ["syu"],
+    sho: ["syo"],
+    cha: ["tya", "cya"],
+    chu: ["tyu", "cyu"],
+    cho: ["tyo", "cyo"],
+    ja: ["zya", "jya"],
+    ju: ["zyu", "jyu"],
+    jo: ["zyo", "jyo"],
+  };
+
 const contracted: Kana[] = yoon.map(
   ([glyph, reading, example, exampleReading, meaning]) => ({
     id: reading,
     glyph,
     script: "hiragana",
     reading,
+    aliases: contractedAliases[reading],
     cue: `Combine ${glyph[0]} with small ${glyph[1]}. Read both together as one beat: ${reading}.`,
     example,
     exampleReading,

@@ -100,6 +100,40 @@ test("recall accepts both the spelling and common pronunciation of を", () => {
   assert.equal(evaluateAnswer(question, "w"), false);
 });
 
+test("recall accepts systematic romanizations and common Japanese keyboard spellings in both scripts", () => {
+  const cases = [
+    ["shi", "si"],
+    ["chi", "ti"],
+    ["tsu", "tu"],
+    ["fu", "hu"],
+    ["ji", "zi"],
+    ["di", "zi"],
+    ["sha", "sya"],
+    ["shu", "syu"],
+    ["sho", "syo"],
+    ["cha", "tya", "cya"],
+    ["chu", "tyu", "cyu"],
+    ["cho", "tyo", "cyo"],
+    ["ja", "zya", "jya"],
+    ["ju", "zyu", "jyu"],
+    ["jo", "zyo", "jyo"],
+  ];
+  for (const [id, ...aliases] of cases) {
+    for (const prefix of ["", "kata-"]) {
+      const [, recall] = makeExercises([prefix + id]);
+      for (const alias of aliases)
+        assert.ok(
+          evaluateAnswer(recall, alias),
+          prefix + id + " accepts " + alias,
+        );
+      assert.equal(evaluateAnswer(recall, "a"), false);
+    }
+  }
+  const [, shi] = makeExercises(["shi"]);
+  assert.ok(evaluateAnswer(shi, " ＳＩ "));
+  assert.equal(evaluateAnswer(shi, "zi"), false);
+});
+
 test("ぢ and づ accept their standard readings and keyboard spellings", () => {
   const [, di] = makeExercises(["di"]);
   const [, du] = makeExercises(["du"]);
