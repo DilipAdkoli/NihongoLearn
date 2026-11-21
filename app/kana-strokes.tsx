@@ -3,29 +3,33 @@ import { useEffect, useState } from "react";
 import { Platform, Pressable, Text, View, type ViewStyle } from "react-native";
 import Svg, { Line, Path } from "react-native-svg";
 import { JapaneseText } from "../src/JapaneseText";
-import { kana, type Kana } from "../src/learning";
+import { kana, lessons, type Kana } from "../src/learning";
 import { kanaStrokePaths } from "../src/kanaStrokePaths";
 import { createThemedStyles, useThemeColor } from "../src/theme";
 import { kanaDiagramSize, useKanaTrace } from "../src/useKanaTrace";
 
+const supportedKana = new Map(
+  kana
+    .filter(({ glyph }) => Object.hasOwn(kanaStrokePaths, glyph))
+    .map((item) => [item.id, item]),
+);
+
 const groups = [
-  {
-    title: "Hiragana",
-    items: kana.filter(
-      (item) =>
-        item.script === "hiragana" &&
-        Object.hasOwn(kanaStrokePaths, item.glyph),
-    ),
-  },
-  {
-    title: "Katakana",
-    items: kana.filter(
-      (item) =>
-        item.script === "katakana" &&
-        Object.hasOwn(kanaStrokePaths, item.glyph),
-    ),
-  },
-];
+  { title: "Hiragana", script: "hiragana" },
+  { title: "Katakana", script: "katakana" },
+].map(({ title, script }) => ({
+  title,
+  rows: lessons
+    .filter(
+      (lesson) =>
+        lesson.script === script &&
+        lesson.ids.every((id) => supportedKana.has(id)),
+    )
+    .map(({ notebook, ids }) => ({
+      title: notebook,
+      items: ids.map((id) => supportedKana.get(id)!),
+    })),
+}));
 
 const strokeDuration = 650;
 const drawOnWeb: ViewStyle & { touchAction: "none" } = { touchAction: "none" };
@@ -58,11 +62,13 @@ export default function KanaStrokes() {
   const s = useStyles();
   const themeColor = useThemeColor();
   const [group, setGroup] = useState(0);
-  const [item, setItem] = useState(groups[0].items[0]);
+  const [row, setRow] = useState(0);
+  const [item, setItem] = useState(groups[0].rows[0].items[0]);
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [tracing, setTracing] = useState(false);
   const trace = useKanaTrace();
+  const activeRow = groups[group].rows[row];
   const strokes = kanaStrokePaths[item.glyph];
   const total = strokes.length;
   const completed = Math.floor(step);
@@ -113,17 +119,19 @@ export default function KanaStrokes() {
         Kana stroke order
       </Text>
       <Text style={s.body}>
-        Watch each vowel’s strokes in order or trace it on the screen.
+        Watch how to write basic hiragana and katakana, or trace each character
+        on the screen.
       </Text>
       <View accessibilityRole="tablist" style={s.controls}>
-        {groups.map(({ title, items }, index) => (
+        {groups.map(({ title, rows }, index) => (
           <Pressable
             key={title}
             accessibilityRole="tab"
             aria-selected={index === group}
             onPress={() => {
               setGroup(index);
-              show(items[0]);
+              setRow(0);
+              show(rows[0].items[0]);
             }}
             style={[s.button, index === group && s.selected]}
           >
@@ -132,19 +140,40 @@ export default function KanaStrokes() {
         ))}
       </View>
       <View
+        accessibilityRole="tablist"
+        accessibilityLabel="Kana rows"
         style={s.controls}
-        accessibilityLabel={`${groups[group].title} vowels`}
       >
-        {groups[group].items.map((vowel) => (
+        {groups[group].rows.map(({ title, items }, index) => (
           <Pressable
-            key={vowel.id}
-            accessibilityRole="button"
-            accessibilityLabel={`Show ${vowel.glyph}`}
-            accessibilityState={{ selected: vowel.id === item.id }}
-            onPress={() => show(vowel)}
-            style={[s.button, vowel.id === item.id && s.selected]}
+            key={title}
+            accessibilityRole="tab"
+            accessibilityLabel={title}
+            aria-selected={row === index}
+            onPress={() => {
+              setRow(index);
+              show(items[0]);
+            }}
+            style={[s.button, row === index && s.selected]}
           >
-            <JapaneseText style={s.glyph}>{vowel.glyph}</JapaneseText>
+            <JapaneseText style={s.rowGlyph}>{items[0].glyph}</JapaneseText>
+          </Pressable>
+        ))}
+      </View>
+      <View
+        style={s.controls}
+        accessibilityLabel={`${groups[group].title} ${activeRow.title}`}
+      >
+        {activeRow.items.map((character) => (
+          <Pressable
+            key={character.id}
+            accessibilityRole="button"
+            accessibilityLabel={`Show ${character.glyph}`}
+            accessibilityState={{ selected: character.id === item.id }}
+            onPress={() => show(character)}
+            style={[s.button, character.id === item.id && s.selected]}
+          >
+            <JapaneseText style={s.glyph}>{character.glyph}</JapaneseText>
           </Pressable>
         ))}
       </View>
@@ -326,6 +355,7 @@ const useStyles = createThemedStyles({
   primaryText: { color: "#fffef8" },
   disabled: { opacity: 0.55 },
   glyph: { color: "#203730", fontSize: 25 },
+  rowGlyph: { color: "#215848", fontSize: 18 },
   card: {
     padding: 12,
     gap: 12,
