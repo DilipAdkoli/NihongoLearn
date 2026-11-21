@@ -18,9 +18,12 @@
   `app/katakana-path.tsx`, `src/overviewPath.ts`,
   `src/dailyStudyPlan.ts`, `src/LibraryScreens.tsx`,
   `tests/kanaPaths.test.ts`, `README.md`, `AGENTS.md`, and this document.
-- **Verification:** Pending on this new commit. Previous branch baseline:
-  TypeScript passed, 71 tests passed, formatting passed, web export passed.
-  Update this status after checking the committed tree.
+- **Verification:** On the feature commit plus these format-only corrections:
+  `npm ci` succeeded, `npm run typecheck` succeeded, `npm test` passed
+  **76/76 tests**, `npm run format:check` succeeded, and
+  `npm run export:web` succeeded with **337 offline assets**.
+  The feature commit's Vercel preview was READY. The final formatting/handoff
+  commit needs its own preview build status checked before release.
 - These paths track whether each character has been *studied*; they are **not**
   yet proficiency certifications. The current app tracks separate recall and
   listening results elsewhere.
@@ -51,7 +54,8 @@
 
 ## Next concrete development tasks
 
-1. Verify this commit: TypeScript, unit tests, Prettier, and Expo web export.
+1. Verify the final formatting/handoff commit's preview deployment; the
+   functional code and tests were already validated locally in a sandbox.
 2. Extend guided kana routes with *measured* recall/listening mastery checks
    rather than treating `seen` as mastery; protect existing user progress.
 3. Expand and verify a cohesive beginner N5 learning sequence.

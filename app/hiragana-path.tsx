@@ -8,7 +8,10 @@ export default function HiraganaPathScreen() {
     <LearningPath
       title="Hiragana step by step"
       steps={hiraganaPath(data)}
-      completion={{ href: "/review", label: "Review the hiragana you've learned" }}
+      completion={{
+        href: "/review",
+        label: "Review the hiragana you've learned",
+      }}
     />
   );
 }

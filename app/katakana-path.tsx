@@ -8,7 +8,10 @@ export default function KatakanaPathScreen() {
     <LearningPath
       title="Katakana step by step"
       steps={katakanaPath(data)}
-      completion={{ href: "/review", label: "Review the katakana you've learned" }}
+      completion={{
+        href: "/review",
+        label: "Review the katakana you've learned",
+      }}
     />
   );
 }

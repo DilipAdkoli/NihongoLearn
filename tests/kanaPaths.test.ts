@@ -24,7 +24,9 @@ for (const [script, createPath] of [
 ] as const) {
   test(`${script} guided path covers each lesson and character once`, () => {
     const path = createPath(fresh);
-    const expectedLessons = lessons.filter((lesson) => lesson.script === script);
+    const expectedLessons = lessons.filter(
+      (lesson) => lesson.script === script,
+    );
     const expectedIds = kana
       .filter((item) => item.script === script)
       .map((item) => item.id)
