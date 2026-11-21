@@ -302,6 +302,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/kana-strokes",
+    title: "Kana stroke order",
+    detail: "Watch how to write the hiragana and katakana vowels",
+    icon: BookOpen,
+  },
+  {
     href: "/loanwords",
     title: "Katakana loanword sounds",
     detail: "Look up ファ, ティ, and other combinations",
