@@ -36,6 +36,9 @@ export default function DailyPlan() {
       <Text style={s.detail} accessibilityRole="summary">
         {forecast.dueNow} due now · {forecast.dueNext24Hours} due in the next 24 hours
       </Text>
+      <Link href="/mistakes" style={s.back}>
+        See explanations for mistakes ›
+      </Link>
       {data.dailyGoal > 0 && (
         <Text style={s.detail}>
           {goal.complete ? "Daily goal reached" : "Daily goal"} ·{" "}
