@@ -52,6 +52,25 @@ addEntry({
 addEntry({ spelling: "角", kana: "かど", meaning: "corner", romaji: "kado" });
 addEntry({ spelling: "部屋", kana: "へや", meaning: "room", romaji: "heya" });
 addEntry({
+  spelling: "歯医者",
+  kana: "はいしゃ",
+  meaning: "dentist",
+  romaji: "haisha",
+});
+addEntry({
+  spelling: "予約",
+  kana: "よやく",
+  meaning: "appointment or reservation",
+  romaji: "yoyaku",
+});
+addEntry({
+  spelling: "午前",
+  kana: "ごぜん",
+  meaning: "a.m.",
+  romaji: "gozen",
+});
+addEntry({ spelling: "午後", kana: "ごご", meaning: "p.m.", romaji: "gogo" });
+addEntry({
   spelling: "一泊",
   kana: "いっぱく",
   meaning: "one night’s stay",

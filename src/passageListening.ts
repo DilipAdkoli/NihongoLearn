@@ -255,4 +255,52 @@ export const passageListening: readonly CourseGroup[] = [
       },
     ),
   },
+  {
+    id: "appointment-change",
+    title: "Change an appointment",
+    passage: {
+      japanese:
+        "A: はいしゃの よやくは ろくがつ よっかの ごぜん くじです。\nB: すみません、その ひは しごとが あります。\nA: ろくがつ とおかの ごご さんじは どうですか。\nB: はい、ろくがつ とおかの ごご さんじで おねがいします。",
+      standardJapanese:
+        "A: 歯医者の予約は六月四日の午前九時です。\nB: すみません、その日は仕事があります。\nA: 六月十日の午後三時はどうですか。\nB: はい、六月十日の午後三時でお願いします。",
+      english:
+        "A: Your dentist appointment is on June 4 at 9 a.m.\nB: I’m sorry, I have work that day.\nA: How about June 10 at 3 p.m.?\nB: Yes, June 10 at 3 p.m., please.",
+      lookupWords: ["歯医者", "予約", "午前", "午後"],
+      audio: [
+        require("../assets/audio/passage-appointment-change-normal.mp3"),
+        require("../assets/audio/passage-appointment-change-slow.mp3"),
+      ],
+    },
+    lessons: questions(
+      {
+        id: "appointment-original",
+        title: "The original appointment",
+        prompt: "When was the appointment originally scheduled?",
+        choices: ["June 4 at 9 a.m.", "June 4 at 9 p.m.", "June 10 at 9 a.m."],
+        answer: "June 4 at 9 a.m.",
+        feedback: "ろくがつ よっか is June 4. ごぜん くじ means 9 a.m.",
+      },
+      {
+        id: "appointment-reason",
+        title: "The reason for changing",
+        prompt: "Why does the patient need to change the appointment?",
+        choices: [
+          "They have class",
+          "They have work",
+          "They will be out of town",
+        ],
+        answer: "They have work",
+        feedback: "その ひ is that day. しごとが あります means I have work.",
+      },
+      {
+        id: "appointment-new",
+        title: "The new appointment",
+        prompt: "Which date and time do they agree on?",
+        choices: ["June 10 at 3 a.m.", "June 4 at 3 p.m.", "June 10 at 3 p.m."],
+        answer: "June 10 at 3 p.m.",
+        feedback:
+          "ろくがつ とおか is June 10. ごご さんじ means 3 p.m., and おねがいします accepts the suggested time here.",
+      },
+    ),
+  },
 ];
