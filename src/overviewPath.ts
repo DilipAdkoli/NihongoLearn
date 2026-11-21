@@ -39,6 +39,14 @@ export const overviewPaths = [
     href: "/katakana-path",
     action: "Learn katakana",
   },
+  {
+    id: 5,
+    title: "Complete beginner journey",
+    detail:
+      "Build a small N5-style foundation across kana, grammar, reading, listening, travel, and plans.",
+    href: "/beginner-n5-path",
+    action: "Open beginner journey",
+  },
 ] as const;
 
 export type OverviewPath = (typeof overviewPaths)[number]["id"];

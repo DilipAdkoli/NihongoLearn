@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { selectedPathSteps } from "../src/dailyStudyPlan.ts";
 import { hiraganaPath, katakanaPath } from "../src/kanaPaths.ts";
+import { beginnerN5Path } from "../src/beginnerN5Path.ts";
 import { kana, lessons, type Script } from "../src/learning.ts";
 import { readOverviewPath } from "../src/overviewPath.ts";
 import type { Attempt, StudyData } from "../src/storage.types.ts";
@@ -106,5 +107,9 @@ test("both scripts can be selected as the learner's personal daily path", () => 
   assert.deepEqual(
     selectedPathSteps({ ...fresh, overviewPath: 4 }).map((step) => step.id),
     katakanaPath(fresh).map((step) => step.id),
+  );
+  assert.deepEqual(
+    selectedPathSteps({ ...fresh, overviewPath: 5 }).map((step) => step.id),
+    beginnerN5Path(fresh).map((step) => step.id),
   );
 });

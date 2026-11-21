@@ -16,15 +16,12 @@ export type PathStudy = Pick<StudyData, "seen" | "attempts">;
 
 export function completeSteps(steps: readonly LearningStep[], data: PathStudy) {
   const seen = new Set(data.seen);
-  const correct = new Set(
-    data.attempts
-      .filter((attempt) => attempt.correct)
-      .map((attempt) => attempt.kanaId),
-  );
+  const latestById = new Map<string, Attempt>();
   const latest = new Map<string, Attempt>();
   for (const attempt of [...data.attempts].sort(
     (a, b) => a.at - b.at || a.id.localeCompare(b.id),
   )) {
+    latestById.set(attempt.kanaId, attempt);
     latest.set(`${attempt.kanaId}:${attempt.mode}`, attempt);
   }
   return steps.map((step) => ({
@@ -39,6 +36,6 @@ export function completeSteps(steps: readonly LearningStep[], data: PathStudy) {
                 ),
               )
             : true)
-        : step.answers.every((id) => correct.has(id)),
+        : step.answers.every((id) => latestById.get(id)?.correct),
   }));
 }

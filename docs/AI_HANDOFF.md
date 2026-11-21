@@ -40,6 +40,19 @@
   The repository-wide `npm run format:check` remains a baseline failure,
   reporting 182 existing or line-ending-sensitive files; changed files were
   formatted and checked separately.
+- Added a selectable **Complete beginner journey** overview path covering
+  hiragana, katakana, basic sentences, everyday words, reading, listening,
+  dates, travel, and planning. It routes through existing reviewed lesson
+  content and does not claim official JLPT N5 certification.
+- Fixed shared path completion logic so a later wrong answer removes a step
+  from completion, while `seen` and local attempts remain unchanged.
+- Files changed: `src/beginnerN5Path.ts`, `app/beginner-n5-path.tsx`,
+  `src/learningPath.ts`, `src/dailyStudyPlan.ts`, `src/overviewPath.ts`,
+  `tests/beginnerN5Path.test.ts`, `tests/kanaPaths.test.ts`, `README.md`,
+  and this document.
+- Verification for the beginner journey: `npm run typecheck` succeeded,
+  `npm test` passed **80/80 tests**, changed files pass Prettier, and
+  `npm run export:web` succeeded.
 
 ## Recently completed in prior sprints
 
@@ -67,8 +80,9 @@
 
 ## Next concrete development tasks
 
-1. Verify this measured-mastery commit's preview deployment.
-2. Expand and verify a cohesive beginner N5 learning sequence.
+1. Verify this beginner-journey and latest-answer commit's preview deployment.
+2. Continue from the existing roadmap without claiming unreviewed language or
+   audio content is native-speaker validated.
 3. Validate the Android APK and offline audio on a real phone.
 4. Plan a reviewed development-to-production merge, checking divergence.
 
