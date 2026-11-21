@@ -425,6 +425,82 @@ export const wordGroups: readonly {
       },
     ],
   },
+  {
+    id: "size-and-age",
+    title: "Size and age of things",
+    words: [
+      {
+        id: "big",
+        kana: "おおきい",
+        spelling: "大きい",
+        romaji: "ookii",
+        meaning: "big",
+        audio: require("../assets/audio/word-big.mp3"),
+      },
+      {
+        id: "small",
+        kana: "ちいさい",
+        spelling: "小さい",
+        romaji: "chiisai",
+        meaning: "small",
+        audio: require("../assets/audio/word-small.mp3"),
+      },
+      {
+        id: "new",
+        kana: "あたらしい",
+        spelling: "新しい",
+        romaji: "atarashii",
+        meaning: "new",
+        audio: require("../assets/audio/word-new.mp3"),
+      },
+      {
+        id: "old",
+        kana: "ふるい",
+        spelling: "古い",
+        romaji: "furui",
+        meaning: "old (for things)",
+        audio: require("../assets/audio/word-old.mp3"),
+      },
+    ],
+  },
+  {
+    id: "descriptions",
+    title: "Prices and descriptions",
+    words: [
+      {
+        id: "expensive",
+        kana: "たかい",
+        spelling: "高い",
+        romaji: "takai",
+        meaning: "expensive",
+        audio: require("../assets/audio/word-expensive.mp3"),
+      },
+      {
+        id: "cheap",
+        kana: "やすい",
+        spelling: "安い",
+        romaji: "yasui",
+        meaning: "cheap",
+        audio: require("../assets/audio/word-cheap.mp3"),
+      },
+      {
+        id: "delicious",
+        kana: "おいしい",
+        spelling: "美味しい",
+        romaji: "oishii",
+        meaning: "delicious",
+        audio: require("../assets/audio/word-delicious.mp3"),
+      },
+      {
+        id: "quiet",
+        kana: "しずか",
+        spelling: "静か",
+        romaji: "shizuka",
+        meaning: "quiet",
+        audio: require("../assets/audio/word-quiet.mp3"),
+      },
+    ],
+  },
 ];
 
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
