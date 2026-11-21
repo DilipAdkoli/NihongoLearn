@@ -2,6 +2,7 @@ import { ability } from "./ability.ts";
 import { actionPatterns } from "./actionPatterns.ts";
 import type { CourseGroup } from "./ChoiceCourse";
 import { comparisons } from "./comparisons.ts";
+import { conditionals } from "./conditionals.ts";
 import { connectors } from "./connectors.ts";
 import { existence } from "./existence.ts";
 import {
@@ -68,4 +69,9 @@ export const grammarTopics: readonly (CourseGroup & {
   },
   { id: "connectors", title: "Reasons and connections", lessons: connectors },
   { id: "ability", title: "Ability and potential verbs", lessons: ability },
+  {
+    id: "conditionals",
+    title: "Say what happens if something changes",
+    lessons: conditionals,
+  },
 ];
