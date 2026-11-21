@@ -47,6 +47,7 @@ type Course =
   | "time"
   | "calendar"
   | "vocabulary-recall"
+  | "vocabulary-listening"
   | "counters"
   | "prices"
   | "beginner-check"

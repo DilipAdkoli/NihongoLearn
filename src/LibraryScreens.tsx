@@ -242,6 +242,12 @@ const lessonLinks = [
     icon: BookOpen,
   },
   {
+    href: "/word-listening",
+    title: "Listen to everyday words",
+    detail: "Hear each word and choose its meaning",
+    icon: AudioLines,
+  },
+  {
     href: "/grammar",
     title: "First Japanese sentences",
     detail: "Beginner grammar, including particles and verb forms",
@@ -852,6 +858,9 @@ export function Progress() {
   const vocabularyAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("vocabulary:"),
   );
+  const vocabularyListeningAttempts = data.attempts.filter((a) =>
+    a.kanaId.startsWith("vocabulary-listening:"),
+  );
   const readingAttempts = data.attempts.filter((a) =>
     a.kanaId.startsWith("reading:"),
   );
@@ -964,6 +973,12 @@ export function Progress() {
       )}
       {!!vocabularyAttempts.length && (
         <Score label="Vocabulary" attempts={vocabularyAttempts} />
+      )}
+      {!!vocabularyListeningAttempts.length && (
+        <Score
+          label="Vocabulary listening"
+          attempts={vocabularyListeningAttempts}
+        />
       )}
       {!!readingAttempts.length && (
         <Score label="Reading" attempts={readingAttempts} />

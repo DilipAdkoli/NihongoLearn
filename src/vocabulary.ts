@@ -11,11 +11,12 @@ type Word = {
 };
 
 export const wordGroups: readonly {
-  id?: string;
+  id: string;
   title: string;
   words: readonly Word[];
 }[] = [
   {
+    id: "food-and-drink",
     title: "Drinks and food",
     words: [
       {
@@ -53,6 +54,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "objects",
     title: "Things around you",
     words: [
       {
@@ -90,6 +92,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "station",
     title: "At the station",
     words: [
       {
@@ -127,6 +130,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "people-and-time",
     title: "People and time",
     words: [
       {
@@ -164,6 +168,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "directions",
     title: "Directions",
     words: [
       {
@@ -239,6 +244,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "daily-routines",
     title: "Daily routines",
     words: [
       {
@@ -276,6 +282,7 @@ export const wordGroups: readonly {
     ],
   },
   {
+    id: "evening-routines",
     title: "From school or work to bedtime",
     words: [
       {
@@ -588,6 +595,10 @@ export const wordGroups: readonly {
   },
 ];
 
+function wordFeedback(word: Word) {
+  return `${word.spelling} (${word.kana}) means ${word.meaning}.`;
+}
+
 export const vocabulary = wordGroups.map(({ id, title, words }) => ({
   id,
   title,
@@ -601,7 +612,7 @@ export const vocabulary = wordGroups.map(({ id, title, words }) => ({
     stem: word.kana,
     choices: words.map((entry) => entry.meaning),
     answer: word.meaning,
-    feedback: `${word.spelling} (${word.kana}) means ${word.meaning}.`,
+    feedback: wordFeedback(word),
     audio: word.audio,
   })),
 }));
@@ -623,6 +634,24 @@ export const vocabularyRecall = wordGroups.map(({ title, words }) => ({
       ...(word.id === "friend" ? ["友達"] : []),
     ],
     answer: word.kana,
-    feedback: `${word.spelling} (${word.kana}) means ${word.meaning}.`,
+    feedback: wordFeedback(word),
+  })),
+}));
+
+export const vocabularyListening = wordGroups.map(({ id, title, words }) => ({
+  id,
+  title,
+  lessons: words.map((word, index): ChoiceLesson => ({
+    id: word.id,
+    title: `Word ${index + 1}`,
+    japanese: "",
+    english: "",
+    explanation: "",
+    stem: "",
+    prompt: "Which meaning matches the word you hear?",
+    choices: words.map((entry) => entry.meaning),
+    answer: word.meaning,
+    feedback: wordFeedback(word),
+    promptAudio: word.audio,
   })),
 }));
