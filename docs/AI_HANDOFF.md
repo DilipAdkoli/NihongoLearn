@@ -58,7 +58,8 @@
   test-arm64 build.
 - Android work is paused until the user explicitly requests it to resume.
   Do not add Android features, broaden APK triggers, or claim device validation
-  until that request.
+  until that request. The Android APK workflow is now manual-only
+  (`workflow_dispatch`) and does not run on pushes to `main`.
 - Corrected the beginner journey reading route to open the real `desk-objects`
   passage and added topic-integrity coverage for its reading and listening steps.
 - Verification after the routing fix: `npm run typecheck` succeeded,

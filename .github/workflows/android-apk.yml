@@ -1,12 +1,6 @@
 name: Android test APK
 
 on:
-  push:
-    branches: [main, "codex/**"]
-    paths:
-      - .github/workflows/android-apk.yml
-      - app.json
-      - package-lock.json
   workflow_dispatch:
 
 permissions:
