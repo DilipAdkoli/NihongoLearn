@@ -304,7 +304,8 @@ const lessonLinks = [
   {
     href: "/kana-strokes",
     title: "Kana stroke order",
-    detail: "Watch and trace the strokes of the 92 basic hiragana and katakana",
+    detail:
+      "Watch and trace the strokes of basic and marked hiragana and katakana",
     icon: BookOpen,
   },
   {

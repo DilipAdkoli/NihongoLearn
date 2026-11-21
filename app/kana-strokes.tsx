@@ -183,9 +183,7 @@ export default function KanaStrokes() {
           onPress={toggleTracing}
         />
         {tracing && (
-          <Text style={s.body}>
-            Draw over the guide. Lift your finger between strokes.
-          </Text>
+          <Text style={s.body}>Draw over the guide, one stroke at a time.</Text>
         )}
         <View
           accessibilityLabel={
