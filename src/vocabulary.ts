@@ -593,6 +593,83 @@ export const wordGroups: readonly {
       },
     ],
   },
+  {
+    id: "cafe-drinks",
+    title: "Café drinks",
+    words: [
+      {
+        id: "coffee",
+        kana: "コーヒー",
+        spelling: "コーヒー",
+        romaji: "koohii",
+        meaning: "coffee",
+        audio: require("../assets/audio/word-dining-coffee.mp3"),
+      },
+      {
+        id: "black-tea",
+        kana: "こうちゃ",
+        spelling: "紅茶",
+        romaji: "koucha",
+        meaning: "black tea",
+        note: "紅茶 is black tea. お茶 can mean green tea or tea in general.",
+        audio: require("../assets/audio/word-dining-black-tea.mp3"),
+      },
+      {
+        id: "milk",
+        kana: "ぎゅうにゅう",
+        spelling: "牛乳",
+        romaji: "gyuunyuu",
+        meaning: "milk",
+        audio: require("../assets/audio/word-dining-milk.mp3"),
+      },
+      {
+        id: "juice",
+        kana: "ジュース",
+        spelling: "ジュース",
+        romaji: "juusu",
+        meaning: "juice",
+        audio: require("../assets/audio/word-dining-juice.mp3"),
+      },
+    ],
+  },
+  {
+    id: "meal-foods",
+    title: "Food at a meal",
+    words: [
+      {
+        id: "egg",
+        kana: "たまご",
+        spelling: "卵",
+        romaji: "tamago",
+        meaning: "egg",
+        audio: require("../assets/audio/word-dining-egg.mp3"),
+      },
+      {
+        id: "meat",
+        kana: "にく",
+        spelling: "肉",
+        romaji: "niku",
+        meaning: "meat",
+        audio: require("../assets/audio/word-dining-meat.mp3"),
+      },
+      {
+        id: "fish",
+        kana: "さかな",
+        spelling: "魚",
+        romaji: "sakana",
+        meaning: "fish",
+        audio: require("../assets/audio/word-dining-fish.mp3"),
+      },
+      {
+        id: "vegetables",
+        kana: "やさい",
+        spelling: "野菜",
+        romaji: "yasai",
+        meaning: "vegetables",
+        audio: require("../assets/audio/word-dining-vegetables.mp3"),
+      },
+    ],
+  },
 ];
 
 function wordFeedback(word: Word) {
