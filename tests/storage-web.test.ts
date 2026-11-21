@@ -33,6 +33,7 @@ test("web progress survives reopening and retries preserve the original attempt"
     dailyGoal: 0,
     overviewPath: 0,
     japaneseTextSize: 0,
+    darkMode: false,
     romaji: true,
     sound: true,
   });
@@ -67,6 +68,7 @@ test("web progress survives reopening and retries preserve the original attempt"
       store.setDailyGoal(20),
       store.setOverviewPath(1),
       store.setJapaneseTextSize(2),
+      store.setPreference("darkMode", true),
     ]);
   `);
   run(
@@ -79,6 +81,7 @@ test("web progress survives reopening and retries preserve the original attempt"
     dailyGoal: 20,
     overviewPath: 1,
     japaneseTextSize: 2,
+    darkMode: true,
     romaji: false,
     sound: false,
   });

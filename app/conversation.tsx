@@ -1,7 +1,9 @@
+import { createThemedStyles } from "../src/theme";
 import { ChoiceCourse, useChoiceTopic } from "../src/ChoiceCourse";
 import { dialogueGroups } from "../src/dialogueAudio";
 
 export default function Conversation() {
+  const s = useStyles();
   const initialTopic = useChoiceTopic();
   return (
     <ChoiceCourse
@@ -21,7 +23,7 @@ export default function Conversation() {
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   link: {
     color: "#215848",
     fontFamily: "DMSansBold",

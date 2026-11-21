@@ -128,6 +128,8 @@ export function createSqliteStorage(
         sound: settings.find((setting) => setting.key === "sound")?.value !== 0,
         romaji:
           settings.find((setting) => setting.key === "romaji")?.value !== 0,
+        darkMode:
+          settings.find((setting) => setting.key === "darkMode")?.value === 1,
       };
     },
     async markSeen(id) {

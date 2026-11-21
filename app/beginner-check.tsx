@@ -1,5 +1,6 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import {
   beginnerCheck,
   beginnerCheckCourse,
@@ -27,6 +28,7 @@ const groups = beginnerCheck.map((group) => ({
 }));
 
 export default function BeginnerCheck() {
+  const s = useStyles();
   const { data } = useStudy();
   const scores = beginnerCheckProgress(data.attempts);
   const total = scores.reduce((sum, score) => sum + score.total, 0);
@@ -65,7 +67,7 @@ export default function BeginnerCheck() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   summary: {
     borderColor: "#cddbc7",
     borderWidth: 1,

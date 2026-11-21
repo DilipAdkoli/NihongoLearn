@@ -1,3 +1,4 @@
+import { useThemeColor } from "../src/theme";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -11,6 +12,7 @@ import {
 import { useStudy } from "../src/study";
 
 function SavedPracticeBatch({ recall }: { recall: boolean }) {
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const title = recall ? "Recall saved words" : "Saved word practice";
   const course = recall ? savedRecallCourse : "saved-words";
@@ -44,16 +46,20 @@ function SavedPracticeBatch({ recall }: { recall: boolean }) {
       <View style={{ gap: 14 }}>
         <Text
           accessibilityRole="header"
-          style={{ fontFamily: "DMSerifText", fontSize: 30, color: "#203730" }}
+          style={{
+            fontFamily: "DMSerifText",
+            fontSize: 30,
+            color: themeColor("#203730"),
+          }}
         >
           {title}
         </Text>
-        <Text style={{ fontFamily: "DMSans", color: "#566860" }}>
+        <Text style={{ fontFamily: "DMSans", color: themeColor("#566860") }}>
           Save a glossary word to start practicing.
         </Text>
         <Link
           href="/dictionary"
-          style={{ color: "#215848", fontFamily: "DMSansBold" }}
+          style={{ color: themeColor("#215848"), fontFamily: "DMSansBold" }}
         >
           Open glossary
         </Link>

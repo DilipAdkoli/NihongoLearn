@@ -1,6 +1,8 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { Slot, router, usePathname } from "expo-router";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import {
   BookOpen,
   ChartNoAxesColumn,
@@ -15,13 +17,12 @@ import {
 import {
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { StudyProvider } from "../src/study";
+import { StudyProvider, useStudy } from "../src/study";
 import { useOfflineState } from "../src/useOfflineState";
 
 const offlineLabels = {
@@ -40,6 +41,8 @@ const tabs = [
 ] as const;
 
 function Brand() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <View style={s.brand}>
       <View style={s.stamp}>
@@ -48,7 +51,7 @@ function Brand() {
         </Text>
       </View>
       <Text style={s.brandText}>
-        Nihongo<Text style={{ color: "#a94128" }}>Learn</Text>
+        Nihongo<Text style={{ color: themeColor("#a94128") }}>Learn</Text>
       </Text>
     </View>
   );
@@ -63,6 +66,8 @@ function NavItem({
   active: boolean;
   small: boolean;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const Icon: LucideIcon = tab.icon;
   return (
     <Pressable
@@ -80,7 +85,7 @@ function NavItem({
       <Icon
         size={small ? 20 : 19}
         strokeWidth={active ? 2.3 : 1.7}
-        color={active ? "#245643" : "#626b60"}
+        color={themeColor(active ? "#245643" : "#626b60")}
       />
       <Text style={[s.tabLabel, small && s.smallLabel, active && s.current]}>
         {tab.name}
@@ -90,15 +95,25 @@ function NavItem({
 }
 
 function Frame() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
+  const { darkMode } = useStudy().data;
   const path = usePathname();
   const offlineState = useOfflineState();
   const { width } = useWindowDimensions();
   const wide = width >= 960;
   const session = path === "/session";
   const name = tabs.find((tab) => tab.path === path)?.name || "Lesson";
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", themeColor("#244f41", "background"));
+  }, [darkMode, themeColor]);
   return (
     <SafeAreaView style={s.full}>
-      <StatusBar style="dark" />
+      <StatusBar style={darkMode ? "light" : "dark"} />
       <View style={s.frame}>
         {wide && !session && (
           <View style={s.sidebar}>
@@ -116,7 +131,7 @@ function Frame() {
             </View>
             <View style={s.profile}>
               <View style={s.avatar}>
-                <CircleUserRound size={24} color="#536348" />
+                <CircleUserRound size={24} color={themeColor("#536348")} />
               </View>
               <View>
                 <Text style={s.profileName}>Guest learner</Text>
@@ -130,9 +145,9 @@ function Frame() {
             <View style={[s.top, !wide && s.topMobile]}>
               {wide ? (
                 <View style={s.crumb}>
-                  <LibraryBig size={17} color="#626b60" />
+                  <LibraryBig size={17} color={themeColor("#626b60")} />
                   <Text style={s.muted}>Workspace</Text>
-                  <ChevronRight size={13} color="#969a8c" />
+                  <ChevronRight size={13} color={themeColor("#969a8c")} />
                   <Text style={s.crumbName}>{name}</Text>
                 </View>
               ) : (
@@ -206,7 +221,7 @@ export default function Layout() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   full: { flex: 1, backgroundColor: "#f7f6f0" },
   frame: { flex: 1, flexDirection: "row" },
   main: { flex: 1, minWidth: 0 },

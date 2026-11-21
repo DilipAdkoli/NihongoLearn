@@ -1,7 +1,8 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { glossaryEntries } from "../src/glossaryEntries";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
 import { JapaneseText } from "../src/JapaneseText";
 import {
@@ -12,6 +13,8 @@ import {
 import { useWordBookmarks } from "../src/useWordBookmarks";
 
 export default function Dictionary() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { saved, saving, saveFailed, toggleWord } = useWordBookmarks();
   const [savedOnly, setSavedOnly] = useState(false);
   const [query, setQuery] = useState("");
@@ -83,7 +86,7 @@ export default function Dictionary() {
           setLimit(24);
         }}
         placeholder="Search words"
-        placeholderTextColor="#566860"
+        placeholderTextColor={themeColor("#566860")}
         autoCorrect={false}
         autoCapitalize="none"
         returnKeyType="search"
@@ -162,7 +165,7 @@ export default function Dictionary() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 14, width: "100%", maxWidth: 760 },
   back: {
     color: "#215848",

@@ -32,6 +32,7 @@ test("saved word review schedules typed recall and leaves recognition-only words
     dailyGoal: 0,
     overviewPath: 0,
     japaneseTextSize: 0,
+    darkMode: false,
     sound: true,
     romaji: true,
   };

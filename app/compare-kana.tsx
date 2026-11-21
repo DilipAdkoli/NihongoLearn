@@ -1,7 +1,8 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
 import { JapaneseText } from "../src/JapaneseText";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { playKana } from "../src/audio";
 import { kanaComparisons } from "../src/kanaComparisons";
 import { kana } from "../src/learning";
@@ -18,6 +19,7 @@ const comparisons = kanaComparisons.map(({ title, entries }) => ({
 }));
 
 export default function CompareKana() {
+  const s = useStyles();
   const { data } = useStudy();
   const [audioError, setAudioError] = useState("");
 
@@ -85,7 +87,7 @@ export default function CompareKana() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { width: "100%", maxWidth: 760, gap: 15 },
   back: {
     color: "#215848",

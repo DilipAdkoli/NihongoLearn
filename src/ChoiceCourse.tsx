@@ -1,6 +1,7 @@
+import { createThemedStyles, useThemeColor } from "./theme";
 import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useRef, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { playClip } from "./audio";
 import { glossaryKey } from "./glossary";
 import { glossaryEntries } from "./glossaryEntries";
@@ -83,6 +84,7 @@ function ClipButton({
   label: string;
   accessibilityLabel?: string;
 }) {
+  const s = useStyles();
   const [audioError, setAudioError] = useState(false);
 
   return (
@@ -122,6 +124,8 @@ function PracticeCard({
   onAnswer: (attempt: Attempt) => Promise<void>;
   reviewQuestions: boolean;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const studyFirst =
     !reviewQuestions && (course === "vocabulary" || course === "kanji");
   const questionHeading = reviewQuestions && course === "grammar";
@@ -248,7 +252,7 @@ function PracticeCard({
             <TextInput
               accessibilityLabel="Your answer in Japanese"
               placeholder="Type in Japanese"
-              placeholderTextColor="#566860"
+              placeholderTextColor={themeColor("#566860")}
               autoCorrect={false}
               autoCapitalize="none"
               maxLength={course === "writing-type" ? 120 : 50}
@@ -320,6 +324,7 @@ function PracticeCard({
 }
 
 function PassageVocabulary({ terms }: { terms: readonly string[] }) {
+  const s = useStyles();
   const [shown, setShown] = useState(false);
   const { saved, saving, saveFailed, toggleWord } = useWordBookmarks();
   const words = terms.flatMap((term) => {
@@ -391,6 +396,7 @@ function Passage({
   audio,
   lookupWords,
 }: PassageData) {
+  const s = useStyles();
   const [translated, setTranslated] = useState(false);
   const [transcript, setTranscript] = useState(false);
   const [showKanji, setShowKanji] = useState(false);
@@ -513,6 +519,7 @@ export function ChoiceCourse({
   initialTopic?: string;
   reviewQuestions?: boolean;
 }) {
+  const s = useStyles();
   const { data, answer } = useStudy();
   const [topic, setTopic] = useState(() =>
     initialTopic
@@ -595,7 +602,7 @@ export function ChoiceCourse({
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 17, width: "100%", maxWidth: 760 },
   back: {
     color: "#215848",

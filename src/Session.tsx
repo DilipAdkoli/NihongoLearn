@@ -1,9 +1,9 @@
+import { createThemedStyles, useThemeColor } from "./theme";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import {
   Keyboard,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -42,6 +42,7 @@ function Action({
   disabled?: boolean;
   onPress: () => void;
 }) {
+  const s = useStyles();
   return (
     <Pressable
       accessibilityRole="button"
@@ -60,6 +61,7 @@ function Action({
 }
 
 function ListenButton({ id, label }: { id: string; label: string }) {
+  const s = useStyles();
   const [audioError, setAudioError] = useState(false);
   async function listen() {
     try {
@@ -97,6 +99,7 @@ function LessonCard({
   sound: boolean;
   romaji: boolean;
 }) {
+  const s = useStyles();
   return (
     <>
       <View style={s.studyCard}>
@@ -144,6 +147,8 @@ export default function Session({
   onFinish,
   onRecommendedLesson,
 }: SessionProps) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const listening = mode === "listening";
   const [items] = useState(() => kana.filter((item) => ids.includes(item.id)));
   const [exercises] = useState(() => makeExercises(ids, mode));
@@ -392,7 +397,7 @@ export default function Session({
                       autoCorrect={false}
                       maxLength={32}
                       placeholder="Type here"
-                      placeholderTextColor="#72796f"
+                      placeholderTextColor={themeColor("#72796f")}
                       returnKeyType="done"
                       style={s.input}
                       editable={!busy && !feedback && !error}
@@ -503,7 +508,7 @@ export default function Session({
 const ink = "#203730";
 const green = "#215848";
 const border = "#cdd3c7";
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   screen: { flex: 1, backgroundColor: "#f7f6f0" },
   page: {
     paddingHorizontal: 22,

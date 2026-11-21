@@ -11,6 +11,7 @@ test("backup exports versioned Unicode study data and preferences", () => {
     dailyGoal: 0,
     overviewPath: 0,
     japaneseTextSize: 0,
+    darkMode: false,
     romaji: true,
     attempts: [
       {
@@ -50,6 +51,7 @@ test("import parses exported progress without changing device preferences", () =
     dailyGoal: 0,
     overviewPath: 0,
     japaneseTextSize: 0,
+    darkMode: false,
     romaji: false,
   };
   assert.deepEqual(parseBackup(createBackup(data, new Date(0)).content), {

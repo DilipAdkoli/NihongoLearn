@@ -1,12 +1,14 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { playClip } from "../src/audio";
 import { JapaneseText } from "../src/JapaneseText";
 
 import { soundComparisons, type SoundWord } from "../src/soundRules";
 
 function Word({ word }: { word: SoundWord }) {
+  const s = useStyles();
   const [failed, setFailed] = useState(false);
   async function listen() {
     setFailed(false);
@@ -39,6 +41,7 @@ function Word({ word }: { word: SoundWord }) {
 }
 
 export default function SoundRules() {
+  const s = useStyles();
   return (
     <View style={s.page}>
       <Link href="/learn" style={s.back}>
@@ -67,7 +70,7 @@ export default function SoundRules() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 17, width: "100%", maxWidth: 760 },
   back: {
     color: "#215848",

@@ -1,8 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { createThemedStyles, useThemeColor } from "./theme";
+import { Text, View } from "react-native";
 import { recentActivity } from "./activity";
 import type { Attempt } from "./storage.types";
 
 export function ActivityChart({ attempts }: { attempts: readonly Attempt[] }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const days = recentActivity(attempts, new Date());
   const maximum = Math.max(1, ...days.map((day) => day.answered));
   const practiced = days.filter((day) => day.answered > 0).length;
@@ -39,7 +42,10 @@ export function ActivityChart({ attempts }: { attempts: readonly Attempt[] }) {
                     height: answered
                       ? Math.max(5, (54 * answered) / maximum)
                       : 3,
-                    backgroundColor: answered ? "#215848" : "#c9d2c1",
+                    backgroundColor: themeColor(
+                      answered ? "#215848" : "#c9d2c1",
+                      "background",
+                    ),
                   },
                 ]}
               />
@@ -54,7 +60,7 @@ export function ActivityChart({ attempts }: { attempts: readonly Attempt[] }) {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   card: {
     padding: 16,
     gap: 6,

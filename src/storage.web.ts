@@ -47,6 +47,7 @@ function readStudy(): StudyData {
     ),
     sound: storage.getItem(namespace + "sound") !== "off",
     romaji: storage.getItem(namespace + "romaji") !== "off",
+    darkMode: storage.getItem(namespace + "darkMode") === "on",
   };
 }
 

@@ -1,10 +1,12 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { JapaneseText } from "../src/JapaneseText";
 import { countingTable, numberPractice } from "../src/numbers";
 
 export default function Numbers() {
+  const s = useStyles();
   return (
     <View style={s.page}>
       <Link href="/learn" style={s.back}>
@@ -44,7 +46,7 @@ export default function Numbers() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { width: "100%", maxWidth: 760, gap: 12 },
   back: {
     color: "#215848",

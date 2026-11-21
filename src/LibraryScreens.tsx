@@ -1,9 +1,9 @@
+import { createThemedStyles, useThemeColor } from "./theme";
 import { Link, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
   Pressable,
-  StyleSheet,
   Switch,
   Text,
   TextInput,
@@ -46,6 +46,7 @@ const coral = "#c95634";
 const firstLessonIds = lessons[0].ids;
 
 function Heading({ title, detail }: { title: string; detail: string }) {
+  const s = useStyles();
   return (
     <View style={s.heading}>
       <Text accessibilityRole="header" style={s.title}>
@@ -57,6 +58,8 @@ function Heading({ title, detail }: { title: string; detail: string }) {
 }
 
 function Action({ label, onPress }: { label: string; onPress: () => void }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <Pressable
       accessibilityRole="button"
@@ -64,7 +67,7 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
       style={({ pressed }) => [s.action, pressed && s.pressed]}
     >
       <Text style={s.actionLabel}>{label}</Text>
-      <ArrowRight size={18} color="white" />
+      <ArrowRight size={18} color={themeColor("white")} />
     </Pressable>
   );
 }
@@ -78,6 +81,8 @@ function KanaChart({
   script: Script;
   romaji: boolean;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const [expanded, setExpanded] = useState(false);
   const characters = kana.filter((item) => item.script === script);
   return (
@@ -99,7 +104,7 @@ function KanaChart({
         </View>
         <ChevronRight
           size={18}
-          color={muted}
+          color={themeColor(muted)}
           style={{ transform: [{ rotate: expanded ? "90deg" : "0deg" }] }}
         />
       </Pressable>
@@ -303,6 +308,8 @@ const kanaLessons = (["hiragana", "katakana"] as const).flatMap((script) =>
 );
 
 export function Learn() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const [script, setScript] = useState<Script>("hiragana");
   const [query, setQuery] = useState("");
@@ -329,7 +336,7 @@ export function Learn() {
         value={query}
         onChangeText={setQuery}
         placeholder="Search lessons"
-        placeholderTextColor={muted}
+        placeholderTextColor={themeColor(muted)}
         autoCorrect={false}
         autoCapitalize="none"
         returnKeyType="search"
@@ -352,7 +359,7 @@ export function Learn() {
                     pressed && s.pressed,
                   ]}
                 >
-                  <Icon size={18} color={green} />
+                  <Icon size={18} color={themeColor(green)} />
                   <Text style={s.rowTitle}>{title}</Text>
                   <Text style={s.detail}>{detail}</Text>
                 </Pressable>
@@ -418,7 +425,7 @@ export function Learn() {
         return (
           <View key={`${lesson.script}:${lesson.title}`} style={s.feature}>
             <View style={s.iconLabel}>
-              <BookOpen size={18} color={green} />
+              <BookOpen size={18} color={themeColor(green)} />
               <Text style={s.kicker}>
                 {lesson.script.toUpperCase()} / LESSON {number}
               </Text>
@@ -461,6 +468,8 @@ function latestResult(attempts: Attempt[], id: string, mode: Attempt["mode"]) {
 }
 
 function ReviewLink({ href, label }: { href: Href; label: string }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <Link href={href} asChild>
       <Pressable
@@ -468,13 +477,15 @@ function ReviewLink({ href, label }: { href: Href; label: string }) {
         style={({ pressed }) => [s.action, pressed && s.pressed]}
       >
         <Text style={s.actionLabel}>{label}</Text>
-        <ArrowRight size={18} color="white" />
+        <ArrowRight size={18} color={themeColor("white")} />
       </Pressable>
     </Link>
   );
 }
 
 export function Review() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const { queue, due, now } = useReviewQueue(data);
   const savedRecall = savedWordRecallQueue(data, glossaryEntries, now);
@@ -510,7 +521,7 @@ export function Review() {
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
-          <RotateCcw size={18} color={green} />
+          <RotateCcw size={18} color={themeColor(green)} />
           <Text style={s.kicker}>PERSONAL PRACTICE</Text>
         </View>
         <Text style={s.featureTitle}>{title}</Text>
@@ -646,6 +657,7 @@ export function Review() {
 }
 
 function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
+  const s = useStyles();
   const correct = attempts.filter((item) => item.correct).length;
   return (
     <View style={s.stat}>
@@ -665,6 +677,8 @@ function Score({ label, attempts }: { label: string; attempts: Attempt[] }) {
 }
 
 export function Progress() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const studied = kana.filter((item) => data.seen.includes(item.id)).length;
   const grammarAttempts = data.attempts.filter((a) =>
@@ -731,7 +745,7 @@ export function Progress() {
       />
       <View style={s.feature}>
         <View style={s.iconLabel}>
-          <Sprout size={19} color={green} />
+          <Sprout size={19} color={themeColor(green)} />
           <Text style={s.kicker}>KANA</Text>
         </View>
         <Text style={s.featureTitle}>
@@ -860,6 +874,8 @@ export function Progress() {
 }
 
 export function Settings() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const {
     data,
     changePreference,
@@ -930,7 +946,24 @@ export function Settings() {
         </Text>
         <View style={s.list}>
           <View style={s.row}>
-            <AudioLines size={23} color={green} />
+            <View style={s.grow}>
+              <Text style={s.rowTitle}>Dark theme</Text>
+            </View>
+            <Switch
+              value={data.darkMode}
+              disabled={pending}
+              accessibilityLabel="Dark theme"
+              onValueChange={(value) =>
+                savePreference(() => changePreference("darkMode", value))
+              }
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
+            />
+          </View>
+          <View style={[s.row, s.rule]}>
+            <AudioLines size={23} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Pronunciation audio</Text>
               <Text style={s.detail}>
@@ -944,11 +977,14 @@ export function Settings() {
               onValueChange={(value) =>
                 savePreference(() => changePreference("sound", value))
               }
-              trackColor={{ false: "#bbc4be", true: green }}
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
             />
           </View>
           <View style={[s.row, s.rule]}>
-            <BookOpen size={22} color={green} />
+            <BookOpen size={22} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Kana reading hints</Text>
               <Text style={s.detail}>
@@ -963,7 +999,10 @@ export function Settings() {
               onValueChange={(value) =>
                 savePreference(() => changePreference("romaji", value))
               }
-              trackColor={{ false: "#bbc4be", true: green }}
+              trackColor={{
+                false: themeColor("#bbc4be", "background"),
+                true: themeColor(green, "background"),
+              }}
             />
           </View>
           <View style={[s.row, s.rule]}>
@@ -997,7 +1036,7 @@ export function Settings() {
             </View>
           </View>
           <View style={[s.row, s.rule]}>
-            <HardDrive size={22} color={green} />
+            <HardDrive size={22} color={themeColor(green)} />
             <View style={s.grow}>
               <Text style={s.rowTitle}>Local progress</Text>
               <Text style={s.detail}>
@@ -1125,7 +1164,7 @@ export function Settings() {
           Audio credits
         </Text>
         <View style={[s.list, s.credit]}>
-          <CircleHelp size={21} color={green} />
+          <CircleHelp size={21} color={themeColor(green)} />
           <View style={s.grow}>
             <Text style={s.body}>
               Kana audio synthesized with HTS Voice Mei, © Nagoya Institute of
@@ -1145,7 +1184,7 @@ export function Settings() {
               style={({ pressed }) => [s.link, pressed && s.pressed]}
             >
               <Text style={s.linkText}>Audio license</Text>
-              <ExternalLink size={15} color={green} />
+              <ExternalLink size={15} color={themeColor(green)} />
             </Pressable>
           </View>
         </View>
@@ -1154,7 +1193,7 @@ export function Settings() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   search: {
     minHeight: 46,
     color: ink,

@@ -20,9 +20,10 @@ export type StudyData = {
   japaneseTextSize: JapaneseTextSize;
   sound: boolean;
   romaji: boolean;
+  darkMode: boolean;
 };
 
-export type StudyPreference = "sound" | "romaji";
+export type StudyPreference = "sound" | "romaji" | "darkMode";
 
 export type StudyStorage = {
   loadStudy(): Promise<StudyData>;

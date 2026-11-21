@@ -1,6 +1,7 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { dialogueGroups } from "../src/dialogueAudio";
 import { JapaneseText } from "../src/JapaneseText";
 import { useClipPlayback } from "../src/useClipPlayback";
@@ -15,6 +16,7 @@ const phrases = dialogueGroups.flatMap((group) =>
 );
 
 export default function RepeatPhrases() {
+  const s = useStyles();
   const [index, setIndex] = useState(0);
   const [translation, setTranslation] = useState(false);
   const { play, stop, playing, audioError } = useClipPlayback();
@@ -105,7 +107,7 @@ export default function RepeatPhrases() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { width: "100%", maxWidth: 760, gap: 14 },
   title: {
     color: "#203730",

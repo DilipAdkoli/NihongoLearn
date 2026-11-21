@@ -1,11 +1,13 @@
+import { createThemedStyles } from "./theme";
 import { Link, type Href } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import type { completeSteps } from "./learningPath";
 import { startLesson } from "./study";
 
 type Step = ReturnType<typeof completeSteps>[number];
 
 function StepAction({ step }: { step: Step }) {
+  const s = useStyles();
   const label = step.complete ? "Practice again" : "Open";
   const text = (
     <Text style={[s.buttonText, step.complete && s.doneButtonText]}>
@@ -47,6 +49,7 @@ export function LearningPath({
   steps: readonly Step[];
   completion?: { href: Href; label: string };
 }) {
+  const s = useStyles();
   const completed = steps.filter((step) => step.complete).length;
   const next = steps.find((step) => !step.complete);
 
@@ -97,7 +100,7 @@ export function LearningPath({
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { width: "100%", maxWidth: 760, gap: 12 },
   back: {
     color: "#215848",

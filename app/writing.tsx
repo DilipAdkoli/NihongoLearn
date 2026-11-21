@@ -1,12 +1,14 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { JapaneseText } from "../src/JapaneseText";
 import type { Attempt } from "../src/storage.types";
 import { useStudy } from "../src/study";
 import { isSentenceAnswer, writingTasks } from "../src/writing";
 
 function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
+  const s = useStyles();
   const { answer } = useStudy();
   const [selected, setSelected] = useState<number[]>([]);
   const [result, setResult] = useState<Attempt>();
@@ -126,6 +128,7 @@ function Sentence({ task }: { task: (typeof writingTasks)[number] }) {
 }
 
 export default function Writing() {
+  const s = useStyles();
   return (
     <View style={s.page}>
       <Link href="/learn" style={s.back}>
@@ -148,7 +151,7 @@ export default function Writing() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 16, width: "100%", maxWidth: 760 },
   title: { color: "#203730", fontFamily: "DMSerifText", fontSize: 36 },
   heading: { color: "#203730", fontFamily: "DMSerifText", fontSize: 23 },

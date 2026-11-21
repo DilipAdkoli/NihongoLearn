@@ -1,5 +1,6 @@
+import { createThemedStyles } from "../src/theme";
 import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChoiceCourse } from "../src/ChoiceCourse";
 import { JapaneseText } from "../src/JapaneseText";
 import { counterPractice, japaneseCount, type Counter } from "../src/counters";
@@ -40,6 +41,7 @@ const examples: readonly {
 ];
 
 export default function Counters() {
+  const s = useStyles();
   return (
     <View style={s.page}>
       <Link href="/learn" style={s.back}>
@@ -80,7 +82,7 @@ export default function Counters() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { width: "100%", maxWidth: 760, gap: 12 },
   back: {
     color: "#215848",

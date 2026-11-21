@@ -1,3 +1,4 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { Link, router } from "expo-router";
 import {
   ArrowRight,
@@ -13,7 +14,6 @@ import {
 import {
   Image,
   Pressable,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
@@ -38,6 +38,8 @@ function Metric({
   icon: LucideIcon;
   tone: "sage" | "clay" | "gold";
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const colors = {
     sage: ["#e6edde", "#3d664e"],
     clay: ["#f7e7db", "#a34e35"],
@@ -45,8 +47,13 @@ function Metric({
   }[tone];
   return (
     <View style={s.metric}>
-      <View style={[s.metricIcon, { backgroundColor: colors[0] }]}>
-        <Icon size={20} strokeWidth={1.8} color={colors[1]} />
+      <View
+        style={[
+          s.metricIcon,
+          { backgroundColor: themeColor(colors[0], "background") },
+        ]}
+      >
+        <Icon size={20} strokeWidth={1.8} color={themeColor(colors[1])} />
       </View>
       <View style={{ flexShrink: 1 }}>
         <Text style={s.metricValue}>{value}</Text>
@@ -65,6 +72,8 @@ function SectionTitle({
   link: string;
   onPress: () => void;
 }) {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   return (
     <View style={s.sectionTitle}>
       <Text accessibilityRole="header" style={s.h2}>
@@ -76,13 +85,15 @@ function SectionTitle({
         style={({ pressed }) => [s.link, pressed && s.pressed]}
       >
         <Text style={s.linkText}>{link}</Text>
-        <ArrowRight size={15} color="#345b45" />
+        <ArrowRight size={15} color={themeColor("#345b45")} />
       </Pressable>
     </View>
   );
 }
 
 export default function Home() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const { data } = useStudy();
   const { due } = useReviewQueue(data);
   const pathInfo = overviewPaths[data.overviewPath];
@@ -122,7 +133,7 @@ export default function Home() {
         </Text>
         {!phone && (
           <View style={s.date}>
-            <CalendarDays size={15} color="#727a69" />
+            <CalendarDays size={15} color={themeColor("#727a69")} />
             <Text style={s.dateText}>{date}</Text>
           </View>
         )}
@@ -154,10 +165,10 @@ export default function Home() {
               <Text style={s.startText}>
                 {nextIndex < 0 ? "Revisit lesson" : "Start lesson"}
               </Text>
-              <ArrowRight size={17} color="#fffdf6" />
+              <ArrowRight size={17} color={themeColor("#fffdf6")} />
             </Pressable>
             <View style={s.time}>
-              <Clock3 size={15} color="#d4dfd0" />
+              <Clock3 size={15} color={themeColor("#d4dfd0")} />
               <Text style={s.timeText}>~5 min</Text>
             </View>
           </View>
@@ -198,7 +209,7 @@ export default function Home() {
             style={({ pressed }) => [s.reviewButton, pressed && s.pressed]}
           >
             <Text style={s.linkText}>Start review</Text>
-            <ArrowRight size={16} color="#345b45" />
+            <ArrowRight size={16} color={themeColor("#345b45")} />
           </Pressable>
         </View>
       )}
@@ -221,7 +232,7 @@ export default function Home() {
               <Text style={s.linkText}>
                 {completedSteps ? "Continue path" : pathInfo.action}
               </Text>
-              <ArrowRight size={16} color="#345b45" />
+              <ArrowRight size={16} color={themeColor("#345b45")} />
             </Pressable>
           </Link>
         </View>
@@ -285,7 +296,7 @@ export default function Home() {
       />
       <View style={s.notebook}>
         <View style={s.bookHead}>
-          <BookMarked size={17} color="#5b6956" />
+          <BookMarked size={17} color={themeColor("#5b6956")} />
           <Text style={s.bookLabel}>{lesson.script.toUpperCase()}</Text>
           <View style={s.separator} />
           <Text style={s.bookGroup}>{lesson.notebook}</Text>
@@ -307,7 +318,7 @@ export default function Home() {
             >
               {data.seen.includes(item.id) && (
                 <View style={s.seen}>
-                  <Check size={12} color="#356446" />
+                  <Check size={12} color={themeColor("#356446")} />
                 </View>
               )}
               <JapaneseText style={[s.character, phone && { fontSize: 31 }]}>
@@ -321,7 +332,7 @@ export default function Home() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   headingRow: {
     flexDirection: "row",
     alignItems: "center",

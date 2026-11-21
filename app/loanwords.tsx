@@ -1,7 +1,8 @@
+import { createThemedStyles, useThemeColor } from "../src/theme";
 import { Link } from "expo-router";
 import { JapaneseText } from "../src/JapaneseText";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { playClip } from "../src/audio";
 import { searchLoanwords } from "../src/loanwords";
 
@@ -22,6 +23,8 @@ const audio = {
 } as const;
 
 export default function Loanwords() {
+  const s = useStyles();
+  const themeColor = useThemeColor();
   const [query, setQuery] = useState("");
   const results = searchLoanwords(query);
   const [error, setError] = useState("");
@@ -56,7 +59,7 @@ export default function Loanwords() {
         value={query}
         onChangeText={setQuery}
         placeholder="Search ファ, fa, or file"
-        placeholderTextColor="#566860"
+        placeholderTextColor={themeColor("#566860")}
         autoCorrect={false}
         autoCapitalize="none"
         style={s.input}
@@ -96,7 +99,7 @@ export default function Loanwords() {
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = createThemedStyles({
   page: { gap: 14, maxWidth: 900, width: "100%" },
   back: {
     color: "#215848",
