@@ -39,6 +39,15 @@ export default function SessionRoute() {
           params: { ids: suggested.join(","), mode: "study" },
         })
       }
+      onRetryMissed={(missed) =>
+        router.replace({
+          pathname: "/session",
+          params: {
+            ids: missed.join(","),
+            mode: mode === "listening" ? "listening" : "review",
+          },
+        })
+      }
       onFinish={() => router.replace("/progress")}
     />
   );

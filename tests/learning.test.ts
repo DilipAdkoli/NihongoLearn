@@ -5,8 +5,10 @@ import {
   kana,
   lessons,
   makeExercises,
+  missedKanaIds,
   mixedKanaSample,
 } from "../src/learning.ts";
+import type { Attempt } from "../src/storage.types.ts";
 
 test("kana lessons have unique glyphs and examples readable with taught characters", () => {
   assert.deepEqual(
@@ -55,6 +57,27 @@ test("a session quizzes each selected kana once per mode and spaces its recall",
   assert.ok(recognition.every((q) => q.mode === "recognition"));
   assert.ok(recall.every((q) => q.mode === "recall" && q.choices.length === 0));
   assert.deepEqual(makeExercises([]), []);
+});
+
+test("session summaries return unique kana IDs for incorrect answers", () => {
+  const attempt = (id: string, kanaId: string, correct: boolean): Attempt => ({
+    id,
+    kanaId,
+    mode: "recognition",
+    answer: "",
+    correct,
+    at: 1,
+  });
+  assert.deepEqual(
+    missedKanaIds([
+      attempt("1", "a", false),
+      attempt("2", "i", true),
+      attempt("3", "a", false),
+      attempt("4", "u", false),
+    ]),
+    ["a", "u"],
+  );
+  assert.deepEqual(missedKanaIds([attempt("1", "a", true)]), []);
 });
 
 test("recognition includes exactly one correct glyph among four distinct choices", () => {

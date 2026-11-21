@@ -1063,6 +1063,16 @@ export function makeExercises(
   return [...recognition, ...recall];
 }
 
+export function missedKanaIds(attempts: readonly Attempt[]): string[] {
+  return [
+    ...new Set(
+      attempts
+        .filter((attempt) => !attempt.correct)
+        .map((attempt) => attempt.kanaId),
+    ),
+  ];
+}
+
 export function evaluateAnswer(exercise: Exercise, answer: string): boolean {
   const item = kana.find((entry) => entry.id === exercise.kanaId);
   if (!item) return false;

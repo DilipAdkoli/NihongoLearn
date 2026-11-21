@@ -15,6 +15,7 @@ import {
   kana,
   lessons,
   makeExercises,
+  missedKanaIds,
   type Kana,
   type SessionMode,
 } from "./learning";
@@ -31,6 +32,7 @@ type SessionProps = {
   onClose: () => void;
   onFinish: () => void;
   onRecommendedLesson: (ids: string[]) => void;
+  onRetryMissed: (ids: string[]) => void;
 };
 
 function Action({
@@ -146,6 +148,7 @@ export default function Session({
   onClose,
   onFinish,
   onRecommendedLesson,
+  onRetryMissed,
 }: SessionProps) {
   const s = useStyles();
   const themeColor = useThemeColor();
@@ -252,6 +255,7 @@ export default function Session({
               ? "Review"
               : `${(lesson?.script ?? items[0]?.script) === "katakana" ? "Katakana" : "Hiragana"} lesson`;
   const countCorrect = attempts.filter((a) => a.correct).length;
+  const missedIds = stage === "results" ? missedKanaIds(attempts) : [];
 
   const suggestion =
     stage === "results" && mode === "placement"
@@ -477,7 +481,17 @@ export default function Session({
               </Text>
             )}
             {stage === "results" ? (
-              <Action label="View progress" onPress={onFinish} />
+              <View style={s.resultActions}>
+                {missedIds.length > 0 && (
+                  <Action
+                    label={`Retry ${missedIds.length} missed ${
+                      missedIds.length === 1 ? "item" : "items"
+                    }`}
+                    onPress={() => onRetryMissed(missedIds)}
+                  />
+                )}
+                <Action label="View progress" onPress={onFinish} />
+              </View>
             ) : feedback ? (
               <Action
                 label={last ? "See results" : "Next question"}
@@ -673,6 +687,7 @@ const useStyles = createThemedStyles({
     borderRadius: 18,
     padding: 22,
   },
+  resultActions: { gap: 10 },
   score: {
     fontFamily: "DMSerifText",
     fontSize: 60,

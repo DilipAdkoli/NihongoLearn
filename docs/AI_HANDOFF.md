@@ -64,6 +64,11 @@
 - Verification after the routing fix: `npm run typecheck` succeeded,
   `npm test` passed **81/81 tests**, changed files pass Prettier, and
   `npm run export:web` succeeded.
+- Added session-summary retry for missed kana: incorrect items are deduplicated
+  and routed into a listening or review session. Correct items are not repeated.
+- Verification after missed-answer retry: `npm run typecheck` succeeded,
+  `npm test` passed **82/82 tests**, changed files pass Prettier, and
+  `npm run export:web` succeeded.
 
 ## Recently completed in prior sprints
 
