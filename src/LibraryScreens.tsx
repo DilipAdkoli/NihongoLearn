@@ -1,5 +1,5 @@
 import { createThemedStyles, useThemeColor } from "./theme";
-import { Link, type Href } from "expo-router";
+import { Link, router, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Linking,
@@ -520,6 +520,32 @@ export function Learn() {
         maxLength={100}
         style={s.search}
       />
+      {!searching && (
+        <View style={s.feature}>
+          <View style={s.iconLabel}>
+            <BookOpen size={18} color={themeColor(green)} />
+            <Text style={s.kicker}>KANJI</Text>
+          </View>
+          <Text accessibilityRole="header" style={s.featureTitle}>
+            Learn kanji in context
+          </Text>
+          <Text style={s.body}>
+            Study weekday and place signs, choose kanji readings, and type
+            familiar kanji words.
+          </Text>
+          <View style={s.featureFooter}>
+            <Action label="First kanji" onPress={() => router.push("/kanji")} />
+            <Action
+              label="Read kanji"
+              onPress={() => router.push("/kanji-reading")}
+            />
+            <Action
+              label="Write kanji"
+              onPress={() => router.push("/kanji-recall")}
+            />
+          </View>
+        </View>
+      )}
       {courses.length > 0 && (
         <View style={s.section}>
           <Text accessibilityRole="header" style={s.sectionTitle}>

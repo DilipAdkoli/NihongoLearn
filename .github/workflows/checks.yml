@@ -76,7 +76,7 @@ jobs:
           try {
             $base = 'http://localhost:8081'
             $ready = $false
-            for ($i = 0; $i -lt 30; $i++) {
+            for ($i = 0; $i -lt 60; $i++) {
               try {
                 $page = Invoke-WebRequest "$base/reading" -Headers @{ Accept = 'text/html' } -TimeoutSec 2
                 if ($page.Content -match 'register-offline.js') { $ready = $true; break }

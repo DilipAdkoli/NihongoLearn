@@ -113,6 +113,10 @@ test("beginner journey and loanword practice are visible in the Learn catalog", 
   const catalog = readFileSync("src/LibraryScreens.tsx", "utf8");
   assert.match(catalog, /href: "\/beginner-n5-path"/);
   assert.match(catalog, /href: "\/loanword-practice"/);
+  assert.match(catalog, /Learn kanji in context/);
+  assert.match(catalog, /router\.push\("\/kanji"\)/);
+  assert.match(catalog, /router\.push\("\/kanji-reading"\)/);
+  assert.match(catalog, /router\.push\("\/kanji-recall"\)/);
   assert.ok(existsSync("app/beginner-n5-path.tsx"));
   assert.ok(existsSync("app/loanword-practice.tsx"));
 });

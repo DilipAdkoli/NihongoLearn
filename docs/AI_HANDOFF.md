@@ -24,7 +24,7 @@
   `npm run export:web` succeeded with **337 offline assets**.
   The feature commit's Vercel preview was READY. The final formatting/handoff
   commit needs its own preview build status checked before release.
-- These paths track whether each character has been *studied*; they are **not**
+- These paths track whether each character has been _studied_; they are **not**
   yet proficiency certifications.
 - Updated the Hiragana and Katakana guided paths to require latest correct
   recall and listening attempts for every character in a row before marking
@@ -73,6 +73,10 @@
   by-character list, with each skill using the latest attempt for that mode.
 - Exposed the Complete beginner journey and katakana loanword practice directly
   in the Learn catalog, and added discoverability coverage for both routes.
+- Added a prominent Kanji section to Learn with direct links to first-kanji,
+  kanji reading, and kanji recall lessons.
+- Increased the Windows preview launcher smoke-test timeout and preserved
+  explicit failure reporting for packaged preview startup.
 - Verification after catalog and progress updates: `npm run typecheck` succeeded,
   `npm test` passed **84/84 tests**, changed files pass Prettier, and
   `npm run export:web` succeeded.
