@@ -1,7 +1,7 @@
 import type { ChoiceLesson } from "./ChoiceCourse";
 
 export const reading: readonly {
-  id?: string;
+  id: string;
   title: string;
   passage: {
     japanese: string;
@@ -12,6 +12,7 @@ export const reading: readonly {
   lessons: readonly ChoiceLesson[];
 }[] = [
   {
+    id: "desk-objects",
     title: "What’s on the desk?",
     passage: {
       japanese:
@@ -50,6 +51,7 @@ export const reading: readonly {
     ],
   },
   {
+    id: "at-the-cafe",
     title: "At the café",
     passage: {
       japanese:
@@ -145,6 +147,7 @@ export const reading: readonly {
     ],
   },
   {
+    id: "morning-routine",
     title: "A morning routine",
     passage: {
       japanese:
@@ -195,6 +198,7 @@ export const reading: readonly {
     ],
   },
   {
+    id: "message-from-a-friend",
     title: "A message from a friend",
     passage: {
       japanese:
@@ -245,6 +249,7 @@ export const reading: readonly {
     ],
   },
   {
+    id: "bookstore-hours",
     title: "Bookstore opening hours",
     passage: {
       japanese:

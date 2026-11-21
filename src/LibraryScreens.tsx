@@ -33,7 +33,9 @@ import { japaneseTextSizes } from "./japaneseTextSize";
 import { missedLessons } from "./MissedChoiceCourse";
 import { kana, lessons, type Script } from "./learning";
 import { overviewPaths } from "./overviewPath";
+import { passageListening } from "./passageListening";
 import { placementSample } from "./placement";
+import { reading } from "./reading";
 import { savedRecallCourse, savedWordRecallQueue } from "./savedWordReview";
 import { REVIEW_BATCH_SIZE, useReviewQueue } from "./useReviewQueue";
 import { startLesson, useStudy } from "./study";
@@ -300,6 +302,43 @@ function normalizeLessonSearch(text: string) {
     .toLowerCase();
 }
 
+const passageLinks = [
+  {
+    pathname: "/reading",
+    groups: reading,
+    detail: "Reading practice",
+    icon: BookOpen,
+  },
+  {
+    pathname: "/passage-listening",
+    groups: passageListening,
+    detail: "Listening practice",
+    icon: AudioLines,
+  },
+] as const;
+
+const courseLinks = lessonLinks.map((link) => ({
+  ...link,
+  key: link.href,
+  searchable: normalizeLessonSearch(`${link.title} ${link.detail}`),
+}));
+
+const lessonSearchLinks = [
+  ...courseLinks,
+  ...passageLinks.flatMap(({ pathname, groups, detail, icon }) =>
+    groups.map(({ id, title, passage }) => ({
+      key: `${pathname}/${id}`,
+      href: { pathname, params: { topic: id } },
+      title,
+      detail,
+      icon,
+      searchable: normalizeLessonSearch(
+        [title, detail, passage.japanese, passage.standardJapanese].join(" "),
+      ),
+    })),
+  ),
+];
+
 const kanaById = new Map(kana.map((item) => [item.id, item.glyph]));
 const kanaLessons = (["hiragana", "katakana"] as const).flatMap((script) =>
   lessons
@@ -321,11 +360,11 @@ export function Learn() {
   const [query, setQuery] = useState("");
   const terms = normalizeLessonSearch(query).split(/\s+/).filter(Boolean);
   const searching = terms.length > 0;
-  const courses = lessonLinks.filter(({ title, detail }) =>
-    terms.every((term) =>
-      normalizeLessonSearch(title + " " + detail).includes(term),
-    ),
-  );
+  const courses = searching
+    ? lessonSearchLinks.filter(({ searchable }) =>
+        terms.every((term) => searchable.includes(term)),
+      )
+    : courseLinks;
   const visibleKana = kanaLessons.filter(({ lesson, searchable }) =>
     searching
       ? terms.every((term) => searchable.includes(term))
@@ -355,8 +394,8 @@ export function Learn() {
             Beginner Japanese
           </Text>
           <View style={s.courseGrid}>
-            {courses.map(({ href, title, detail, icon: Icon }) => (
-              <Link key={href} href={href} asChild>
+            {courses.map(({ href, key, title, detail, icon: Icon }) => (
+              <Link key={key} href={href} asChild>
                 <Pressable
                   accessibilityRole="link"
                   style={({ pressed }) => [

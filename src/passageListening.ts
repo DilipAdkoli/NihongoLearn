@@ -19,8 +19,13 @@ function questions(
   }));
 }
 
-export const passageListening: readonly CourseGroup[] = [
+export const passageListening: readonly (CourseGroup & {
+  id: string;
+  title: string;
+  passage: NonNullable<CourseGroup["passage"]>;
+})[] = [
   {
+    id: "yesterday",
     title: "Yesterday",
     passage: {
       japanese:
@@ -56,6 +61,7 @@ export const passageListening: readonly CourseGroup[] = [
     ),
   },
   {
+    id: "tomorrows-plans",
     title: "Tomorrow’s plans",
     passage: {
       japanese: "あした、えきに いきます。\nえきで ともだちに あいます。",
@@ -119,6 +125,7 @@ export const passageListening: readonly CourseGroup[] = [
     ),
   },
   {
+    id: "evening-routine",
     title: "An evening routine",
     passage: {
       japanese:
