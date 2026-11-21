@@ -17,20 +17,43 @@ import { plainVerbs } from "./plainVerbs.ts";
 import { questionWords } from "./questions.ts";
 import { requests } from "./requests.ts";
 
-export const grammarTopics: readonly CourseGroup[] = [
-  { title: "Statements and questions", lessons: grammar },
-  { title: "Pointing to things and places", lessons: demonstratives },
-  { title: "Ask everyday questions", lessons: questionWords },
-  { title: "Say what’s present and where", lessons: existence },
-  { title: "Objects, places, and destinations", lessons: particles },
-  { title: "Possession, company, and ranges", lessons: nounParticles },
-  { title: "Polite verb forms", lessons: verbs },
-  { title: "Describing things", lessons: adjectives },
-  { title: "Comparing things", lessons: comparisons },
-  { title: "Requests with the て-form", lessons: teForm },
-  { title: "Actions, permission, and wants", lessons: actionPatterns },
-  { title: "Plain verb forms", lessons: plainVerbs },
-  { title: "Requests and obligations", lessons: requests },
-  { title: "Reasons and connections", lessons: connectors },
-  { title: "Ability and potential verbs", lessons: ability },
+export const grammarTopics: readonly (CourseGroup & {
+  id: string;
+  title: string;
+})[] = [
+  { id: "statements", title: "Statements and questions", lessons: grammar },
+  {
+    id: "demonstratives",
+    title: "Pointing to things and places",
+    lessons: demonstratives,
+  },
+  { id: "questions", title: "Ask everyday questions", lessons: questionWords },
+  {
+    id: "existence",
+    title: "Say what’s present and where",
+    lessons: existence,
+  },
+  {
+    id: "particles",
+    title: "Objects, places, and destinations",
+    lessons: particles,
+  },
+  {
+    id: "noun-particles",
+    title: "Possession, company, and ranges",
+    lessons: nounParticles,
+  },
+  { id: "polite-verbs", title: "Polite verb forms", lessons: verbs },
+  { id: "adjectives", title: "Describing things", lessons: adjectives },
+  { id: "comparisons", title: "Comparing things", lessons: comparisons },
+  { id: "te-form", title: "Requests with the て-form", lessons: teForm },
+  {
+    id: "action-patterns",
+    title: "Actions, permission, and wants",
+    lessons: actionPatterns,
+  },
+  { id: "plain-verbs", title: "Plain verb forms", lessons: plainVerbs },
+  { id: "requests", title: "Requests and obligations", lessons: requests },
+  { id: "connectors", title: "Reasons and connections", lessons: connectors },
+  { id: "ability", title: "Ability and potential verbs", lessons: ability },
 ];

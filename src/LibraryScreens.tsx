@@ -28,6 +28,7 @@ import { saveBackup } from "./saveBackup";
 import { dailyGoals } from "./dailyGoal";
 import { confusedPairs } from "./confusions";
 import { glossaryEntries } from "./glossaryEntries";
+import { grammarTopics } from "./grammarCourse";
 import { JapaneseText } from "./JapaneseText";
 import { japaneseTextSizes } from "./japaneseTextSize";
 import { missedLessons } from "./MissedChoiceCourse";
@@ -302,7 +303,13 @@ function normalizeLessonSearch(text: string) {
     .toLowerCase();
 }
 
-const passageLinks = [
+const topicCourses = [
+  {
+    pathname: "/grammar",
+    groups: grammarTopics,
+    detail: "Grammar practice",
+    icon: BookOpen,
+  },
   {
     pathname: "/reading",
     groups: reading,
@@ -325,15 +332,25 @@ const courseLinks = lessonLinks.map((link) => ({
 
 const lessonSearchLinks = [
   ...courseLinks,
-  ...passageLinks.flatMap(({ pathname, groups, detail, icon }) =>
-    groups.map(({ id, title, passage }) => ({
+  ...topicCourses.flatMap(({ pathname, groups, detail, icon }) =>
+    groups.map(({ id, title, passage, lessons }) => ({
       key: `${pathname}/${id}`,
       href: { pathname, params: { topic: id } },
       title,
       detail,
       icon,
       searchable: normalizeLessonSearch(
-        [title, detail, passage.japanese, passage.standardJapanese].join(" "),
+        [
+          title,
+          detail,
+          ...(passage
+            ? [passage.japanese, passage.standardJapanese, passage.english]
+            : lessons.flatMap((lesson) => [
+                lesson.title,
+                lesson.japanese,
+                lesson.english,
+              ])),
+        ].join(" "),
       ),
     })),
   ),
